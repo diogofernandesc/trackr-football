@@ -1,7 +1,7 @@
 import unittest
 import json
 from ingest_engine.football_data import FootballData
-from ingest_engine.cons import Competition
+from ingest_engine.cons import Competition, FootballDataApiFilters as fda
 
 
 class ApiTest(unittest.TestCase):
@@ -18,12 +18,33 @@ class ApiTest(unittest.TestCase):
         self.assertEqual(req['errorCode'], 400)
         test_fd.session.close()
 
-    def testCompetitionEndPoint(self):
+    def testPerformGet(self):
         test_fd = FootballData(api_key='test')
         comps = self.fd.request_competitions(2002)
+        comps_locked = self.fd.request_competitions(2004)
+        self.assertEqual(test_fd.request_competitions(), {})
+        self.assertEqual(comps_locked, {})
+        self.assertEqual(comps['id'], 2002)
+        test_fd.session.close()
+
+    def testCompetitionEndPoint(self):
+        test_fd = FootballData(api_key='test')
+        comps = self.fd.request_competitions(competition_id=2002)
         self.assertEqual(test_fd.request_competitions(), {})
         self.assertEqual(comps['id'], 2002)
         test_fd.session.close()
+
+    def testCompetitionMatchEndPoint(self):
+        test_fd = FootballData(api_key='test')
+        comp_matches = self.fd.request_competition_match(competition_id=2003, **{fda.MATCHDAY: 11})
+        self.assertEqual(test_fd.request_competition_match(competition_id=2003), {})
+        self.assertEqual(comp_matches['matches'][0][fda.MATCHDAY], 11)
+
+    def testMatchEndPoint(self):
+        test_fd = FootballData(api_key='test')
+        matches = self.fd.request_match(**{fda.TO_DATE: '2018-09-15', fda.FROM_DATE: '2018-09-05'})
+        self.assertEqual(matches['filters'][fda.FROM_DATE], '2018-09-05')
+        self.assertEqual(test_fd.request_match(match_id=204998), {})
 
     def testCompetitionParse(self):
         test_req = json.loads(
