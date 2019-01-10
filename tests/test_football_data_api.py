@@ -1,7 +1,7 @@
 import unittest
 import json
 from ingest_engine.football_data import FootballData
-from ingest_engine.cons import Competition, FootballDataApiFilters as fda
+from ingest_engine.cons import Competition, Match, FootballDataApiFilters as fda
 
 
 class ApiTest(unittest.TestCase):
@@ -22,23 +22,23 @@ class ApiTest(unittest.TestCase):
         test_fd = FootballData(api_key='test')
         comps = self.fd.request_competitions(2002)
         comps_locked = self.fd.request_competitions(2004)
-        self.assertEqual(test_fd.request_competitions(), {})
-        self.assertEqual(comps_locked, {})
-        self.assertEqual(comps['id'], 2002)
+        self.assertEqual(test_fd.request_competitions(), [])
+        self.assertEqual(comps_locked, [])
+        self.assertEqual(comps[0][Competition.FOOTBALL_DATA_API_ID], 2002)
         test_fd.session.close()
 
     def testCompetitionEndPoint(self):
         test_fd = FootballData(api_key='test')
         comps = self.fd.request_competitions(competition_id=2002)
-        self.assertEqual(test_fd.request_competitions(), {})
-        self.assertEqual(comps['id'], 2002)
+        self.assertEqual(test_fd.request_competitions(), [])
+        self.assertEqual(comps[0][Competition.FOOTBALL_DATA_API_ID], 2002)
         test_fd.session.close()
 
     def testCompetitionMatchEndPoint(self):
         test_fd = FootballData(api_key='test')
-        comp_matches = self.fd.request_competition_match(competition_id=2003, **{fda.MATCHDAY: 11})
-        self.assertEqual(test_fd.request_competition_match(competition_id=2003), {})
-        self.assertEqual(comp_matches['matches'][0][fda.MATCHDAY], 11)
+        comp_matches = self.fd.request_competition_match(competition_id=2003, **{Match.MATCHDAY: 11})
+        self.assertEqual(test_fd.request_competition_match(competition_id=2003), [])
+        self.assertEqual(comp_matches[0][Match.MATCHDAY], 11)
 
     def testMatchEndPoint(self):
         test_fd = FootballData(api_key='test')
@@ -56,7 +56,7 @@ class ApiTest(unittest.TestCase):
         self.assertEqual(self.fd.request_competitions(competition_id=2002), [test_res])
         
     def testMatchParse(self):
-        test_res = [{'season_football_data_id': 235686,
+        test_res = {'season_football_data_id': 235686,
                      'season_start_date': '2018-08-24',
                      'season_end_date': '2019-05-18',
                      'utc_date': '2018-08-24T18:30:00Z',
@@ -74,6 +74,6 @@ class ApiTest(unittest.TestCase):
                      'home_team': 'FC Bayern München',
                      'away_team': 'TSG 1899 Hoffenheim',
                      'referees':
-                         ['Bastian Dankert', 'René Rohde', 'Markus Häcker', 'Thorsten Schiffner', 'Sören Storks']}]
+                         ['Bastian Dankert', 'René Rohde', 'Markus Häcker', 'Thorsten Schiffner', 'Sören Storks']}
 
         self.assertEqual(self.fd.request_competition_match(competition_id=2002)[0], test_res)

@@ -55,13 +55,14 @@ class FootballData(object):
             api_res = [result]
 
         for comp in api_res:
-            dict_result = {
-                Competition.NAME: comp['name'],
-                Competition.CODE: comp['code'],
-                Competition.LOCATION: comp['area']['name'],
-                Competition.FOOTBALL_DATA_API_ID: comp['id']
-            }
-            total_results.append(dict_result)
+            if comp:
+                dict_result = {
+                    Competition.NAME: comp['name'],
+                    Competition.CODE: comp['code'],
+                    Competition.LOCATION: comp['area']['name'],
+                    Competition.FOOTBALL_DATA_API_ID: comp['id']
+                }
+                total_results.append(dict_result)
 
         return total_results
 
@@ -168,7 +169,7 @@ class FootballData(object):
 
 fd = FootballData()
 
-print(fd.request_competition_match(competition_id=2002))
+print(fd.request_competitions(competition_id=2002))
 # print(fd.request_match(**{fda.TO_DATE: '2018-09-15', fda.FROM_DATE: '2018-09-05'}))
 # fd.session.get('http://api.football-data.org/v2/competitions')
 # api_res = fd.request_competitions(2002)
