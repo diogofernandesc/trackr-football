@@ -138,39 +138,48 @@ class FootballData(object):
             for name_filter, value in kwargs.items():
                 built_uri += f'{name_filter}={value}&'
 
-        return self.perform_get(built_uri=built_uri)
-
-    def parse_competitions(self, api_res):
-        """
-        Parse competition results from API request ready for database insertion/update/other
-        :rtype: list
-        :param api_res: The dict result from API call to the competitions endpoint
-        :return: Parsed results from API in list of dicts format
-        """
+        result = self.perform_get(built_uri=built_uri)
         total_results = []
-        if 'competitions' in api_res:
-            api_res = api_res['competitions']
+        if result:
+            if 'matches' in result:
+                for match in result['matches']:
+                    data = {
+                        Match.SEASON_FOOTBALL_DATA_ID: match[Match.ID],
+                        Match.SEASON_START_DATE: match['season']['startDate'],
+                        Match.SEASON_END_DATE: match['season']['endDate'],
+                        Match.MATCH_UTC_DATE: match['utcDate'],
+                        Match.STATUS: match['status'],
+                        Match.MATCHDAY: match['matchday'],
+                        Match.FULL_TIME_HOME_SCORE: match['score']['fullTime']['homeTeam'],
+                        Match.FULL_TIME_AWAY_SCORE: match['score']['fullTime']['awayTeam'],
+                        Match.HALF_TIME_HOME_SCORE: match['score']['halfTime']['homeTeam'],
+                        Match.HALF_TIME_AWAY_SCORE: match['score']['halfTime']['awayTeam'],
+                        Match.EXTRA_TIME_HOME_SCORE: match['score']['extraTime']['homeTeam'],
+                        Match.EXTRA_TIME_AWAY_SCORE: match['score']['extraTime']['awayTeam'],
+                        Match.PENALTY_HOME_SCORE: match['score']['penalties']['homeTeam'],
+                        Match.PENALTY_AWAY_SCORE: match['score']['penalties']['awayTeam'],
+                        Match.WINNER: match['score']['winner'],
+                        Match.HOME_TEAM: match['homeTeam']['name'],
+                        Match.AWAY_TEAM: match['awayTeam']['name'],
+                        Match.FILTERS: result['filters']
+                    }
 
-        else:
-            api_res = [api_res]
+                    refs = []
+                    for ref in match['referees']:
+                        refs.append(ref['name'])
 
-        for comp in api_res:
-            dict_result = {
-                Competition.NAME: comp['name'],
-                Competition.CODE: comp['code'],
-                Competition.LOCATION: comp['area']['name'],
-                Competition.FOOTBALL_DATA_API_ID: comp['id']
-            }
-            total_results.append(dict_result)
+                    if refs:
+                        data[Match.REFEREES] = refs
+
+                    total_results.append(data)
 
         return total_results
 
 
-
 fd = FootballData()
 
-print(fd.request_competitions(competition_id=2002))
-# print(fd.request_match(**{fda.TO_DATE: '2018-09-15', fda.FROM_DATE: '2018-09-05'}))
+# print(fd.request_competitions(competition_id=2002))
+print(fd.request_match(**{fda.TO_DATE: '2018-09-15', fda.FROM_DATE: '2018-09-05'}))
 # fd.session.get('http://api.football-data.org/v2/competitions')
 # api_res = fd.request_competitions(2002)
 # print(api_res)

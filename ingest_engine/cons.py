@@ -60,6 +60,7 @@ class Match:
     HOME_TEAM = 'home_team'
     AWAY_TEAM = 'away_team'
     REFEREES = 'referees'
+    FILTERS = 'filters'
 
 
 class Competition:

@@ -43,8 +43,8 @@ class ApiTest(unittest.TestCase):
     def testMatchEndPoint(self):
         test_fd = FootballData(api_key='test')
         matches = self.fd.request_match(**{fda.TO_DATE: '2018-09-15', fda.FROM_DATE: '2018-09-05'})
-        self.assertEqual(matches['filters'][fda.FROM_DATE], '2018-09-05')
-        self.assertEqual(test_fd.request_match(match_id=204998), {})
+        self.assertEqual(matches[0]['filters'][fda.FROM_DATE], '2018-09-05')
+        self.assertEqual(test_fd.request_match(match_id=204998), [])
 
     def testCompetitionParse(self):
         test_res = {
@@ -76,4 +76,34 @@ class ApiTest(unittest.TestCase):
                      'referees':
                          ['Bastian Dankert', 'René Rohde', 'Markus Häcker', 'Thorsten Schiffner', 'Sören Storks']}
 
+        test_res2 = {
+            "season_football_data_id": 204998,
+            "season_start_date": "2018-04-14",
+            "season_end_date": "2018-12-02",
+            "utc_date": "2018-09-05T22:30:00Z",
+            "status": "FINISHED",
+            "matchday": 23,
+            "full_time_home_score": 1,
+            "full_time_away_score": 1,
+            "half_time_home_score": 1,
+            "half_time_away_score": 1,
+            "extra_time_home_score": None,
+            "extra_time_away_score": None,
+            "penalty_home_score": None,
+            "penalty_away_score": None,
+            "winner": "DRAW",
+            "home_team": "Botafogo FR",
+            "away_team": "Cruzeiro EC",
+            "referees": [
+                "Raphael Claus",
+                "Danilo Ricardo Simon Manis",
+                "Rogerio Pablos Zanardo",
+                "Daniel do Espirito Santo Parro"],
+            'filters': {'dateFrom': '2018-09-05',
+                        'dateTo': '2018-09-15',
+                        'permission': 'TIER_ONE'},
+            
+        }
+
         self.assertEqual(self.fd.request_competition_match(competition_id=2002)[0], test_res)
+        self.assertEqual(self.fd.request_match(**{fda.TO_DATE: '2018-09-15', fda.FROM_DATE: '2018-09-05'})[0], test_res2)
