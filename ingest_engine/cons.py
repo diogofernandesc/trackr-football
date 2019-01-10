@@ -40,7 +40,26 @@ class FootballDataApiFilters:
     STANDING_AWAY = 'AWAY'
 
 
-
+class Match:
+    ID = 'id'
+    SEASON_FOOTBALL_DATA_ID = 'season_football_data_id'
+    SEASON_START_DATE = 'season_start_date'
+    SEASON_END_DATE = 'season_end_date'
+    MATCH_UTC_DATE = 'utc_date'
+    STATUS = 'status'
+    MATCHDAY = 'matchday'
+    FULL_TIME_HOME_SCORE = 'full_time_home_score'
+    FULL_TIME_AWAY_SCORE = 'full_time_away_score'
+    HALF_TIME_HOME_SCORE = 'half_time_home_score'
+    HALF_TIME_AWAY_SCORE = 'half_time_away_score'
+    EXTRA_TIME_HOME_SCORE = 'extra_time_home_score'
+    EXTRA_TIME_AWAY_SCORE = 'extra_time_away_score'
+    PENALTY_HOME_SCORE = 'penalty_home_score'
+    PENALTY_AWAY_SCORE = 'penalty_away_score'
+    WINNER = 'winner'
+    HOME_TEAM = 'home_team'
+    AWAY_TEAM = 'away_team'
+    REFEREES = 'referees'
 
 
 class Competition:

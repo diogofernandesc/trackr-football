@@ -47,36 +47,33 @@ class ApiTest(unittest.TestCase):
         self.assertEqual(test_fd.request_match(match_id=204998), {})
 
     def testCompetitionParse(self):
-        test_req = json.loads(
-            '''
-            {
-                  "id":2002,
-                  "area":{
-                    "id":2088,
-                    "name":"Germany"
-                  },
-                  "name":"Bundesliga",
-                  "code":"BL1",
-                  "emblemUrl":null,
-                  "plan":"TIER_ONE",
-                  "currentSeason":{
-                    "id":155,
-                    "startDate":"2018-08-24",
-                    "endDate":"2019-05-18",
-                    "currentMatchday":14,
-                    "winner":null
-                  }
-            }
-            '''
-        )
         test_res = {
             Competition.NAME: 'Bundesliga',
             Competition.FOOTBALL_DATA_API_ID: 2002,
             Competition.LOCATION: 'Germany',
             Competition.CODE: 'BL1',
         }
-        self.assertEqual(self.fd.parse_competitions(api_res=test_req), [test_res])
+        self.assertEqual(self.fd.request_competitions(competition_id=2002), [test_res])
         
+    def testMatchParse(self):
+        test_res = [{'season_football_data_id': 235686,
+                     'season_start_date': '2018-08-24',
+                     'season_end_date': '2019-05-18',
+                     'utc_date': '2018-08-24T18:30:00Z',
+                     'status': 'FINISHED',
+                     'matchday': 1,
+                     'full_time_home_score': 3,
+                     'full_time_away_score': 1,
+                     'half_time_home_score': 1,
+                     'half_time_away_score': 0,
+                     'extra_time_home_score': None,
+                     'extra_time_away_score': None,
+                     'penalty_home_score': None,
+                     'penalty_away_score': None,
+                     'winner': 'HOME_TEAM',
+                     'home_team': 'FC Bayern München',
+                     'away_team': 'TSG 1899 Hoffenheim',
+                     'referees':
+                         ['Bastian Dankert', 'René Rohde', 'Markus Häcker', 'Thorsten Schiffner', 'Sören Storks']}]
 
-
-
+        self.assertEqual(self.fd.request_competition_match(competition_id=2002)[0], test_res)
