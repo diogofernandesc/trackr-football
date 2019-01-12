@@ -63,6 +63,43 @@ class Match:
     FILTERS = 'filters'
 
 
+class Team:
+    FOOTBALL_DATA_ID = 'football_data_id'
+    COUNTRY = 'country'
+    NAME = 'name'
+    SHORT_NAME = 'short_name'
+    ACRONYM = 'acronym'
+    CREST_URL = 'crest_url'
+    ADDRESS = 'address'
+    PHONE = 'phone'
+    WEBSITE = 'website'
+    EMAIL = 'email'
+    YEAR_FOUNDED = 'year_founded'
+    CLUB_COLOURS = 'club_colours'
+    STADIUM = 'stadium'
+
+
+class Standings:
+    COMPETITION_NAME = 'competition_name'
+    STAGE = 'stage'
+    TYPE = 'type'
+    SEASON = 'season'
+    MATCH_DAY = 'match_day'
+    TABLE = 'table'
+    GROUP = 'group'
+    POSITION = 'position'
+    TEAM_NAME = 'team_name'
+    GAMES_PLAYED = 'games_played'
+    GAMES_WON = 'games_won'
+    GAMES_DRAWN = 'games_drawn'
+    GAMES_LOST = 'games_lost'
+    POINTS = 'points'
+    GOALS_FOR = 'goals_for'
+    GOALS_AGAINST = 'goals_against'
+    GOAL_DIFFERENCE = 'goal_difference'
+
+
+
 class Competition:
     NAME = 'name'
     CODE = 'code'
