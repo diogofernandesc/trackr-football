@@ -1,7 +1,7 @@
 import unittest
 import json
 from ingest_engine.football_data import FootballData
-from ingest_engine.cons import Competition, Match, FootballDataApiFilters as fda
+from ingest_engine.cons import Competition, Match, Team, FootballDataApiFilters as fda
 
 
 class ApiTest(unittest.TestCase):
@@ -39,6 +39,20 @@ class ApiTest(unittest.TestCase):
         comp_matches = self.fd.request_competition_match(competition_id=2003, **{Match.MATCHDAY: 11})
         self.assertEqual(test_fd.request_competition_match(competition_id=2003), [])
         self.assertEqual(comp_matches[0][Match.MATCHDAY], 11)
+
+    def testCompetitionTeamEndpoint(self):
+        test_fd = FootballData(api_key='test')
+        comp_teams = self.fd.request_competition_team(competition_id=2002)
+        self.assertEqual(test_fd.request_competition_team(competition_id=2002), [])
+        self.assertEqual(comp_teams[0][Team.FOOTBALL_DATA_ID], 2)
+
+    def testCompetitionStandingsEndpoint(self):
+        test_fd = FootballData(api_key='test')
+        comp_standings_league = self.fd.request_competition_standings(competition_id=2002)
+        comp_standings_non_league = self.fd.request_competition_standings(competition_id=2001)
+        self.assertEqual(test_fd.request_competition_standings(competition_id=2002), [])
+        self.assertIsNone(comp_standings_league['standings'][0]['group'])
+        self.assertIsInstance(comp_standings_non_league['standings'][0]['group'], str)
 
     def testMatchEndPoint(self):
         test_fd = FootballData(api_key='test')

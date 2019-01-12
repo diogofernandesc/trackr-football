@@ -1,7 +1,7 @@
 import requests as re
 import json
 import os
-from ingest_engine.cons import Competition, Match
+from ingest_engine.cons import Competition, Match, Team, Standings
 from ingest_engine.cons import FootballDataApiFilters as fda
 
 
@@ -72,7 +72,7 @@ class FootballData(object):
         :param competition_id: REQUIRED competition id to retrieves matches for
         :param kwargs: All possible filters applicable to this endpoint /v2/competitions/{id}/matches
         :return: Request result for match competitions endpoint
-        :rtype: dict
+        :rtype: list
         """
         built_uri = f'competitions/{competition_id}/matches'
 
@@ -115,6 +115,99 @@ class FootballData(object):
                         data[Match.REFEREES] = refs
 
                     total_results.append(data)
+
+        return total_results
+
+    def request_competition_team(self, competition_id, season=None):
+        """
+        Lists team information for a particular competition
+        :param competition_id: ID of the competition for which to request team information
+        :param season: Available season filter
+        :return: Parsed list of information for each team in competition
+        :rtype: list
+        """
+        built_uri = f'competitions/{competition_id}/teams'
+
+        # Check for any applied season filter
+        if season:
+            built_uri += f'?season={season}'
+
+        result = self.perform_get(built_uri=built_uri)
+        total_results = []
+        if result:
+            if 'teams' in result:
+                for team in result['teams']:
+                    total_results.append({
+                        Team.FOOTBALL_DATA_ID: team['id'],
+                        Team.NAME: team['name'],
+                        Team.SHORT_NAME: team['shortName'],
+                        Team.COUNTRY: team['area']['name'],
+                        Team.CREST_URL: team['crestUrl'],
+                        Team.ADDRESS: team['address'],
+                        Team.PHONE: team['phone'],
+                        Team.WEBSITE: team['website'],
+                        Team.EMAIL: team['email'],
+                        Team.YEAR_FOUNDED: team['founded'],
+                        Team.CLUB_COLOURS: team['clubColors'],
+                        Team.STADIUM: team['venue']
+                    })
+
+        return total_results
+
+    # TODO: Standings for non-league based competitions?
+    def request_competition_standings(self, competition_id, standing_type=None):
+        """
+        Lists standing information for a particular competition
+        :param competition_id: ID of the competition for which to request standings information
+        :param standing_type: Filter available to endpoint: TOTAL | HOME | AWAY
+        :return: Parsed list of information for standings in competition
+        :rtype: List
+        """
+        built_uri = f'competitions/{competition_id}/standings'
+
+        # Check for any applied season filter
+        if standing_type:
+            built_uri += f'?standingType={standing_type}'
+
+        result = self.perform_get(built_uri=built_uri)
+        total_results = []
+        if result:
+            if 'standings' in result:
+                season_start_year = result['season']['startDate'].split("-")[0]
+                season = f'{season_start_year}-{int(season_start_year)+1}'
+
+                for standings in result['standings']:
+                    data = {
+                        Standings.STAGE: standings['stage'],
+                        Standings.TYPE: standings['type'],
+                        Standings.SEASON: season,
+                        Standings.GROUP: standings['group'],
+                        Standings.MATCH_DAY: result['season']['currentMatchday'],
+                    }
+
+                    table = []
+                    for entry in standings['table']:
+                        table.append({
+                            Standings.POSITION: entry['position'],
+                            Standings.TEAM_NAME: entry['team']['name'],
+                            Standings.GAMES_PLAYED: entry['playedGames'],
+                            Standings.GAMES_WON: entry['won'],
+                            Standings.GAMES_DRAWN: entry['draw'],
+                            Standings.GAMES_LOST: entry['lost'],
+                            Standings.POINTS: entry['points'],
+                            Standings.GOALS_FOR: entry['goalsFor'],
+                            Standings.GOALS_AGAINST: entry['goalsAgainst'],
+                            Standings.GOAL_DIFFERENCE: entry['goalDifference']
+                        })
+
+                    data[Standings.TABLE] = table
+                    total_results.append(data)
+
+        if result:
+            return {
+                Standings.COMPETITION_NAME: result['competition']['name'],
+                'standings': total_results
+            }
 
         return total_results
 
@@ -175,11 +268,16 @@ class FootballData(object):
 
         return total_results
 
+    # def request_team
+
+
 
 fd = FootballData()
 
 # print(fd.request_competitions(competition_id=2002))
-print(fd.request_match(**{fda.TO_DATE: '2018-09-15', fda.FROM_DATE: '2018-09-05'}))
+print(fd.request_competition_standings(competition_id=2002))
+# print(fd.request_competition_team(competition_id=2002, season=2017))
+# print(fd.request_match(**{fda.TO_DATE: '2018-09-15', fda.FROM_DATE: '2018-09-05'}))
 # fd.session.get('http://api.football-data.org/v2/competitions')
 # api_res = fd.request_competitions(2002)
 # print(api_res)
