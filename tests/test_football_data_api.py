@@ -1,5 +1,6 @@
 import unittest
 import json
+from time import sleep
 from ingest_engine.football_data import FootballData
 from ingest_engine.cons import Competition, Match, Team, Player, FootballDataApiFilters as fda
 
@@ -7,65 +8,62 @@ from ingest_engine.cons import Competition, Match, Team, Player, FootballDataApi
 class ApiTest(unittest.TestCase):
     def setUp(self):
         self.fd = FootballData()
+        self.test_fd = FootballData(api_key='test')
 
     def tearDown(self):
         self.fd.session.close()
 
     def testApiSetUp(self):
-        test_fd = FootballData(api_key='test')
-        req = test_fd.session.get('http://api.football-data.org/v2/competitions').text
+        req = self.test_fd.session.get('http://api.football-data.org/v2/competitions').text
         req = json.loads(req)
         self.assertEqual(req['errorCode'], 400)
-        test_fd.session.close()
+        self.test_fd.session.close()
 
     def testPerformGet(self):
-        test_fd = FootballData(api_key='test')
-        comps = self.fd.request_competitions(2002)
         comps_locked = self.fd.request_competitions(2004)
-        self.assertEqual(test_fd.request_competitions(), [])
+        self.assertEqual(self.test_fd.request_competitions(), [])
         self.assertEqual(comps_locked, [])
-        self.assertEqual(comps[0][Competition.FOOTBALL_DATA_API_ID], 2002)
-        test_fd.session.close()
+        self.test_fd.session.close()
 
     def testCompetitionEndPoint(self):
-        test_fd = FootballData(api_key='test')
         comps = self.fd.request_competitions(competition_id=2002)
-        self.assertEqual(test_fd.request_competitions(), [])
+        self.assertEqual(self.test_fd.request_competitions(), [])
         self.assertEqual(comps[0][Competition.FOOTBALL_DATA_API_ID], 2002)
-        test_fd.session.close()
+        self.test_fd.session.close()
 
     def testCompetitionMatchEndPoint(self):
-        test_fd = FootballData(api_key='test')
         comp_matches = self.fd.request_competition_match(competition_id=2003, **{Match.MATCHDAY: 11})
-        self.assertEqual(test_fd.request_competition_match(competition_id=2003), [])
+        self.assertEqual(self.test_fd.request_competition_match(competition_id=2003), [])
         self.assertEqual(comp_matches[0][Match.MATCHDAY], 11)
 
     def testCompetitionTeamEndpoint(self):
-        test_fd = FootballData(api_key='test')
         comp_teams = self.fd.request_competition_team(competition_id=2002)
-        self.assertEqual(test_fd.request_competition_team(competition_id=2002), [])
+        self.assertEqual(self.test_fd.request_competition_team(competition_id=2002), [])
         self.assertEqual(comp_teams[0][Team.FOOTBALL_DATA_ID], 2)
 
     def testCompetitionStandingsEndpoint(self):
-        test_fd = FootballData(api_key='test')
         comp_standings_league = self.fd.request_competition_standings(competition_id=2002)
         comp_standings_non_league = self.fd.request_competition_standings(competition_id=2001)
-        self.assertEqual(test_fd.request_competition_standings(competition_id=2002), [])
+        self.assertEqual(self.test_fd.request_competition_standings(competition_id=2002), [])
         self.assertIsNone(comp_standings_league['standings'][0]['group'])
         self.assertIsInstance(comp_standings_non_league['standings'][0]['group'], str)
 
     def testCompetitionScorersEndpoint(self):
-        test_fd = FootballData(api_key='test')
         comp_scorers = self.fd.request_competition_scorers(competition_id=2002)
-        self.assertEqual(test_fd.request_competition_scorers(competition_id=2002), [])
+        self.assertEqual(self.test_fd.request_competition_scorers(competition_id=2002), [])
         self.assertIsInstance(comp_scorers[0][Player.NUMBER_OF_GOALS], int)
         self.assertEqual(len(comp_scorers[0]), 10)
 
     def testMatchEndPoint(self):
-        test_fd = FootballData(api_key='test')
         matches = self.fd.request_match(**{fda.TO_DATE: '2018-09-15', fda.FROM_DATE: '2018-09-05'})
         self.assertEqual(matches[0]['filters'][fda.FROM_DATE], '2018-09-05')
-        self.assertEqual(test_fd.request_match(match_id=204998), [])
+        self.assertEqual(self.test_fd.request_match(match_id=204998), [])
+
+    def testTeamEndpoint(self):
+        team = self.fd.request_team(team_id=4)
+        self.assertEqual(self.test_fd.request_team(team_id=4), {})
+        self.assertTrue(len(team[Team.SQUAD]) >= 11)
+        self.assertIsInstance(team[Team.FOOTBALL_DATA_ID], int)
 
     def testCompetitionParse(self):
         test_res = {

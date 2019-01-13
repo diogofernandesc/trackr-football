@@ -1,6 +1,7 @@
 import requests as re
 import json
 import os
+from time import sleep
 from ingest_engine.cons import Competition, Match, Team, Standings, Player
 from ingest_engine.cons import FootballDataApiFilters as fda
 
@@ -20,14 +21,24 @@ class FootballData(object):
     def perform_get(self, built_uri):
         '''
         Performs GET request and deals with any issues arising from call
+        Handles API rate limits
         :param built_uri: endpoint to attach to the base API url
         :return: dict result of call, {} if failed
         '''
         result = self.session.get(url=self.uri + built_uri)
         try:
             result = json.loads(result.text)
-            if 'errorCode' in result or 'error' in result:
+            if 'errorCode' in result:
+                if result['errorCode'] == 429:
+                    wait_time = [int(s) for s in result['message'].split() if s.isdigit()][0]
+                    sleep(wait_time + 5)  # Wait for rate limiting to end before performing request again
+                    self.perform_get(built_uri=built_uri)
+
                 result = {}
+
+            elif 'error' in result:
+                result = {}
+
         except re.exceptions.ConnectionError:
             result = {}
 
@@ -312,12 +323,70 @@ class FootballData(object):
 
         return total_results
 
-    # def request_team(self):
+    def request_team(self, team_id):
+        """
+        Performs API request to retrieve specific team at URL -> v2/teams/{id}
+        :param team_id: Football data ID for team
+        :return: Parsed dict of team information
+        :rtype: dict
+        """
+        built_uri = f'teams/{team_id}/'
+        result = self.perform_get(built_uri=built_uri)
+        data = {}
 
+        if result:
+            data = {
+                Team.FOOTBALL_DATA_ID: result['id'],
+                Team.NAME: result['name'],
+                Team.SHORT_NAME: result['shortName'],
+                Team.ACRONYM: result['tla'],
+                Team.CREST_URL: result['crestUrl'],
+                Team.ADDRESS: result['address'],
+                Team.PHONE: result['phone'],
+                Team.WEBSITE: result['website'],
+                Team.EMAIL: result['email'],
+                Team.YEAR_FOUNDED: result['founded'],
+                Team.CLUB_COLOURS: result['clubColors'],
+                Team.STADIUM: result['venue']
+            }
+
+            if 'activeCompetitions' in result:
+                if result['activeCompetitions']:
+                    active_competitions = []
+                    for entry in result['activeCompetitions']:
+                        active_competitions.append({
+                            Competition.FOOTBALL_DATA_API_ID: entry['id'],
+                            Competition.LOCATION: entry['area']['name'],
+                            Competition.NAME: entry['name'],
+                            Competition.CODE: entry['code'],
+                        })
+
+                    if active_competitions:
+                        data[Team.ACTIVE_COMPETITIONS] = active_competitions
+
+            if 'squad' in result:
+                if result['squad']:
+                    squad = []
+                    for entry in result['squad']:
+                        squad.append({
+                            Player.NAME: entry['name'],
+                            Player.POSITION: entry['position'],
+                            Player.DATE_OF_BIRTH: entry['dateOfBirth'],
+                            Player.COUNTRY_OF_BIRTH: entry['countryOfBirth'],
+                            Player.NATIONALITY: entry['nationality'],
+                            Player.SHIRT_NUMBER: entry['shirtNumber'],
+                            Team.SQUAD_ROLE: entry['role']
+                        })
+
+                    if squad:
+                        data[Team.SQUAD] = squad
+
+        return data
 
 
 fd = FootballData()
 
+print(fd.request_team(team_id=4))
 # print(fd.request_competitions(competition_id=2002))
 # print(fd.request_competition_scorers(competition_id=2002))
 # print(fd.request_competition_standings(competition_id=2002))

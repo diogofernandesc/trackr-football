@@ -77,6 +77,9 @@ class Team:
     YEAR_FOUNDED = 'year_founded'
     CLUB_COLOURS = 'club_colours'
     STADIUM = 'stadium'
+    ACTIVE_COMPETITIONS = 'active_competitions'
+    SQUAD = 'squad'
+    SQUAD_ROLE = 'squad_role'
 
 
 class Standings:
