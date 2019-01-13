@@ -1,7 +1,8 @@
 import requests as re
 import json
 import os
-from ingest_engine.cons import Competition, Match, Team, Standings
+from time import sleep
+from ingest_engine.cons import Competition, Match, Team, Standings, Player
 from ingest_engine.cons import FootballDataApiFilters as fda
 
 
@@ -20,14 +21,24 @@ class FootballData(object):
     def perform_get(self, built_uri):
         '''
         Performs GET request and deals with any issues arising from call
+        Handles API rate limits
         :param built_uri: endpoint to attach to the base API url
         :return: dict result of call, {} if failed
         '''
         result = self.session.get(url=self.uri + built_uri)
         try:
             result = json.loads(result.text)
-            if 'errorCode' in result or 'error' in result:
+            if 'errorCode' in result:
+                if result['errorCode'] == 429:
+                    wait_time = [int(s) for s in result['message'].split() if s.isdigit()][0]
+                    sleep(wait_time + 5)  # Wait for rate limiting to end before performing request again
+                    self.perform_get(built_uri=built_uri)
+
                 result = {}
+
+            elif 'error' in result:
+                result = {}
+
         except re.exceptions.ConnectionError:
             result = {}
 
@@ -154,7 +165,6 @@ class FootballData(object):
 
         return total_results
 
-    # TODO: Standings for non-league based competitions?
     def request_competition_standings(self, competition_id, standing_type=None):
         """
         Lists standing information for a particular competition
@@ -208,6 +218,51 @@ class FootballData(object):
                 Standings.COMPETITION_NAME: result['competition']['name'],
                 'standings': total_results
             }
+
+        return total_results
+
+    def request_competition_scorers(self, competition_id, limit=None):
+        """
+        Lists standing information for a particular competition
+        :param competition_id: ID of the competition for which to request scorer information
+        :param limit: Limit result set from API (default 10)
+        :return: Parsed list with scorer information for given competition
+        :rtype: list
+        """
+        built_uri = f'competitions/{competition_id}/scorers'
+
+        # Check for any applied season filter
+        if limit:
+            built_uri += f'?limit={limit}'
+
+        result = self.perform_get(built_uri=built_uri)
+        total_results = []
+        if result:
+            if 'scorers' in result:
+                for scorer in result['scorers']:
+                    player = scorer['player']
+                    data = {
+                        Player.NAME: player['name'],
+                        Player.FIRST_NAME: player['firstName'],
+                        Player.LAST_NAME: player['lastName'],
+                        Player.DATE_OF_BIRTH: player['dateOfBirth'],
+                        Player.COUNTRY_OF_BIRTH: player['countryOfBirth'],
+                        Player.NATIONALITY: player['nationality'],
+                        Player.POSITION: player['position'],
+                        Player.SHIRT_NUMBER: player['shirtNumber'],
+                        Player.TEAM: scorer['team']['name'],
+                        Player.NUMBER_OF_GOALS: scorer['numberOfGoals']
+
+                    }
+
+                    if 'lastName' in player:
+                        if player['lastName']:
+                            data[Player.LAST_NAME] = player['lastName']
+
+                        else:
+                            data[Player.LAST_NAME] = player['name'].split(" ")[1]
+
+                    total_results.append(data)
 
         return total_results
 
@@ -268,14 +323,73 @@ class FootballData(object):
 
         return total_results
 
-    # def request_team
+    def request_team(self, team_id):
+        """
+        Performs API request to retrieve specific team at URL -> v2/teams/{id}
+        :param team_id: Football data ID for team
+        :return: Parsed dict of team information
+        :rtype: dict
+        """
+        built_uri = f'teams/{team_id}/'
+        result = self.perform_get(built_uri=built_uri)
+        data = {}
 
+        if result:
+            data = {
+                Team.FOOTBALL_DATA_ID: result['id'],
+                Team.NAME: result['name'],
+                Team.SHORT_NAME: result['shortName'],
+                Team.ACRONYM: result['tla'],
+                Team.CREST_URL: result['crestUrl'],
+                Team.ADDRESS: result['address'],
+                Team.PHONE: result['phone'],
+                Team.WEBSITE: result['website'],
+                Team.EMAIL: result['email'],
+                Team.YEAR_FOUNDED: result['founded'],
+                Team.CLUB_COLOURS: result['clubColors'],
+                Team.STADIUM: result['venue']
+            }
+
+            if 'activeCompetitions' in result:
+                if result['activeCompetitions']:
+                    active_competitions = []
+                    for entry in result['activeCompetitions']:
+                        active_competitions.append({
+                            Competition.FOOTBALL_DATA_API_ID: entry['id'],
+                            Competition.LOCATION: entry['area']['name'],
+                            Competition.NAME: entry['name'],
+                            Competition.CODE: entry['code'],
+                        })
+
+                    if active_competitions:
+                        data[Team.ACTIVE_COMPETITIONS] = active_competitions
+
+            if 'squad' in result:
+                if result['squad']:
+                    squad = []
+                    for entry in result['squad']:
+                        squad.append({
+                            Player.NAME: entry['name'],
+                            Player.POSITION: entry['position'],
+                            Player.DATE_OF_BIRTH: entry['dateOfBirth'],
+                            Player.COUNTRY_OF_BIRTH: entry['countryOfBirth'],
+                            Player.NATIONALITY: entry['nationality'],
+                            Player.SHIRT_NUMBER: entry['shirtNumber'],
+                            Team.SQUAD_ROLE: entry['role']
+                        })
+
+                    if squad:
+                        data[Team.SQUAD] = squad
+
+        return data
 
 
 fd = FootballData()
 
+print(fd.request_team(team_id=4))
 # print(fd.request_competitions(competition_id=2002))
-print(fd.request_competition_standings(competition_id=2002))
+# print(fd.request_competition_scorers(competition_id=2002))
+# print(fd.request_competition_standings(competition_id=2002))
 # print(fd.request_competition_team(competition_id=2002, season=2017))
 # print(fd.request_match(**{fda.TO_DATE: '2018-09-15', fda.FROM_DATE: '2018-09-05'}))
 # fd.session.get('http://api.football-data.org/v2/competitions')

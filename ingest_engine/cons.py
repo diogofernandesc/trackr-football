@@ -77,6 +77,9 @@ class Team:
     YEAR_FOUNDED = 'year_founded'
     CLUB_COLOURS = 'club_colours'
     STADIUM = 'stadium'
+    ACTIVE_COMPETITIONS = 'active_competitions'
+    SQUAD = 'squad'
+    SQUAD_ROLE = 'squad_role'
 
 
 class Standings:
@@ -98,6 +101,18 @@ class Standings:
     GOALS_AGAINST = 'goals_against'
     GOAL_DIFFERENCE = 'goal_difference'
 
+
+class Player:
+    NAME = 'name'
+    FIRST_NAME = 'first_name'
+    LAST_NAME = 'last_name'
+    DATE_OF_BIRTH = 'date_of_birth'
+    COUNTRY_OF_BIRTH = 'country_of_birth'
+    NATIONALITY = 'nationality'
+    POSITION = 'position'
+    SHIRT_NUMBER = 'shirt_number'
+    TEAM = 'team'
+    NUMBER_OF_GOALS = 'number_of_goals'
 
 
 class Competition:
