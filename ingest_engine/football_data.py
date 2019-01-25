@@ -31,7 +31,7 @@ class FootballData(object):
             if 'errorCode' in result:
                 if result['errorCode'] == 429:
                     wait_time = [int(s) for s in result['message'].split() if s.isdigit()][0]
-                    sleep(wait_time + 5)  # Wait for rate limiting to end before performing request again
+                    sleep(wait_time + 10)  # Wait for rate limiting to end before performing request again
                     self.perform_get(built_uri=built_uri)
 
                 result = {}
@@ -383,10 +383,41 @@ class FootballData(object):
 
         return data
 
+    def request_player(self, player_id):
+        """
+        Performs API request to retrieve specific player at URL -> v2/players/{id}
+        :param player_id: Football data player ID
+        :return: Parsed player information
+        :rtype: dict
+        """
+        built_uri = f'players/{player_id}/'
+        result = self.perform_get(built_uri=built_uri)
+        data = {}
+
+        if result:
+            data[Player.FIRST_NAME] = result['firstName']
+            data[Player.DATE_OF_BIRTH] = result['dateOfBirth']
+            data[Player.COUNTRY_OF_BIRTH] = result['countryOfBirth']
+            data[Player.NATIONALITY] = result['nationality']
+            data[Player.POSITION] = result['position']
+            data[Player.SHIRT_NUMBER] = result['shirtNumber']
+
+        if 'lastName' in result:
+            if result['lastName']:
+                data[Player.LAST_NAME] = result['lastName']
+
+            elif " " in result['name']:
+                data[Player.LAST_NAME] = result['name'].split(" ")[1]
+
+            elif result['name'] != result['firstName']:
+                data[Player.LAST_NAME] = result['name']
+
+        return data
+
 
 fd = FootballData()
 
-print(fd.request_team(team_id=4))
+# print(fd.request_player(player_id=1))
 # print(fd.request_competitions(competition_id=2002))
 # print(fd.request_competition_scorers(competition_id=2002))
 # print(fd.request_competition_standings(competition_id=2002))
