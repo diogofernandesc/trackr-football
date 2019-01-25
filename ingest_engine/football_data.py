@@ -32,6 +32,11 @@ class FootballData(object):
                 if result['errorCode'] == 429:
                     wait_time = [int(s) for s in result['message'].split() if s.isdigit()][0]
                     sleep(wait_time + 10)  # Wait for rate limiting to end before performing request again
+
+                    # test get, seems API fails first request after rate limit
+                    self.session.get(self.uri + 'competitions')
+
+                    # Resume as necessary
                     self.perform_get(built_uri=built_uri)
 
                 result = {}
@@ -266,21 +271,29 @@ class FootballData(object):
 
         return total_results
 
-    def request_match(self, match_id=None,  **kwargs):
+    def request_match(self, match_id=None, player_id=None, **kwargs):
         """
         Performs API request to retrieve all matches at URL -> /v2/matches
-        Retrieves matches across (a set of competitions) OR a particular ID match
+        Alternatively retrieve all matches for player at URL -> /v2/players/{id}/matches
+        Retrieves matches across (a set of competitions) OR a particular ID match, or player
         :param match_id: Match id for match
+        :param player_id: Player id
         :param kwargs: Dict of possible filters for the endpoint
         :return: dict result from call
         :rtype: dict
         """
+        if match_id and player_id:
+            raise ValueError('You cannot request a match passing match_id AND player_id')
+
         built_uri = f'matches?'
         if fda.ID in kwargs:
             built_uri += f'{kwargs.get(fda.ID)}'
 
         elif match_id:
             built_uri += f'{match_id}'
+
+        elif player_id:
+            built_uri += f'{player_id}'
 
         else:
             for name_filter, value in kwargs.items():
