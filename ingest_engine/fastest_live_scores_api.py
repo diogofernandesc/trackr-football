@@ -35,6 +35,7 @@ class FastestLiveScores(object):
 
         request = self.session.get(built_uri)
         try:
+            print(f"json text: {request.text}")
             result = json.loads(request.text)
             if 'errorText' in result or request.status_code == 400 or request.status_code == 404:
                 result = {}
