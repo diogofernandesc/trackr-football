@@ -1,4 +1,4 @@
-from ratelimit import limits
+from ratelimit import limits, sleep_and_retry
 import requests as re
 import os
 import json
@@ -25,6 +25,7 @@ class FastestLiveScores(object):
         '''
         return f'https://api.crowdscores.com/v1/{endpoint_name}?api_key={self.api_key}'
 
+    @sleep_and_retry
     @limits(calls=100, period=HOUR)
     def perform_get(self, built_uri):
         """
