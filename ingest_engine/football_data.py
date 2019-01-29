@@ -1,9 +1,12 @@
 import requests as re
 import json
 import os
+from ratelimit import limits, sleep_and_retry
 from time import sleep
 from ingest_engine.cons import Competition, Match, Team, Standings, Player
 from ingest_engine.cons import FootballDataApiFilters as fda
+
+HOUR = 3600
 
 
 class FootballData(object):
@@ -18,6 +21,8 @@ class FootballData(object):
         self.session.headers.update({'X-Auth-Token': api_key})
         self.uri = 'http://api.football-data.org/v2/'
 
+    @sleep_and_retry
+    @limits(calls=100, period=HOUR)
     def perform_get(self, built_uri):
         '''
         Performs GET request and deals with any issues arising from call
@@ -31,7 +36,12 @@ class FootballData(object):
             if 'errorCode' in result:
                 if result['errorCode'] == 429:
                     wait_time = [int(s) for s in result['message'].split() if s.isdigit()][0]
-                    sleep(wait_time + 5)  # Wait for rate limiting to end before performing request again
+                    sleep(wait_time + 10)  # Wait for rate limiting to end before performing request again
+
+                    # test get, seems API fails first request after rate limit
+                    self.session.get(self.uri + 'competitions')
+
+                    # Resume as necessary
                     self.perform_get(built_uri=built_uri)
 
                 result = {}
@@ -266,21 +276,29 @@ class FootballData(object):
 
         return total_results
 
-    def request_match(self, match_id=None,  **kwargs):
+    def request_match(self, match_id=None, player_id=None, **kwargs):
         """
         Performs API request to retrieve all matches at URL -> /v2/matches
-        Retrieves matches across (a set of competitions) OR a particular ID match
+        Alternatively retrieve all matches for player at URL -> /v2/players/{id}/matches
+        Retrieves matches across (a set of competitions) OR a particular ID match, or player
         :param match_id: Match id for match
+        :param player_id: Player id
         :param kwargs: Dict of possible filters for the endpoint
         :return: dict result from call
         :rtype: dict
         """
+        if match_id and player_id:
+            raise ValueError('You cannot request a match passing match_id AND player_id')
+
         built_uri = f'matches?'
         if fda.ID in kwargs:
             built_uri += f'{kwargs.get(fda.ID)}'
 
         elif match_id:
             built_uri += f'{match_id}'
+
+        elif player_id:
+            built_uri += f'{player_id}'
 
         else:
             for name_filter, value in kwargs.items():
@@ -383,10 +401,41 @@ class FootballData(object):
 
         return data
 
+    def request_player(self, player_id):
+        """
+        Performs API request to retrieve specific player at URL -> v2/players/{id}
+        :param player_id: Football data player ID
+        :return: Parsed player information
+        :rtype: dict
+        """
+        built_uri = f'players/{player_id}/'
+        result = self.perform_get(built_uri=built_uri)
+        data = {}
+
+        if result:
+            data[Player.FIRST_NAME] = result['firstName']
+            data[Player.DATE_OF_BIRTH] = result['dateOfBirth']
+            data[Player.COUNTRY_OF_BIRTH] = result['countryOfBirth']
+            data[Player.NATIONALITY] = result['nationality']
+            data[Player.POSITION] = result['position']
+            data[Player.SHIRT_NUMBER] = result['shirtNumber']
+
+        if 'lastName' in result:
+            if result['lastName']:
+                data[Player.LAST_NAME] = result['lastName']
+
+            elif " " in result['name']:
+                data[Player.LAST_NAME] = result['name'].split(" ")[1]
+
+            elif result['name'] != result['firstName']:
+                data[Player.LAST_NAME] = result['name']
+
+        return data
+
 
 fd = FootballData()
 
-print(fd.request_team(team_id=4))
+# print(fd.request_player(player_id=1))
 # print(fd.request_competitions(competition_id=2002))
 # print(fd.request_competition_scorers(competition_id=2002))
 # print(fd.request_competition_standings(competition_id=2002))

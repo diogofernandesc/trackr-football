@@ -12,6 +12,7 @@ class ApiTest(unittest.TestCase):
 
     def tearDown(self):
         self.fd.session.close()
+        self.test_fd.session.close()
 
     def testApiSetUp(self):
         req = self.test_fd.session.get('http://api.football-data.org/v2/competitions').text
@@ -23,13 +24,11 @@ class ApiTest(unittest.TestCase):
         comps_locked = self.fd.request_competitions(2004)
         self.assertEqual(self.test_fd.request_competitions(), [])
         self.assertEqual(comps_locked, [])
-        self.test_fd.session.close()
 
     def testCompetitionEndPoint(self):
         comps = self.fd.request_competitions(competition_id=2002)
         self.assertEqual(self.test_fd.request_competitions(), [])
         self.assertEqual(comps[0][Competition.FOOTBALL_DATA_API_ID], 2002)
-        self.test_fd.session.close()
 
     def testCompetitionMatchEndPoint(self):
         comp_matches = self.fd.request_competition_match(competition_id=2003, **{Match.MATCHDAY: 11})
@@ -56,14 +55,24 @@ class ApiTest(unittest.TestCase):
 
     def testMatchEndPoint(self):
         matches = self.fd.request_match(**{fda.TO_DATE: '2018-09-15', fda.FROM_DATE: '2018-09-05'})
+        player_matches = self.fd.request_match(player_id=1)
+        self.assertTrue(len(player_matches[0]) > 0)
+        self.assertRaises(ValueError, self.fd.request_match, 223, 1)
         self.assertEqual(matches[0]['filters'][fda.FROM_DATE], '2018-09-05')
         self.assertEqual(self.test_fd.request_match(match_id=204998), [])
+
 
     def testTeamEndpoint(self):
         team = self.fd.request_team(team_id=4)
         self.assertEqual(self.test_fd.request_team(team_id=4), {})
         self.assertTrue(len(team[Team.SQUAD]) >= 11)
         self.assertIsInstance(team[Team.FOOTBALL_DATA_ID], int)
+
+    def testPlayerEndpoint(self):
+        player = self.fd.request_player(player_id=1)
+        self.assertEqual(self.test_fd.request_player(player_id=1), {})
+        self.assertTrue(len(player) >= 7)
+        self.assertIsInstance(player[Player.SHIRT_NUMBER], int)
 
     def testCompetitionParse(self):
         test_res = {
