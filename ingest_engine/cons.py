@@ -61,6 +61,7 @@ class Match:
     AWAY_TEAM = 'away_team'
     REFEREES = 'referees'
     FILTERS = 'filters'
+    FASTEST_LIVE_SCORES_API_ID = 'fls_api_id'
 
 
 class Team:
