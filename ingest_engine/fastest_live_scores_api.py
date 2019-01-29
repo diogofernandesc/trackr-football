@@ -35,12 +35,15 @@ class FastestLiveScores(object):
 
         request = self.session.get(built_uri)
         try:
-            print(f"json text: {request.text}")
+            print(built_uri)
             result = json.loads(request.text)
             if 'errorText' in result or request.status_code == 400 or request.status_code == 404:
                 result = {}
 
         except re.exceptions.ConnectionError:
+            result = {}
+
+        except json.decoder.JSONDecodeError:
             result = {}
 
         return result
@@ -100,8 +103,8 @@ class FastestLiveScores(object):
 
 
 
-if __name__ == "__main__":
-    fls = FastestLiveScores(api_key=os.getenv('FASTEST_LIVE_SCORES_API_KEY'))
-    print(fls.request_teams())
+# if __name__ == "__main__":
+#     fls = FastestLiveScores(api_key=os.getenv('FASTEST_LIVE_SCORES_API_KEY'))
+#     print(fls.request_teams())
 
 
