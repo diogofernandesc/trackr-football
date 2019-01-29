@@ -1,9 +1,12 @@
 import requests as re
 import json
 import os
+from ratelimit import limits
 from time import sleep
 from ingest_engine.cons import Competition, Match, Team, Standings, Player
 from ingest_engine.cons import FootballDataApiFilters as fda
+
+HOUR = 3600
 
 
 class FootballData(object):
@@ -18,6 +21,7 @@ class FootballData(object):
         self.session.headers.update({'X-Auth-Token': api_key})
         self.uri = 'http://api.football-data.org/v2/'
 
+    @limits(calls=100, period=HOUR)
     def perform_get(self, built_uri):
         '''
         Performs GET request and deals with any issues arising from call
