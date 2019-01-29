@@ -2,6 +2,7 @@ from ratelimit import limits
 import requests as re
 import os
 import json
+from ingest_engine.cons import Competition, Team
 
 HOUR = 3600
 
@@ -10,7 +11,7 @@ class FastestLiveScores(object):
     """
     Wrapper for API available at -> https://customer.fastestlivescores.com/
     """
-    def __init__(self, api_key):
+    def __init__(self, api_key=None):
         self.session = re.session()
         self.api_key = api_key
         if not api_key:
@@ -46,16 +47,60 @@ class FastestLiveScores(object):
     def request_competitions(self):
         """
         Retrieve all the competitions the API supports
+        Mainly used for mapping existing competitions in DB to the same competition in API
         :return: List of competitions, each entry with data
         """
         endpoint = self.build_endpoint(endpoint_name="competitions")
         result = self.perform_get(built_uri=endpoint)
-        
+        total_results = []
+
+        if result:
+            for competition in result:
+                total_results.append({
+                    Competition.NAME: competition['name'],
+                    Competition.FASTEST_LIVE_SCORES_API_ID: competition['dbid'],
+                })
+
+        return total_results
+
+    def request_teams(self):
+        """
+        Retrieve all the teams the API supports
+        Mainly used for mapping existing teams in DB to the same team in API
+        :return: List of teams
+        """
+        endpoint = self.build_endpoint(endpoint_name="teams")
+        result = self.perform_get(built_uri=endpoint)
+        total_results = []
+
+        if result:
+            for team in result:
+                data = {
+                    Team.NAME: team['name'],
+                    Team.FASTEST_LIVE_SCORES_API_ID: team['dbid'],
+                }
+                if "defaultHomeVenue" in team:
+                    stadium_details = team['defaultHomeVenue']
+                    if stadium_details:
+                        if "capacity" in stadium_details and stadium_details["capacity"]:
+                            if stadium_details["capacity"] > 0:
+                                data[Team.STADIUM_CAPACITY] = stadium_details["capacity"]
+
+                        if "geolocation" in stadium_details and stadium_details["geolocation"]:
+                            if "latitude" in stadium_details["geolocation"]:
+                                data[Team.STADIUM_LAT] = stadium_details["geolocation"]["latitude"]
+
+                            if "latitude" in stadium_details["geolocation"]:
+                                data[Team.STADIUM_LONG] = stadium_details["geolocation"]["longitude"]
+
+                total_results.append(data)
+
+        return total_results
 
 
 
 if __name__ == "__main__":
     fls = FastestLiveScores(api_key=os.getenv('FASTEST_LIVE_SCORES_API_KEY'))
-    fls.request_competitions()
+    print(fls.request_teams())
 
 

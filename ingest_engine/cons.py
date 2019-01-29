@@ -77,9 +77,13 @@ class Team:
     YEAR_FOUNDED = 'year_founded'
     CLUB_COLOURS = 'club_colours'
     STADIUM = 'stadium'
+    STADIUM_LAT = 'stadium_lat'
+    STADIUM_LONG = 'stadium_long'
+    STADIUM_CAPACITY = 'stadium_capacity'
     ACTIVE_COMPETITIONS = 'active_competitions'
     SQUAD = 'squad'
     SQUAD_ROLE = 'squad_role'
+    FASTEST_LIVE_SCORES_API_ID = 'fls_api_id'
 
 
 class Standings:
@@ -102,6 +106,7 @@ class Standings:
     GOAL_DIFFERENCE = 'goal_difference'
 
 
+
 class Player:
     NAME = 'name'
     FIRST_NAME = 'first_name'
@@ -120,6 +125,8 @@ class Competition:
     CODE = 'code'
     LOCATION = 'location'
     FOOTBALL_DATA_API_ID = 'football_data_api_id'
+    FASTEST_LIVE_SCORES_API_ID = 'fls_api_id'
+
 
 
 class Season:

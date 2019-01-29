@@ -61,7 +61,6 @@ class ApiTest(unittest.TestCase):
         self.assertEqual(matches[0]['filters'][fda.FROM_DATE], '2018-09-05')
         self.assertEqual(self.test_fd.request_match(match_id=204998), [])
 
-
     def testTeamEndpoint(self):
         team = self.fd.request_team(team_id=4)
         self.assertEqual(self.test_fd.request_team(team_id=4), {})
