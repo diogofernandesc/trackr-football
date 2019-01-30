@@ -135,8 +135,20 @@ class FastestLiveScores(object):
 
         return total_result
 
-    # def request_match_details(self, ):
+    def request_match_details(self, match_id):
+        """
+        Gets specific information per match half, parsed
+        :param match_id: MANDATORY FLS match id for which to retrieve details
+        :return: Parsed match events and detailed for given match id
+        :rtype: dict
+        """
+        endpoint = self.build_endpoint(endpoint_name=f"matches/{match_id}")
+        result = self.perform_get(built_uri=endpoint)
+        total_result = []
 
+        if result:
+            result = result["matchevents"]
+            # for phase in result:
 
 if __name__ == "__main__":
     fls = FastestLiveScores(api_key=os.getenv('FASTEST_LIVE_SCORES_API_KEY'))
