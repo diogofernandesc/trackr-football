@@ -45,6 +45,7 @@ class Match:
     SEASON_FOOTBALL_DATA_ID = 'season_football_data_id'
     SEASON_START_DATE = 'season_start_date'
     SEASON_END_DATE = 'season_end_date'
+    SEASON_YEAR = 'season_year'
     MATCH_UTC_DATE = 'utc_date'
     STATUS = 'status'
     MATCHDAY = 'matchday'
@@ -62,6 +63,8 @@ class Match:
     REFEREES = 'referees'
     FILTERS = 'filters'
     FASTEST_LIVE_SCORES_API_ID = 'fls_api_id'
+    FLS_API_COMPETITION_ID = 'fls_competition_id'
+    COMPETITION = 'competition'
 
 
 class Team:

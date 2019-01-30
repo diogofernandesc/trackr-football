@@ -35,6 +35,9 @@ class ApiTest(unittest.TestCase):
             if Team.STADIUM_LAT in team:
                 self.assertTrue(-90 <= team[Team.STADIUM_LAT] <= 90)
 
-
+    def testMatchesEndpoint(self):
+        matches = self.fls.request_matches()
+        self.assertTrue(len(matches) > 0)
+        self.assertEqual(self.test_fls.request_matches(), [])
 
 

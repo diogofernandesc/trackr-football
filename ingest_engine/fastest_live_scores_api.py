@@ -2,7 +2,7 @@ from ratelimit import limits, sleep_and_retry
 import requests as re
 import os
 import json
-from ingest_engine.cons import Competition, Team
+from ingest_engine.cons import Competition, Team, Match
 
 HOUR = 3600
 
@@ -17,13 +17,19 @@ class FastestLiveScores(object):
         if not api_key:
             self.api_key = os.environ.get('FASTEST_LIVE_SCORES_API_KEY')
 
-    def build_endpoint(self, endpoint_name):
-        '''
+    def build_endpoint(self, endpoint_name, **kwargs):
+        """
         Create endpoint url used in API call based on endpoint name
         :param endpoint_name: the API resource path e.g. /competitions
         :return: Endpoint string
-        '''
-        return f'https://api.crowdscores.com/v1/{endpoint_name}?api_key={self.api_key}'
+        """
+        built_uri = f'https://api.crowdscores.com/v1/{endpoint_name}?api_key={self.api_key}'
+        if kwargs:
+            built_uri += '?'
+            for name_filter, value in kwargs.items():
+                built_uri += f'&{name_filter}={value}'
+
+        return built_uri
 
     @sleep_and_retry
     @limits(calls=100, period=HOUR)
@@ -36,7 +42,6 @@ class FastestLiveScores(object):
 
         request = self.session.get(built_uri)
         try:
-            print(built_uri)
             result = json.loads(request.text)
             if 'errorText' in result or request.status_code == 400 or request.status_code == 404:
                 result = {}
@@ -102,10 +107,39 @@ class FastestLiveScores(object):
 
         return total_results
 
+    def request_matches(self, **kwargs):
+        """
+        Request basic match information, max time interval is 7 days unless looking at specific team
+        :param team_id: FLS team id for which to retrieve matches
+        :param competition_id: FLS competition id for which to retrieve matches
+        :param from_date: Matches started after this time Example: 2014-11-19T12:00:00-03:00
+        :param to_date: Matches started before this time
+        :return:
+        """
+        endpoint = self.build_endpoint(**kwargs, endpoint_name="matches")
+        result = self.perform_get(built_uri=endpoint)
+        total_result = []
+
+        if result:
+            for match in result:
+                total_result.append({
+                    Match.HOME_TEAM: match["homeTeam"]["name"],
+                    Match.AWAY_TEAM: match["awayTeam"]["name"],
+                    Match.FULL_TIME_HOME_SCORE: match["homeGoals"],
+                    Match.FULL_TIME_AWAY_SCORE: match["awayGoals"],
+                    Match.COMPETITION: match["competition"]["name"],
+                    Match.FLS_API_COMPETITION_ID: match["competition"]["dbid"],
+                    Match.SEASON_YEAR: match["season"]["name"],
+                    Match.FASTEST_LIVE_SCORES_API_ID: match["dbid"]
+                })
+
+        return total_result
+
+    # def request_match_details(self, ):
 
 
-# if __name__ == "__main__":
-#     fls = FastestLiveScores(api_key=os.getenv('FASTEST_LIVE_SCORES_API_KEY'))
-#     print(fls.request_teams())
+if __name__ == "__main__":
+    fls = FastestLiveScores(api_key=os.getenv('FASTEST_LIVE_SCORES_API_KEY'))
+    print(fls.request_matches(competition_id=60))
 
 
