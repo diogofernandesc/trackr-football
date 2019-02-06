@@ -435,8 +435,8 @@ class FootballData(object):
 
 fd = FootballData()
 
+
 # print(fd.request_player(player_id=1))
-# print(fd.request_competitions(competition_id=2002))
 # print(fd.request_competition_scorers(competition_id=2002))
 # print(fd.request_competition_standings(competition_id=2002))
 # print(fd.request_competition_team(competition_id=2002, season=2017))
