@@ -147,7 +147,6 @@ class Standings:
     GOAL_DIFFERENCE = 'goal_difference'
 
 
-
 class Player:
     NAME = 'name'
     FIRST_NAME = 'first_name'
@@ -163,8 +162,13 @@ class Player:
     WEIGHT = 'weight'
     GENDER = 'gender'
     HEIGHT = 'height'
-
-
+    TEAM_FLS_ID = 'team_fls_id'
+    ASSISTS = 'assists'
+    RED_CARDS = 'red_cards'
+    COMPETITION_FLS_ID = 'competition_fls_id'
+    YELLOW_CARDS = 'yellow_cards'
+    FASTEST_LIVE_SCORES_API_ID = 'fls_api_id'
+    COMPETITION_STATS = 'competition_stats'
 
 
 class Competition:

@@ -2,7 +2,7 @@ from ratelimit import limits, sleep_and_retry
 import requests as re
 import os
 import json
-from ingest_engine.cons import Competition, Team, Match, MatchEvent, FLS_STATES_MAPPER as state_mapper
+from ingest_engine.cons import Competition, Player, Team, Match, MatchEvent, FLS_STATES_MAPPER as state_mapper
 
 HOUR = 3600
 
@@ -254,9 +254,55 @@ class FastestLiveScores(object):
 
         return dict_result
 
+    def request_player_details(self, **kwargs):
+        """
+        Gets specific player information, given a number of filters from:
+        Team_ids, round_ids, competition_ids, season_ids
+        :param kwargs: Potential filters (as comma separated lists)
+        :return: List of player details
+        :rtype: list
+        """
+        endpoint = self.build_endpoint(**kwargs, endpoint_name="playerstats")
+        result = self.perform_get(built_uri=endpoint)
+        total_result = []
+
+        if result:
+            for detail in result:
+                data = {
+                    Player.NAME: detail['name'],
+                    Player.WEIGHT: detail['weight'],
+                    Player.GENDER: detail['gender'],
+                    Player.TEAM: detail['team']['name'],
+                    Player.TEAM_FLS_ID: detail['team']['dbid'],
+                    Player.SHIRT_NUMBER: detail['number'],
+                    Player.HEIGHT: detail['height'],
+                    Player.DATE_OF_BIRTH_EPOCH: detail['dateOfBirth'],
+                    Player.FASTEST_LIVE_SCORES_API_ID: detail['dbid'],
+                    Player.POSITION: detail['position'],
+                }
+
+                if 'playerstats' in detail:
+                    comp_stats = []
+                    for stats in detail['playerstats']:
+                        comp_stats.append({
+                            Competition.NAME: stats['competitionName'],
+                            Competition.FASTEST_LIVE_SCORES_API_ID: stats['competitionId'],
+                            Player.ASSISTS: stats['assists'],
+                            Player.NUMBER_OF_GOALS: stats['goals'],
+                            Player.RED_CARDS: stats['redCards'],
+                            Player.YELLOW_CARDS: stats['yellowCards']
+                        })
+                    data[Player.COMPETITION_STATS] = comp_stats
+
+                total_result.append(data)
+
+        return total_result
+
+
+
 
 if __name__ == "__main__":
     fls = FastestLiveScores(api_key=os.getenv('FASTEST_LIVE_SCORES_API_KEY'))
-    print(fls.request_match_details(match_id=321042))
+    print(fls.request_player_details(team_ids=1))
 
 
