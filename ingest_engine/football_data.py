@@ -115,10 +115,9 @@ class FootballData(object):
 
 
 
-print(os.environ.get('FOOTBALL_DATA_API_KEY'))
 fd = FootballData()
 
-print(fd.request_competitions(competition_id=2002))
+# print(fd.request_competitions(competition_id=2002))
 # print(fd.request_match(**{fda.TO_DATE: '2018-09-15', fda.FROM_DATE: '2018-09-05'}))
 # fd.session.get('http://api.football-data.org/v2/competitions')
 # api_res = fd.request_competitions(2002)
