@@ -40,4 +40,13 @@ class ApiTest(unittest.TestCase):
         self.assertTrue(len(matches) > 0)
         self.assertEqual(self.test_fls.request_matches(), [])
 
+    def testMatchDetailsEndpoint(self):
+        match_details = self.fls.request_match_details(match_id=321042)
+        self.assertTrue(len(match_details) > 0)
+        self.assertEqual(self.test_fls.request_match_details(match_id=321042), {})
+        self.assertTrue(Match.HOME_TEAM_FLS_ID in match_details)
+        self.assertTrue(Match.AWAY_TEAM_FLS_ID in match_details)
+        self.assertTrue(Match.HOME_FORM in match_details)
+        self.assertTrue(Match.AWAY_FORM in match_details)
+        self.assertTrue(Match.PREVIOUS_ENCOUNTERS in match_details)
 

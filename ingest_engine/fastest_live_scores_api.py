@@ -130,7 +130,7 @@ class FastestLiveScores(object):
                     Match.COMPETITION: match["competition"]["name"],
                     Match.FLS_API_COMPETITION_ID: match["competition"]["dbid"],
                     Match.SEASON_YEAR: match["season"]["name"],
-                    Match.FASTEST_LIVE_SCORES_API_ID: match["dbid"]
+                    Match.FLS_MATCH_ID: match["dbid"]
                 })
 
         return total_result
@@ -228,7 +228,8 @@ class FastestLiveScores(object):
                         MatchEvent.ADDED_TIME: match_time['extra'],
                         Match.HOME_TEAM_FLS_ID: event['homeTeam']['dbid'],
                         Match.AWAY_TEAM_FLS_ID: event['awayTeam']['dbid'],
-                        Match.FLS_MATCH_ID: event['matchId'], MatchEvent.OCCURED_AT: event['happenedAt'],
+                        Match.FLS_MATCH_ID: event['matchId'],
+                        MatchEvent.OCCURED_AT: event['happenedAt'],
                         MatchEvent.TYPE: event['type']
                     }
 
@@ -237,7 +238,6 @@ class FastestLiveScores(object):
 
                     if Match.AWAY_TEAM_FLS_ID not in dict_result:
                         dict_result[Match.AWAY_TEAM_FLS_ID] = event['awayTeam']['dbid']
-
 
                     if 'scoringPlayer' in event:
                         if event['scoringPlayer']:
