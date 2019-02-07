@@ -35,6 +35,26 @@ class ApiTest(unittest.TestCase):
             if Team.STADIUM_LAT in team:
                 self.assertTrue(-90 <= team[Team.STADIUM_LAT] <= 90)
 
+    def testMatchesEndpoint(self):
+        matches = self.fls.request_matches()
+        self.assertTrue(len(matches) > 0)
+        self.assertEqual(self.test_fls.request_matches(), [])
+
+    def testMatchDetailsEndpoint(self):
+        match_details = self.fls.request_match_details(match_id=321042)
+        self.assertTrue(len(match_details) > 0)
+        self.assertEqual(self.test_fls.request_match_details(match_id=321042), {})
+        self.assertTrue(Match.HOME_TEAM_FLS_ID in match_details)
+        self.assertTrue(Match.AWAY_TEAM_FLS_ID in match_details)
+        self.assertTrue(Match.HOME_FORM in match_details)
+        self.assertTrue(Match.AWAY_FORM in match_details)
+        self.assertTrue(Match.PREVIOUS_ENCOUNTERS in match_details)
+
+    def testPlayerDetailsEndpoint(self):
+        player_details = self.fls.request_player_details(team_ids=1)
+        self.assertTrue(len(player_details) > 0)
+        self.assertEqual(self.test_fls.request_player_details(team_ids=1), [])
+        self.assertTrue(Player.NAME in player_details[0])
 
 
 
