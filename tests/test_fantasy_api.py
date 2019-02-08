@@ -1,8 +1,6 @@
 import unittest
-import json
-from time import sleep
 from ingest_engine.fantasy_api import Fantasy
-from ingest_engine.cons import Competition, Match, Team, Player, FootballDataApiFilters as fda, FantasyGameWeek
+from ingest_engine.cons import Team, Player, FantasyGameWeek
 
 
 class ApiTest(unittest.TestCase):
