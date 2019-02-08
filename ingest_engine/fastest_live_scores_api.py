@@ -2,17 +2,18 @@ from ratelimit import limits, sleep_and_retry
 import requests as re
 import os
 import json
+from ingest_engine.api_integration import ApiIntegration
 from ingest_engine.cons import Competition, Player, Team, Match, MatchEvent, FLS_STATES_MAPPER as state_mapper
 
 HOUR = 3600
 
 
-class FastestLiveScores(object):
+class FastestLiveScores(ApiIntegration):
     """
     Wrapper for API available at -> https://customer.fastestlivescores.com/
     """
     def __init__(self, api_key=None):
-        self.session = re.session()
+        super().__init__()
         self.api_key = api_key
         if not api_key:
             self.api_key = os.environ.get('FASTEST_LIVE_SCORES_API_KEY')

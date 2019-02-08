@@ -1,6 +1,5 @@
 import unittest
 import json
-from time import sleep
 from ingest_engine.football_data import FootballData
 from ingest_engine.cons import Competition, Match, Team, Player, FootballDataApiFilters as fda
 

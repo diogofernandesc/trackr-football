@@ -3,19 +3,20 @@ import json
 import os
 from ratelimit import limits, sleep_and_retry
 from time import sleep
+from ingest_engine.api_integration import ApiIntegration
 from ingest_engine.cons import Competition, Match, Team, Standings, Player
 from ingest_engine.cons import FootballDataApiFilters as fda
 
 HOUR = 3600
 
 
-class FootballData(object):
+class FootballData(ApiIntegration):
     """
     Wrapper for the football-data api available at https://www.football-data.org/documentation/api
     """
 
     def __init__(self, api_key=None):
-        self.session = re.Session()
+        super().__init__()
         if not api_key:
             api_key = os.environ.get('FOOTBALL_DATA_API_KEY')
         self.session.headers.update({'X-Auth-Token': api_key})
