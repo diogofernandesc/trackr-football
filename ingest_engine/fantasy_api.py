@@ -87,7 +87,7 @@ class Fantasy(ApiIntegration):
                     Player.FANTASY_CREATIVITY: float(player['creativity']),
                     Player.FANTASY_THREAT: float(player['threat']),
                     Player.FANTASY_ICT_INDEX: float(player['ict_index']),
-                    Player.FANTASY_GAME_WEEK: result['current-event']
+                    Player.FANTASY_WEEK: result['current-event']
                 })
 
             if 'teams' in result:
@@ -112,6 +112,7 @@ class Fantasy(ApiIntegration):
                         FantasyGameWeek.DEADLINE_TIME_EPOCH: game_week['deadline_time_epoch'],
                         FantasyGameWeek.AVERAGE_SCORE: game_week['average_entry_score'],
                         FantasyGameWeek.HIGHEST_SCORE: game_week['highest_score'],
+                        FantasyGameWeek.FINISHED: game_week['finished']
                     })
 
             if players:
@@ -128,7 +129,7 @@ class Fantasy(ApiIntegration):
 
 if __name__ == "__main__":
     fantasy = Fantasy()
-    print(fantasy.request_base_information(full=True))
+    print(fantasy.request_base_information(full=False))
 
 
 

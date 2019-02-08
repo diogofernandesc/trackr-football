@@ -222,7 +222,6 @@ class Player:
     FANTASY_ICT_INDEX = 'fantasy_ict_index'  # Influence, creativity, threat index
     FANTASY_TEAM_ID = 'fantasy_team_id'
     FANTASY_PHOTO_URL = 'fantasy_photo_url'
-    FANTASY_GAME_WEEK = 'fantasy_game_week'
 
 
 
