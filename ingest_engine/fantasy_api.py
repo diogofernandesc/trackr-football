@@ -1,7 +1,3 @@
-from ratelimit import limits, sleep_and_retry
-import requests as re
-import os
-import json
 from ingest_engine.cons import *
 from ingest_engine.cons import FANTASY_STATUS_MAPPER as st_mapper
 from ingest_engine.api_integration import ApiIntegration

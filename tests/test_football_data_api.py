@@ -16,7 +16,7 @@ class ApiTest(unittest.TestCase):
     def testApiSetUp(self):
         req = self.test_fd.session.get('http://api.football-data.org/v2/competitions').text
         req = json.loads(req)
-        self.assertEqual(req['errorCodew'], 400)
+        self.assertEqual(req['errorCode'], 400)
         self.test_fd.session.close()
 
     def testPerformGet(self):
