@@ -170,6 +170,53 @@ class Player:
     FASTEST_LIVE_SCORES_API_ID = 'fls_api_id'
     COMPETITION_STATS = 'competition_stats'
 
+    # Fantasy fields:
+    FANTASY_TEAM_CODE = 'fantasy_team_code'
+    FANTASY_ID = 'fantasy_id'
+    FANTASY_STATUS = 'fantasy_status'
+    FANTASY_CODE = 'fantasy_code'
+    FANTASY_PRICE = 'fantasy_price'
+    FANTASY_NEWS = 'fantasy_news'
+    FANTASY_NEWS_TIMESTAMP = 'fantasy_news_timestamp'
+    FANTASY_CHANCE_OF_PLAYING_THIS_WEEK = 'chance_of_playing_this_week'
+    FANTASY_CHANCE_OF_PLAYING_NEXT_WEEK = 'chance_of_playing_next_week'
+    FANTASY_DREAM_TEAM_MEMBER = 'fantasy_dream_team_member'
+    FANTASY_SEASON_VALUE = 'season_value'
+    FANTASY_WEEK_PRICE_RISE = 'fantasy_week_price_rise'
+    FANTASY_OVERALL_PRICE_RISE = 'fantasy_overall_price_rise'
+    FANTASY_WEEK_PRICE_FALL = 'fantasy_week_price_fall'
+    FANTASY_OVERALL_PRICE_FALL = 'fantasy_overall_price_fall'
+    FANTASY_WEEK = 'fantasy_week'
+    FANTASY_DREAM_TEAM_COUNT = 'dream_team_count'  # No. of times in dream team
+    FANTASY_SELECTION_PERCENTAGE = 'selection_percentage'  # % of fantasy users selecting player
+    FANTASY_FORM = 'fantasy_form'
+    FANTASY_OVERALL_TRANSFERS_IN = 'fantasy_overall_transfers_in'
+    FANTASY_WEEK_TRANSFERS_IN = 'fantasy_week_transfers_in'
+    FANTASY_OVERALL_TRANSFERS_OUT = 'fantasy_overall_transfers_out'
+    FANTASY_WEEK_TRANSFERS_OUT = 'fantasy_week_transfers_out'
+    FANTASY_OVERALL_POINTS = 'fantasy_overall_points'
+    FANTASY_WEEK_POINTS = 'fantasy_week_points'
+    FANTASY_POINT_AVERAGE = 'fantasy_point_average'
+    FANTASY_ESTIMATED_WEEK_POINTS = 'fantasy_estimated_week_points'
+    FANTASY_ESTIMATED_NEXT_WEEK_POINTS = 'fantasy_estimated_next_week_points'
+    FANTASY_SPECIAL = 'fantasy_special'
+    MINUTES_PLAYED = 'minutes_played'
+    CLEAN_SHEETS = 'clean_sheets'
+    GOALS_CONCEDED = 'goals_conceded'
+    OWN_GOALS = 'own_goals'
+    PENALTIES_SAVED = 'penalties_saved'
+    PENALTIES_MISSED = 'penalties_missed'
+    SAVES = 'saves'
+    FANTASY_WEEK_BONUS = 'fantasy_week_bonus'
+    FANTASY_TOTAL_BONUS = 'fantasy_total_bonus'
+    FANTASY_INFLUENCE = 'fantasy_influence'
+    FANTASY_CREATIVITY = 'fantasy_creativity'
+    FANTASY_THREAT = 'fantasy_threat'
+    FANTASY_ICT_INDEX = 'fantasy_ict_index'  # Influence, creativity, threat index
+    FANTASY_TEAM_ID = 'fantasy_team_id'
+    FANTASY_PHOTO_URL = 'fantasy_photo_url'
+
+
 
 class Competition:
     NAME = 'name'
@@ -216,5 +263,13 @@ FLS_STATES_MAPPER = {
     9: "full_time",
     101: "abandoned",
     102: "postponed"
+}
+
+FANTASY_STATUS_MAPPER = {
+    "a": "available",
+    "d": "illness",
+    "i": "injury",
+    "n": "ineligible",
+    "u": "unavailable",
 }
 
