@@ -125,7 +125,14 @@ class Team:
     SQUAD = 'squad'
     SQUAD_ROLE = 'squad_role'
     FASTEST_LIVE_SCORES_API_ID = 'fls_api_id'
-
+    FANTASY_CODE = 'fantasy_code'
+    FANTASY_WEEK_STRENGTH = 'fantasy_week_strength'
+    FANTASY_OVERALL_HOME_STRENGTH = 'fantasy_overall_home_strength'
+    FANTASY_OVERALL_AWAY_STRENGTH = 'fantasy_overall_away_strength'
+    FANTASY_ATTACK_HOME_STRENGTH = 'fantasy_attack_home_strength'
+    FANTASY_ATTACK_AWAY_STRENGTH = 'fantasy_attack_away_strength'
+    FANTASY_DEFENCE_HOME_STRENGTH = 'fantasy_defence_home_strength'
+    FANTASY_DEFENCE_AWAY_STRENGTH = 'fantasy_defence_away_strength'
 
 class Standings:
     COMPETITION_NAME = 'competition_name'
@@ -215,6 +222,7 @@ class Player:
     FANTASY_ICT_INDEX = 'fantasy_ict_index'  # Influence, creativity, threat index
     FANTASY_TEAM_ID = 'fantasy_team_id'
     FANTASY_PHOTO_URL = 'fantasy_photo_url'
+    FANTASY_GAME_WEEK = 'fantasy_game_week'
 
 
 
@@ -248,6 +256,18 @@ class FLS_STATES:
     FULL_TIME = 9
     ABANDONED = 101
     POSTPONED = 102
+
+
+class FantasyGameWeek:
+    ID = 'id'
+    NAME = 'name'
+    FANTASY_ID = 'fantasy_id'
+    DEADLINE_TIME = 'deadline_time'
+    DEADLINE_TIME_EPOCH = 'deadline_time_epoch'
+    AVERAGE_SCORE = 'average_score'
+    FINISHED = 'finished'
+    HIGHEST_SCORE = 'highest_score'
+
 
 
 FLS_STATES_MAPPER = {

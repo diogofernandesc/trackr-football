@@ -2,7 +2,8 @@ from ratelimit import limits, sleep_and_retry
 import requests as re
 import os
 import json
-from ingest_engine.cons import Competition, Player, Team, Match, MatchEvent, FANTASY_STATUS_MAPPER as st_mapper
+from ingest_engine.cons import *
+from ingest_engine.cons import FANTASY_STATUS_MAPPER as st_mapper
 from ingest_engine.api_integration import ApiIntegration
 
 
@@ -32,6 +33,8 @@ class Fantasy(ApiIntegration):
         result = self.perform_get(built_uri=self.uri+built_uri)
         if result:
             players = []
+            teams = []
+            game_weeks = []
             for player in result['elements']:
                 players.append({
                     Player.FANTASY_ID: player['id'],
@@ -40,7 +43,7 @@ class Fantasy(ApiIntegration):
                     Player.FANTASY_TEAM_ID: player['team'],
                     Player.FANTASY_CODE: player['code'],
                     Player.FIRST_NAME: player['first_name'],
-                    Player.LAST_NAME: player['last_name'],
+                    Player.LAST_NAME: player['second_name'],
                     Player.SHIRT_NUMBER: player['squad_number'],
                     Player.FANTASY_STATUS: st_mapper.get(player['status']),
                     Player.FANTASY_NEWS: player['news'],
@@ -55,7 +58,7 @@ class Fantasy(ApiIntegration):
                     Player.FANTASY_WEEK_PRICE_FALL: player['cost_change_event_fall'],
                     Player.FANTASY_DREAM_TEAM_MEMBER: player['in_dreamteam'],
                     Player.FANTASY_DREAM_TEAM_COUNT: player['dreamteam_count'],
-                    Player.FANTASY_SELECTION_PERCENTAGE: player['selected_by_percent'],
+                    Player.FANTASY_SELECTION_PERCENTAGE: float(player['selected_by_percent']),
                     Player.FANTASY_FORM: player['form'],
                     Player.FANTASY_OVERALL_TRANSFERS_IN: player['transfers_in'],
                     Player.FANTASY_OVERALL_TRANSFERS_OUT: player['transfers_out'],
@@ -63,9 +66,9 @@ class Fantasy(ApiIntegration):
                     Player.FANTASY_WEEK_TRANSFERS_OUT: player['transfers_out_event'],
                     Player.FANTASY_OVERALL_POINTS: player['total_points'],
                     Player.FANTASY_WEEK_POINTS: player['event_points'],
-                    Player.FANTASY_POINT_AVERAGE: player['points_per_page'],
-                    Player.FANTASY_ESTIMATED_WEEK_POINTS: player['ep_this'],
-                    Player.FANTASY_ESTIMATED_NEXT_WEEK_POINTS: player['ep_next'],
+                    Player.FANTASY_POINT_AVERAGE: float(player['points_per_game']),
+                    Player.FANTASY_ESTIMATED_WEEK_POINTS: float(player['ep_this']),
+                    Player.FANTASY_ESTIMATED_NEXT_WEEK_POINTS: float(player['ep_next']),
                     Player.FANTASY_SPECIAL: player['special'],
                     Player.MINUTES_PLAYED: player['minutes'],
                     Player.NUMBER_OF_GOALS: player['goals_scored'],
@@ -80,19 +83,52 @@ class Fantasy(ApiIntegration):
                     Player.SAVES: player['saves'],
                     Player.FANTASY_WEEK_BONUS: player['bonus'],
                     Player.FANTASY_TOTAL_BONUS: player['bps'],
-                    Player.FANTASY_INFLUENCE: player['influence'],
-                    Player.FANTASY_CREATIVITY: player['creativity'],
-                    Player.FANTASY_THREAT: player['threat'],
-                    Player.FANTASY_ICT_INDEX: player['ict_index'],
+                    Player.FANTASY_INFLUENCE: float(player['influence']),
+                    Player.FANTASY_CREATIVITY: float(player['creativity']),
+                    Player.FANTASY_THREAT: float(player['threat']),
+                    Player.FANTASY_ICT_INDEX: float(player['ict_index']),
+                    Player.FANTASY_GAME_WEEK: result['current-event']
                 })
 
+            if 'teams' in result:
+                for team in result['teams']:
+                    teams.append({
+                        Team.FANTASY_CODE: team['code'],
+                        Team.FANTASY_WEEK_STRENGTH: team['strength'],
+                        Team.FANTASY_OVERALL_HOME_STRENGTH: team['strength_overall_home'],
+                        Team.FANTASY_OVERALL_AWAY_STRENGTH: team['strength_overall_away'],
+                        Team.FANTASY_ATTACK_HOME_STRENGTH: team['strength_attack_home'],
+                        Team.FANTASY_ATTACK_AWAY_STRENGTH: team['strength_attack_away'],
+                        Team.FANTASY_DEFENCE_HOME_STRENGTH: team['strength_defence_home'],
+                        Team.FANTASY_DEFENCE_AWAY_STRENGTH: team['strength_defence_away']
+                    })
 
+            if 'events' in result:
+                for game_week in result['events']:
+                    game_weeks.append({
+                        FantasyGameWeek.FANTASY_ID: game_week['id'],
+                        FantasyGameWeek.NAME: game_week['name'],
+                        FantasyGameWeek.DEADLINE_TIME: game_week['deadline_time'],
+                        FantasyGameWeek.DEADLINE_TIME_EPOCH: game_week['deadline_time_epoch'],
+                        FantasyGameWeek.AVERAGE_SCORE: game_week['average_entry_score'],
+                        FantasyGameWeek.HIGHEST_SCORE: game_week['highest_score'],
+                    })
 
+            if players:
+                total_result['players'] = players
+
+            if teams:
+                total_result['teams'] = teams
+
+            if game_weeks:
+                total_result['game_weeks'] = game_weeks
+
+        return total_result
 
 
 if __name__ == "__main__":
     fantasy = Fantasy()
-    fantasy.request_base_information(full=True)
+    print(fantasy.request_base_information(full=True))
 
 
 
