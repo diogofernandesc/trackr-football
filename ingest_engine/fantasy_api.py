@@ -122,10 +122,123 @@ class Fantasy(ApiIntegration):
 
         return total_result
 
+    def request_player_season_aggregate_data(self, player_id):
+        """
+        Returns summary data for a player's stats
+        :param player_id: The ID of the player for which to retrieve the data
+        :return: parsed season summary results
+        :rtype: dict
+        """
+
+    def request_player_data(self, player_id, season_summaries=True, fixture_data=True, fixture_codes=True):
+        """
+        Returns stats tracked by fantasy football for the footballer given by the player_id param
+        :param player_id: ID of the player for which to retrieve fantasy football data
+        :param season_summaries: Indicator of whether to retrieve historical summary season data for player
+        :param fixture_data: Indicator of whether to retrieve player match data for their fixtures this season
+        :param fixture_codes: Indicator of whether to output a list of fixture codes for player future fixtures
+        :return: Parsed results for player info
+        :rtype: dict
+        """
+        built_uri = f'element-summary/{player_id}'
+        dict_result = {}
+        result = self.perform_get(built_uri=self.uri+built_uri)
+        if result:
+            dict_result[Player.FANTASY_ID] = player_id
+            if season_summaries:
+                if "history_past" in result:
+                    season_history = []
+                    for entry in result['history_past']:
+                        season_history.append({
+                            Season.NAME: entry['season_name'],
+                            Season.FANTASY_CODE: entry['season'],
+                            Player.FANTASY_SEASON_START_PRICE: entry['start_cost'],
+                            Player.FANTASY_SEASON_END_PRICE: entry['end_cost'],
+                            Player.FANTASY_OVERALL_POINTS: entry['total_points'],
+                            Player.MINUTES_PLAYED: entry['minutes'],
+                            Player.NUMBER_OF_GOALS: entry['goals_scored'],
+                            Player.ASSISTS: entry['assists'],
+                            Player.CLEAN_SHEETS: entry['clean_sheets'],
+                            Player.GOALS_CONCEDED: entry['goals_conceded'],
+                            Player.OWN_GOALS: entry['own_goals'],
+                            Player.PENALTIES_SAVED: entry['penalties_saved'],
+                            Player.PENALTIES_MISSED: entry['penalties_missed'],
+                            Player.YELLOW_CARDS: entry['yellow_cards'],
+                            Player.RED_CARDS: entry['red_cards'],
+                            Player.SAVES: entry['saves'],
+                            Player.FANTASY_TOTAL_BONUS: entry['bps'],
+                        })
+
+                    dict_result['season_summaries'] = season_history
+
+            if fixture_data:
+                if 'history' in result:
+                    match_history = []
+                    for match in result['history']:
+                        match_history.append({
+                            Match.START_TIME: match['kickoff_time'],
+                            Match.FULL_TIME_HOME_SCORE: match['team_h_score'],
+                            Match.FULL_TIME_AWAY_SCORE: match['team_a_score'],
+                            Player.PLAYED_AT_HOME: match['was_home'],
+                            Player.FANTASY_WEEK_POINTS: match['total_points'],
+                            Player.FANTASY_SEASON_VALUE: match['value'],
+                            Player.FANTASY_TRANSFERS_BALANCE: match['transfers_balance'],
+                            Player.FANTASY_SELECTION_COUNT: match['selected'],
+                            Player.FANTASY_WEEK_TRANSFERS_IN: match['transfers_in'],
+                            Player.FANTASY_WEEK_TRANSFERS_OUT: match['transfers_out'],
+                            Player.MINUTES_PLAYED: match['minutes'],
+                            Player.NUMBER_OF_GOALS: match['goals_scored'],
+                            Player.ASSISTS: match['assists'],
+                            Player.CLEAN_SHEETS: match['clean_sheets'],
+                            Player.GOALS_CONCEDED: match['goals_conceded'],
+                            Player.OWN_GOALS: match['own_goals'],
+                            Player.PENALTIES_SAVED: match['penalties_saved'],
+                            Player.PENALTIES_MISSED: match['penalties_missed'],
+                            Player.YELLOW_CARDS: match['yellow_cards'],
+                            Player.RED_CARDS: match['red_cards'],
+                            Player.SAVES: match['saves'],
+                            Player.FANTASY_WEEK_BONUS: match['bps'],
+                            Player.FANTASY_INFLUENCE: match['influence'],
+                            Player.FANTASY_CREATIVITY: match['creativity'],
+                            Player.FANTASY_THREAT: match['threat'],
+                            Player.FANTASY_ICT_INDEX: match['ict_index'],
+                            Player.OPEN_PLAY_CROSSES: match['open_play_crosses'],
+                            Player.BIG_CHANCES_CREATED: match['big_chances_created'],
+                            Player.CLEARANCES_BLOCKS_INTERCEPTIONS: match['clearances_blocks_interceptions'],
+                            Player.RECOVERIES: match['recoveries'],
+                            Player.KEY_PASSES: match['key_passes'],
+                            Player.TACKLES: match['tackles'],
+                            Player.WINNING_GOALS: match['winning_goals'],
+                            Player.ATTEMPTED_PASSES: match['attempted_passes'],
+                            Player.COMPLETED_PASSES: match['completed_passes'],
+                            Player.PENALTIES_CONCEDED: match['penalties_conceded'],
+                            Player.BIG_CHANCES_MISSED: match['big_chances_missed'],
+                            Player.ERRORS_LEADING_TO_GOAL: match['errors_leading_to_goal'],
+                            Player.ERRORS_LEADING_TO_GOAL_ATTEMPT: match['errors_leading_to_goal_attempt'],
+                            Player.TACKLED: match['tackled'],
+                            Player.OFFSIDE: match['offside'],
+                            Player.TARGET_MISSED: match['target_missed'],
+                            Player.FOULS: match['fouls'],
+                            Player.DRIBBLES: match['dribbles'],
+                            Player.FANTASY_OPPONENT_TEAM_ID: match['opponent_team']
+                        })
+
+                    dict_result['season_match_history'] = match_history
+
+            if fixture_codes:
+                if 'fixtures' in result:
+                    not_played = []
+                    for fixture in result['fixtures']:
+                        not_played.append(fixture["code"])
+
+                    dict_result[Player.FUTURE_FIXTURES] = not_played
+
+            return dict_result
+
 
 if __name__ == "__main__":
     fantasy = Fantasy()
-    print(fantasy.request_base_information(full=False))
+    print(fantasy.request_player_data(player_id=176))
 
 
 
