@@ -48,6 +48,7 @@ class Match:
     SEASON_YEAR = 'season_year'
     MATCH_UTC_DATE = 'utc_date'
     START_TIME_EPOCH = 'start_time_epoch'
+    START_TIME = 'start_time'
     STATUS = 'status'
     MATCHDAY = 'matchday'
     FULL_TIME_HOME_SCORE = 'full_time_home_score'
@@ -176,10 +177,14 @@ class Player:
     YELLOW_CARDS = 'yellow_cards'
     FASTEST_LIVE_SCORES_API_ID = 'fls_api_id'
     COMPETITION_STATS = 'competition_stats'
+    PLAYED_AT_HOME = 'played_at_home'
+    PLAYED = 'played'
+    NOT_PLAYED = 'not_played'
+    FUTURE_FIXTURES = 'future_fixtures'
 
     # Fantasy fields:
     FANTASY_TEAM_CODE = 'fantasy_team_code'
-    FANTASY_ID = 'fantasy_id'
+    FANTASY_ID = 'fantasy_player_id'
     FANTASY_STATUS = 'fantasy_status'
     FANTASY_CODE = 'fantasy_code'
     FANTASY_PRICE = 'fantasy_price'
@@ -189,6 +194,7 @@ class Player:
     FANTASY_CHANCE_OF_PLAYING_NEXT_WEEK = 'chance_of_playing_next_week'
     FANTASY_DREAM_TEAM_MEMBER = 'fantasy_dream_team_member'
     FANTASY_SEASON_VALUE = 'season_value'
+    FANTASY_WEEK_VALUE = 'week_value'
     FANTASY_WEEK_PRICE_RISE = 'fantasy_week_price_rise'
     FANTASY_OVERALL_PRICE_RISE = 'fantasy_overall_price_rise'
     FANTASY_WEEK_PRICE_FALL = 'fantasy_week_price_fall'
@@ -222,6 +228,32 @@ class Player:
     FANTASY_ICT_INDEX = 'fantasy_ict_index'  # Influence, creativity, threat index
     FANTASY_TEAM_ID = 'fantasy_team_id'
     FANTASY_PHOTO_URL = 'fantasy_photo_url'
+    FANTASY_SEASON_START_PRICE = 'fantasy_season_start_price'
+    FANTASY_SEASON_END_PRICE = 'fantasy_season_start_price'
+    FANTASY_TRANSFERS_BALANCE = 'fantasy_transfers_balance'
+    FANTASY_SELECTION_COUNT = 'fantasy_selection_count'
+
+    # match
+    OPEN_PLAY_CROSSES = 'open_play_crosses'
+    BIG_CHANCES_CREATED = 'big_chances_created'
+    CLEARANCES_BLOCKS_INTERCEPTIONS = 'clearances_blocks_interceptions'
+    RECOVERIES = 'recoveries'
+    KEY_PASSES = 'key_passes'
+    TACKLES = 'tackles'
+    WINNING_GOALS = 'winning_goals'
+    ATTEMPTED_PASSES = 'attempted_passes'
+    COMPLETED_PASSES = 'completed_passes'
+    PENALTIES_CONCEDED = 'penalties_conceded'
+    BIG_CHANCES_MISSED = 'big_chances_missed'
+    ERRORS_LEADING_TO_GOAL = 'errors_leading_to_goal'
+    ERRORS_LEADING_TO_GOAL_ATTEMPT = 'errors_leading_to_goal_attempt'
+    TACKLED = 'tackled'
+    OFFSIDE = 'offside'
+    TARGET_MISSED = 'target_missed'
+    FOULS = 'fouls'
+    DRIBBLES = 'dribbles'
+    FANTASY_OPPONENT_TEAM_ID = 'fantasy_opponent_team_id'
+
 
 
 
@@ -240,6 +272,8 @@ class Season:
     END_DATE = 'end_date'
     WINNER = 'winner'
     FOOTBALL_DATA_API_ID = 'football_data_api_id'
+    NAME = 'season_name'
+    FANTASY_CODE = 'fantasy_code'
 
 
 class FLS_STATES:
