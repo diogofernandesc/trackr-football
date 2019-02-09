@@ -38,9 +38,9 @@ class ApiTest(unittest.TestCase):
 
     def testPlayerEndpoint(self):
         player_details_full = self.fantasy.request_player_data(player_id=160)
-        no_season_summaries = self.fantasy.request_player_data(player_id=160, season_summaries=False)
-        no_fixture_data = self.fantasy.request_player_data(player_id=160, fixture_data=False)
-        no_fixture_codes = self.fantasy.request_player_data(player_id=160, fixture_codes=False)
+        no_season_summaries = self.fantasy.request_player_data(player_id=169, season_summaries=False)
+        no_fixture_data = self.fantasy.request_player_data(player_id=273, fixture_data=False)
+        no_fixture_codes = self.fantasy.request_player_data(player_id=177, fixture_codes=False)
         player_constants = [s for s in list(Player.__dict__.values()) if isinstance(s, str) and s.startswith('fantasy')]
         self.assertTrue('season_summaries' in player_details_full)
         self.assertTrue('season_match_history' in player_details_full)
