@@ -90,6 +90,27 @@ class Match:
     AWAY_TEAM_FLS_ID = 'away_team_fls_id'
     PREVIOUS_ENCOUNTERS = 'previous_encounters'
     PENALTY_SHOOTOUT_SCORE = 'penalty_shootout_score'
+    FINISHED = 'finished'
+    FANTASY_GAME_WEEK = 'fantasy_game_week'
+    GOALS_SCORED = 'goals_scored'
+    ASSISTS = 'assists'
+    OWN_GOALS = 'own_goals'
+    PENALTIES_SAVED = 'penalties_saved'
+    PENALTIES_MISSED = 'penalties_missed'
+    YELLOW_CARDS = 'yellow_cards'
+    RED_CARDS = 'red_cards'
+    SAVES = 'saves'
+    BONUS = 'bonus'
+    BPS = 'bps'
+    FANTASY_HOME_TEAM_DIFFICULTY = 'fantasy_home_team_difficulty'
+    FANTASY_AWAY_TEAM_DIFFICULTY = 'fantasy_away_team_difficulty'
+    FANTASY_MATCH_CODE = 'fantasy_match_code'
+    MINUTES = 'minutes'
+    FANTASY_HOME_TEAM_CODE = 'fantasy_home_team_code'
+    FANTASY_AWAY_TEAM_CODE = 'fantasy_away_team_code'
+    SIDE = 'side'
+    GOAL_AMOUNT = 'amount'
+
 
 class MatchEvent:
     OCCURED_AT = 'occured_at'
@@ -186,7 +207,7 @@ class Player:
     FANTASY_TEAM_CODE = 'fantasy_team_code'
     FANTASY_ID = 'fantasy_player_id'
     FANTASY_STATUS = 'fantasy_status'
-    FANTASY_CODE = 'fantasy_code'
+    FANTASY_CODE = 'player_fantasy_code'
     FANTASY_PRICE = 'fantasy_price'
     FANTASY_NEWS = 'fantasy_news'
     FANTASY_NEWS_TIMESTAMP = 'fantasy_news_timestamp'
@@ -301,7 +322,10 @@ class FantasyGameWeek:
     FINISHED = 'finished'
     HIGHEST_SCORE = 'highest_score'
 
+# ----- API fields ---------
 
+
+# ----- Mappers ------
 
 FLS_STATES_MAPPER = {
     0: "fixture",
