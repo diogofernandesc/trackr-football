@@ -1,6 +1,6 @@
 import unittest
 from ingest_engine.fantasy_api import Fantasy
-from ingest_engine.cons import Team, Player, FantasyGameWeek
+from ingest_engine.cons import Team, Player, Match, FantasyGameWeek
 
 
 class ApiTest(unittest.TestCase):
@@ -50,6 +50,25 @@ class ApiTest(unittest.TestCase):
         self.assertFalse('future_fixtures' in no_fixture_codes)
         for fixture in player_details_full['season_match_history']:
             self.assertTrue(len(set(player_constants) & set(fixture)) > 10)
+
+    def testMatchEndpoint(self):
+        matches = self.fantasy.request_matches()
+        match_constants = [s for s in list(Match.__dict__.values()) if isinstance(s, str)]
+        for match in matches:
+            if len(match) > 11:
+                self.assertTrue({Match.GOALS_SCORED,
+                                 Match.ASSISTS,
+                                 Match.OWN_GOALS,
+                                 Match.PENALTIES_SAVED,
+                                 Match.PENALTIES_MISSED,
+                                 Match.YELLOW_CARDS,
+                                 Match.RED_CARDS,
+                                 Match.SAVES,
+                                 Match.BONUS,
+                                 Match.BPS}
+                                <= set(match))
+
+            self.assertTrue(len(set(match_constants) & set(match)) >= 11)
 
 
 

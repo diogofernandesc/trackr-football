@@ -235,11 +235,61 @@ class Fantasy(ApiIntegration):
 
             return dict_result
 
+    def request_matches(self):
+        """
+        Returns fixture (match) information from https://fantasy.premierleague.com/drf/fixtures/
+        :return: Parsed list of fixtures from API endpoint
+        :rtype: list
+        """
+        built_uri = 'fixtures'
+        total_result = []
+        result = self.perform_get(built_uri=self.uri + built_uri)
+        if result:
+            for match in result:
+                if "kickoff_time" in match and match["kickoff_time"]:  # Filter for actual matches
+                    match_data = {
+                        Match.START_TIME: match["kickoff_time"],
+                        Match.FINISHED: match['started'],
+                        Match.FANTASY_GAME_WEEK: match["event"],
+                        Match.FANTASY_HOME_TEAM_DIFFICULTY: match["team_h_difficulty"],
+                        Match.FANTASY_AWAY_TEAM_DIFFICULTY: match["team_a_difficulty"],
+                        Match.FANTASY_MATCH_CODE: match["code"],
+                        Match.FULL_TIME_HOME_SCORE: match["team_h_score"],
+                        Match.FULL_TIME_AWAY_SCORE: match["team_a_score"],
+                        Match.MINUTES: match["minutes"],
+                        Match.FANTASY_HOME_TEAM_CODE: match["team_h"],
+                        Match.FANTASY_AWAY_TEAM_CODE: match["team_a"]
+                    }
+
+                    stats = match["stats"]
+                    for stat in stats:
+                        for stat_name, value in stat.items():
+                            if stat_name not in match_data:
+                                match_data[stat_name] = []
+
+                            for side, side_value in value.items():
+                                for entry in side_value:
+                                    stat_result = {
+                                        Match.GOAL_AMOUNT: entry["value"],
+                                        Player.FANTASY_CODE: entry["element"],
+                                        Match.SIDE: 'home' if side == 'h' else 'away'
+                                    }
+                                    match_data[stat_name].append(stat_result)
+
+                    total_result.append(match_data)
+
+        return total_result
+
+
+
+
+
+
 
 if __name__ == "__main__":
     fantasy = Fantasy()
-    print(fantasy.request_player_data(player_id=176))
-
+    # print(fantasy.request_player_data(player_id=176))
+    print(fantasy.request_matches())
 
 
 
