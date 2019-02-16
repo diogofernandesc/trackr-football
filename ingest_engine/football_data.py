@@ -54,12 +54,13 @@ class FootballData(ApiIntegration):
                 elif result['errorCode'] == 400:  # Buggy API endpoint results in faulty authentication
                     if 'message' in result:
                         print(result['message'])
-                        if 'invalid' in result['message'] and self.session.headers['X-Auth-Token'] != 'test':
-                            sleep(10)  # Sleep and try again
+                        print(self.session.headers['X-Auth-Token'])
+                        if self.session.headers['X-Auth-Token'] != 'test':
+                            sleep(5)  # Sleep and try again
 
                             print("IT GOT HEREEEEEEEEEE")
                             # test get, seems API fails first request after rate limit
-                            self.session.get(self.uri + 'competitions')
+                            # self.session.get(self.uri + 'competitions')
 
                             self.perform_get(built_uri=built_uri)
 
