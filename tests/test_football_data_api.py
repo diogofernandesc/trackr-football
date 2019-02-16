@@ -2,11 +2,12 @@ import unittest
 import json
 from ingest_engine.football_data import FootballData
 from ingest_engine.cons import Competition, Match, Team, Player, FootballDataApiFilters as fda
+import os
 
 
 class ApiTest(unittest.TestCase):
     def setUp(self):
-        self.fd = FootballData()
+        self.fd = FootballData(api_key=os.getenv("FOOTBALL_DATA_API_KEY"))
         self.test_fd = FootballData(api_key='test')
 
     def tearDown(self):
