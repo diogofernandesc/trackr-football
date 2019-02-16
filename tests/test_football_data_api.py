@@ -27,8 +27,10 @@ class ApiTest(unittest.TestCase):
 
     def testCompetitionEndPoint(self):
         comps = self.fd.request_competitions(competition_id=2002)
+        all_comps = self.fd.request_competitions()
         self.assertEqual(self.test_fd.request_competitions(), [])
         self.assertEqual(comps[0][Competition.FOOTBALL_DATA_API_ID], 2002)
+        self.assertTrue('competitions' in all_comps)
 
     def testCompetitionMatchEndPoint(self):
         comp_matches = self.fd.request_competition_match(competition_id=2003, **{Match.MATCHDAY: 11})
@@ -37,6 +39,8 @@ class ApiTest(unittest.TestCase):
 
     def testCompetitionTeamEndpoint(self):
         comp_teams = self.fd.request_competition_team(competition_id=2002)
+        comp_season = self.fd.request_competition_team(competition_id=2002, season=2017)
+        self.assertEqual(comp_season[0][Team.FOOTBALL_DATA_ID], 2)
         self.assertEqual(self.test_fd.request_competition_team(competition_id=2002), [])
         self.assertEqual(comp_teams[0][Team.FOOTBALL_DATA_ID], 2)
 
