@@ -36,10 +36,11 @@ class FootballData(ApiIntegration):
         result = self.session.get(url=self.uri + built_uri)
         try:
             result = json.loads(result.text)
-            print("--------")
-            print(f"API RESULT: {result}")
-            print(f"THIS IS THE SESSION API KEY: {self.session.headers['X-Auth-Token']}")
-            print(f"THIS IS THE SELF.API_KEY: {self.api_key}")
+            if built_uri == "matches?dateTo=2018-09-15&dateFrom=2018-09-05&":
+                print("--------")
+                print(f"API RESULT: {result}")
+                print(f"THIS IS THE SESSION API KEY: {self.session.headers['X-Auth-Token']}")
+                print(f"THIS IS THE SELF.API_KEY: {self.api_key}")
             if 'errorCode' in result:
                 if result['errorCode'] == 429:
                     wait_time = [int(s) for s in result['message'].split() if s.isdigit()][0]
