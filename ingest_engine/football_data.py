@@ -7,7 +7,7 @@ from ingest_engine.api_integration import ApiIntegration
 from ingest_engine.cons import Competition, Match, Team, Standings, Player
 from ingest_engine.cons import FootballDataApiFilters as fda
 
-MINUTE = 60
+MINUTE = 65  # Extra buffer of time
 
 
 class FootballData(ApiIntegration):
@@ -23,8 +23,8 @@ class FootballData(ApiIntegration):
         self.uri = 'http://api.football-data.org/v2/'
         self.api_key = api_key
 
-    @sleep_and_retry
-    @limits(calls=9, period=MINUTE)
+    # @sleep_and_retry
+    # @limits(calls=5, period=MINUTE)
     def perform_get(self, built_uri):
         """
         Performs GET request and deals with any issues arising from call
@@ -51,7 +51,7 @@ class FootballData(ApiIntegration):
                     # self.session.get(self.uri + 'competitions')
 
                     # Resume as necessary
-                    self.perform_get(built_uri=built_uri)
+                    result = self.perform_get(built_uri=built_uri)
 
                 elif result['errorCode'] == 400:  # Buggy API endpoint results in faulty authentication
                     if 'message' in result:
