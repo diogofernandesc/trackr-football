@@ -1,9 +1,6 @@
 import unittest
-import json
-from time import sleep
-from ingest_engine.cons import Team
 from ingest_engine.fastest_live_scores_api import FastestLiveScores
-from ingest_engine.cons import Competition, Match, Team, Player, FootballDataApiFilters as fda
+from ingest_engine.cons import Match, Team, Player
 
 
 class ApiTest(unittest.TestCase):

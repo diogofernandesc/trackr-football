@@ -48,6 +48,7 @@ class Match:
     SEASON_YEAR = 'season_year'
     MATCH_UTC_DATE = 'utc_date'
     START_TIME_EPOCH = 'start_time_epoch'
+    START_TIME = 'start_time'
     STATUS = 'status'
     MATCHDAY = 'matchday'
     FULL_TIME_HOME_SCORE = 'full_time_home_score'
@@ -89,6 +90,27 @@ class Match:
     AWAY_TEAM_FLS_ID = 'away_team_fls_id'
     PREVIOUS_ENCOUNTERS = 'previous_encounters'
     PENALTY_SHOOTOUT_SCORE = 'penalty_shootout_score'
+    FINISHED = 'finished'
+    FANTASY_GAME_WEEK = 'fantasy_game_week'
+    GOALS_SCORED = 'goals_scored'
+    ASSISTS = 'assists'
+    OWN_GOALS = 'own_goals'
+    PENALTIES_SAVED = 'penalties_saved'
+    PENALTIES_MISSED = 'penalties_missed'
+    YELLOW_CARDS = 'yellow_cards'
+    RED_CARDS = 'red_cards'
+    SAVES = 'saves'
+    BONUS = 'bonus'
+    BPS = 'bps'
+    FANTASY_HOME_TEAM_DIFFICULTY = 'fantasy_home_team_difficulty'
+    FANTASY_AWAY_TEAM_DIFFICULTY = 'fantasy_away_team_difficulty'
+    FANTASY_MATCH_CODE = 'fantasy_match_code'
+    MINUTES = 'minutes'
+    FANTASY_HOME_TEAM_CODE = 'fantasy_home_team_code'
+    FANTASY_AWAY_TEAM_CODE = 'fantasy_away_team_code'
+    SIDE = 'side'
+    GOAL_AMOUNT = 'amount'
+
 
 class MatchEvent:
     OCCURED_AT = 'occured_at'
@@ -125,7 +147,14 @@ class Team:
     SQUAD = 'squad'
     SQUAD_ROLE = 'squad_role'
     FASTEST_LIVE_SCORES_API_ID = 'fls_api_id'
-
+    FANTASY_CODE = 'fantasy_code'
+    FANTASY_WEEK_STRENGTH = 'fantasy_week_strength'
+    FANTASY_OVERALL_HOME_STRENGTH = 'fantasy_overall_home_strength'
+    FANTASY_OVERALL_AWAY_STRENGTH = 'fantasy_overall_away_strength'
+    FANTASY_ATTACK_HOME_STRENGTH = 'fantasy_attack_home_strength'
+    FANTASY_ATTACK_AWAY_STRENGTH = 'fantasy_attack_away_strength'
+    FANTASY_DEFENCE_HOME_STRENGTH = 'fantasy_defence_home_strength'
+    FANTASY_DEFENCE_AWAY_STRENGTH = 'fantasy_defence_away_strength'
 
 class Standings:
     COMPETITION_NAME = 'competition_name'
@@ -169,6 +198,84 @@ class Player:
     YELLOW_CARDS = 'yellow_cards'
     FASTEST_LIVE_SCORES_API_ID = 'fls_api_id'
     COMPETITION_STATS = 'competition_stats'
+    PLAYED_AT_HOME = 'played_at_home'
+    PLAYED = 'played'
+    NOT_PLAYED = 'not_played'
+    FUTURE_FIXTURES = 'future_fixtures'
+
+    # Fantasy fields:
+    FANTASY_TEAM_CODE = 'fantasy_team_code'
+    FANTASY_ID = 'fantasy_player_id'
+    FANTASY_STATUS = 'fantasy_status'
+    FANTASY_CODE = 'player_fantasy_code'
+    FANTASY_PRICE = 'fantasy_price'
+    FANTASY_NEWS = 'fantasy_news'
+    FANTASY_NEWS_TIMESTAMP = 'fantasy_news_timestamp'
+    FANTASY_CHANCE_OF_PLAYING_THIS_WEEK = 'chance_of_playing_this_week'
+    FANTASY_CHANCE_OF_PLAYING_NEXT_WEEK = 'chance_of_playing_next_week'
+    FANTASY_DREAM_TEAM_MEMBER = 'fantasy_dream_team_member'
+    FANTASY_SEASON_VALUE = 'season_value'
+    FANTASY_WEEK_VALUE = 'week_value'
+    FANTASY_WEEK_PRICE_RISE = 'fantasy_week_price_rise'
+    FANTASY_OVERALL_PRICE_RISE = 'fantasy_overall_price_rise'
+    FANTASY_WEEK_PRICE_FALL = 'fantasy_week_price_fall'
+    FANTASY_OVERALL_PRICE_FALL = 'fantasy_overall_price_fall'
+    FANTASY_WEEK = 'fantasy_week'
+    FANTASY_DREAM_TEAM_COUNT = 'dream_team_count'  # No. of times in dream team
+    FANTASY_SELECTION_PERCENTAGE = 'selection_percentage'  # % of fantasy users selecting player
+    FANTASY_FORM = 'fantasy_form'
+    FANTASY_OVERALL_TRANSFERS_IN = 'fantasy_overall_transfers_in'
+    FANTASY_WEEK_TRANSFERS_IN = 'fantasy_week_transfers_in'
+    FANTASY_OVERALL_TRANSFERS_OUT = 'fantasy_overall_transfers_out'
+    FANTASY_WEEK_TRANSFERS_OUT = 'fantasy_week_transfers_out'
+    FANTASY_OVERALL_POINTS = 'fantasy_overall_points'
+    FANTASY_WEEK_POINTS = 'fantasy_week_points'
+    FANTASY_POINT_AVERAGE = 'fantasy_point_average'
+    FANTASY_ESTIMATED_WEEK_POINTS = 'fantasy_estimated_week_points'
+    FANTASY_ESTIMATED_NEXT_WEEK_POINTS = 'fantasy_estimated_next_week_points'
+    FANTASY_SPECIAL = 'fantasy_special'
+    MINUTES_PLAYED = 'minutes_played'
+    CLEAN_SHEETS = 'clean_sheets'
+    GOALS_CONCEDED = 'goals_conceded'
+    OWN_GOALS = 'own_goals'
+    PENALTIES_SAVED = 'penalties_saved'
+    PENALTIES_MISSED = 'penalties_missed'
+    SAVES = 'saves'
+    FANTASY_WEEK_BONUS = 'fantasy_week_bonus'
+    FANTASY_TOTAL_BONUS = 'fantasy_total_bonus'
+    FANTASY_INFLUENCE = 'fantasy_influence'
+    FANTASY_CREATIVITY = 'fantasy_creativity'
+    FANTASY_THREAT = 'fantasy_threat'
+    FANTASY_ICT_INDEX = 'fantasy_ict_index'  # Influence, creativity, threat index
+    FANTASY_TEAM_ID = 'fantasy_team_id'
+    FANTASY_PHOTO_URL = 'fantasy_photo_url'
+    FANTASY_SEASON_START_PRICE = 'fantasy_season_start_price'
+    FANTASY_SEASON_END_PRICE = 'fantasy_season_start_price'
+    FANTASY_TRANSFERS_BALANCE = 'fantasy_transfers_balance'
+    FANTASY_SELECTION_COUNT = 'fantasy_selection_count'
+
+    # match
+    OPEN_PLAY_CROSSES = 'open_play_crosses'
+    BIG_CHANCES_CREATED = 'big_chances_created'
+    CLEARANCES_BLOCKS_INTERCEPTIONS = 'clearances_blocks_interceptions'
+    RECOVERIES = 'recoveries'
+    KEY_PASSES = 'key_passes'
+    TACKLES = 'tackles'
+    WINNING_GOALS = 'winning_goals'
+    ATTEMPTED_PASSES = 'attempted_passes'
+    COMPLETED_PASSES = 'completed_passes'
+    PENALTIES_CONCEDED = 'penalties_conceded'
+    BIG_CHANCES_MISSED = 'big_chances_missed'
+    ERRORS_LEADING_TO_GOAL = 'errors_leading_to_goal'
+    ERRORS_LEADING_TO_GOAL_ATTEMPT = 'errors_leading_to_goal_attempt'
+    TACKLED = 'tackled'
+    OFFSIDE = 'offside'
+    TARGET_MISSED = 'target_missed'
+    FOULS = 'fouls'
+    DRIBBLES = 'dribbles'
+    FANTASY_OPPONENT_TEAM_ID = 'fantasy_opponent_team_id'
+
+
 
 
 class Competition:
@@ -186,6 +293,8 @@ class Season:
     END_DATE = 'end_date'
     WINNER = 'winner'
     FOOTBALL_DATA_API_ID = 'football_data_api_id'
+    NAME = 'season_name'
+    FANTASY_CODE = 'fantasy_code'
 
 
 class FLS_STATES:
@@ -203,6 +312,21 @@ class FLS_STATES:
     POSTPONED = 102
 
 
+class FantasyGameWeek:
+    ID = 'id'
+    NAME = 'name'
+    FANTASY_ID = 'fantasy_id'
+    DEADLINE_TIME = 'deadline_time'
+    DEADLINE_TIME_EPOCH = 'deadline_time_epoch'
+    AVERAGE_SCORE = 'average_score'
+    FINISHED = 'finished'
+    HIGHEST_SCORE = 'highest_score'
+
+# ----- API fields ---------
+
+
+# ----- Mappers ------
+
 FLS_STATES_MAPPER = {
     0: "fixture",
     1: "first_half",
@@ -216,5 +340,13 @@ FLS_STATES_MAPPER = {
     9: "full_time",
     101: "abandoned",
     102: "postponed"
+}
+
+FANTASY_STATUS_MAPPER = {
+    "a": "available",
+    "d": "illness",
+    "i": "injury",
+    "n": "ineligible",
+    "u": "unavailable",
 }
 
