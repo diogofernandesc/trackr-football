@@ -12,9 +12,6 @@ class ApiIntegration(object):
         if api_key:
             self.session.headers.update({'X-Auth-Token': api_key})
 
-
-    @sleep_and_retry
-    @limits(calls=6, period=SECOND)
     def perform_get(self, built_uri):
         """
         Performs GET request dealing with any issues arising specific to this API
