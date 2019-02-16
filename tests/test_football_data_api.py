@@ -62,7 +62,6 @@ class ApiTest(unittest.TestCase):
 
     def testMatchEndPoint(self):
         matches = self.fd.request_match(**{fda.TO_DATE: '2018-09-15', fda.FROM_DATE: '2018-09-05'})
-        print(matches)
         player_matches = self.fd.request_match(player_id=1)
         self.assertTrue(len(player_matches[0]) > 0)
         self.assertRaises(ValueError, self.fd.request_match, 223, 1)

@@ -57,6 +57,8 @@ class FootballData(ApiIntegration):
 
                             self.perform_get(built_uri=built_uri)
 
+                        result = {}
+
                 elif result['errorCode'] == 403:
                     result = {}
 
@@ -76,6 +78,7 @@ class FootballData(ApiIntegration):
         :param competition_id: Id of competition when getting specific competition results
         :return: Request result for competitions endpoint
         """
+
         built_uri = 'competitions/'
         if competition_id:
             built_uri += str(competition_id)
