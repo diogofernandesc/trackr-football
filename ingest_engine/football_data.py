@@ -21,6 +21,7 @@ class FootballData(ApiIntegration):
             api_key = os.environ.get('FOOTBALL_DATA_API_KEY')
             self.session.headers.update({'X-Auth-Token': api_key})
         self.uri = 'http://api.football-data.org/v2/'
+        self.api_key = api_key
 
     @sleep_and_retry
     @limits(calls=10, period=MINUTE)
@@ -31,9 +32,15 @@ class FootballData(ApiIntegration):
         :param built_uri: endpoint to attach to the base API url
         :return: dict result of call, {} if failed
         """
+        # Safety check for requests
+        if self.session.headers['X-auth-Token'] == 'test':
+            return {}
+
         result = self.session.get(url=self.uri + built_uri)
         try:
             result = json.loads(result.text)
+            print(result)
+            print(self.session.headers)
             if 'errorCode' in result:
                 if result['errorCode'] == 429:
                     wait_time = [int(s) for s in result['message'].split() if s.isdigit()][0]
@@ -48,7 +55,7 @@ class FootballData(ApiIntegration):
                 elif result['errorCode'] == 400:  # Buggy API endpoint results in faulty authentication
                     if 'message' in result:
                         if 'invalid' in result['message'] and self.session.headers['X-Auth-Token'] != 'test':
-                            sleep(2)  # Sleep and try again
+                            sleep(5)  # Sleep and try again
                             self.perform_get(built_uri=built_uri)
 
                 result = {}
@@ -441,8 +448,7 @@ class FootballData(ApiIntegration):
 
 
 if __name__ == "__main__":
-    # pass
-    fd = FootballData()
+    fd = FootballData(api_key=os.getenv("FOOTBALL_DATA_API_KEY"))
     # print(fd.request_player(player_id=1))
 
 # print(fd.request_competition_scorers(competition_id=2002))
