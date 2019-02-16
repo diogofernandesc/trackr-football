@@ -32,15 +32,10 @@ class FootballData(ApiIntegration):
         :param built_uri: endpoint to attach to the base API url
         :return: dict result of call, {} if failed
         """
-        # Safety check for requests
-        if self.session.headers['X-auth-Token'] == 'test':
-            return {}
 
         result = self.session.get(url=self.uri + built_uri)
         try:
             result = json.loads(result.text)
-            print(result)
-            print(self.session.headers)
             if 'errorCode' in result:
                 if result['errorCode'] == 429:
                     wait_time = [int(s) for s in result['message'].split() if s.isdigit()][0]
@@ -56,9 +51,14 @@ class FootballData(ApiIntegration):
                     if 'message' in result:
                         if 'invalid' in result['message'] and self.session.headers['X-Auth-Token'] != 'test':
                             sleep(5)  # Sleep and try again
+
+                            # test get, seems API fails first request after rate limit
+                            self.session.get(self.uri + 'competitions')
+
                             self.perform_get(built_uri=built_uri)
 
-                result = {}
+                elif result['errorCode'] == 403:
+                    result = {}
 
             elif 'error' in result:
                 result = {}
