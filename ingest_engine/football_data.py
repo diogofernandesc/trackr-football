@@ -38,9 +38,8 @@ class FootballData(ApiIntegration):
             result = json.loads(result.text)
             if built_uri == "matches?dateTo=2018-09-15&dateFrom=2018-09-05&":
                 print("--------")
-                print(f"API RESULT: {'matches' in result}")
+                print(f"API RESULT: {result}")
                 print(f"THIS IS THE SESSION API KEY: {self.session.headers['X-Auth-Token']}")
-                print(f"THIS IS THE SELF.API_KEY: {self.api_key}")
             if 'errorCode' in result:
                 if result['errorCode'] == 429:
                     wait_time = [int(s) for s in result['message'].split() if s.isdigit()][0]
@@ -457,8 +456,9 @@ class FootballData(ApiIntegration):
         return data
 
 
-if __name__ == "__main__":
-    fd = FootballData(api_key=os.getenv("FOOTBALL_DATA_API_KEY"))
+# if __name__ == "__main__":
+
+    # fd = FootballData(api_key=os.getenv("FOOTBALL_DATA_API_KEY"))
     # print(fd.request_player(player_id=1))
 
 # print(fd.request_competition_scorers(competition_id=2002))
