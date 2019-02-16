@@ -36,8 +36,11 @@ class FootballData(ApiIntegration):
         result = self.session.get(url=self.uri + built_uri)
         try:
             result = json.loads(result.text)
-            print(f"API RESULT: {result}")
+            # print(f"API RESULT: {result}")
+
             if 'errorCode' in result:
+                print(result['errorCode'])
+                print(type(result['errorCode']))
                 if result['errorCode'] == 429:
                     wait_time = [int(s) for s in result['message'].split() if s.isdigit()][0]
                     sleep(wait_time + 10)  # Wait for rate limiting to end before performing request again
@@ -51,7 +54,7 @@ class FootballData(ApiIntegration):
                 elif result['errorCode'] == 400:  # Buggy API endpoint results in faulty authentication
                     if 'message' in result:
                         if 'invalid' in result['message'] and self.session.headers['X-Auth-Token'] != 'test':
-                            sleep(5)  # Sleep and try again
+                            sleep(10)  # Sleep and try again
 
                             # test get, seems API fails first request after rate limit
                             self.session.get(self.uri + 'competitions')
