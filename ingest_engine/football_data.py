@@ -23,8 +23,6 @@ class FootballData(ApiIntegration):
         self.uri = 'http://api.football-data.org/v2/'
         self.api_key = api_key
 
-    # @sleep_and_retry
-    # @limits(calls=5, period=MINUTE)
     def perform_get(self, built_uri):
         """
         Performs GET request and deals with any issues arising from call
@@ -36,19 +34,10 @@ class FootballData(ApiIntegration):
         result = self.session.get(url=self.uri + built_uri)
         try:
             result = json.loads(result.text)
-            if built_uri == "matches?dateTo=2018-09-15&dateFrom=2018-09-05&":
-                print("--------")
-                print(f"API RESULT: {result}")
-                print(f"THIS IS THE SESSION API KEY: {self.session.headers['X-Auth-Token']}")
             if 'errorCode' in result:
                 if result['errorCode'] == 429:
-
-                    print("IT GOT TO 429")
                     wait_time = [int(s) for s in result['message'].split() if s.isdigit()][0]
                     sleep(wait_time + 10)  # Wait for rate limiting to end before performing request again
-
-                    # test get, seems API fails first request after rate limit
-                    # self.session.get(self.uri + 'competitions')
 
                     # Resume as necessary
                     result = self.perform_get(built_uri=built_uri)
@@ -58,11 +47,7 @@ class FootballData(ApiIntegration):
                         if self.session.headers['X-Auth-Token'] != 'test':
                             sleep(5)  # Sleep and try again
 
-                            print("IT GOT HEREEEEEEEEEE")
-                            # test get, seems API fails first request after rate limit
-                            # self.session.get(self.uri + 'competitions')
-
-                            self.perform_get(built_uri=built_uri)
+                            result = self.perform_get(built_uri=built_uri)
 
                         result = {}
 
@@ -331,7 +316,6 @@ class FootballData(ApiIntegration):
             for name_filter, value in kwargs.items():
                 built_uri += f'{name_filter}={value}&'
 
-        print("EXECUTED")
         result = self.perform_get(built_uri=built_uri)
         total_results = []
         if result:
@@ -462,10 +446,10 @@ class FootballData(ApiIntegration):
 
 
 # if __name__ == "__main__":
+#     fd = FootballData(api_key=os.getenv("FOOTBALL_DATA_API_KEY"))
 
-    # fd = FootballData(api_key=os.getenv("FOOTBALL_DATA_API_KEY"))
-    # print(fd.request_player(player_id=1))
 
+# print(fd.request_player(player_id=1))
 # print(fd.request_competition_scorers(competition_id=2002))
 # print(fd.request_competition_standings(competition_id=2002))
 # print(fd.request_competition_team(competition_id=2002, season=2017))
