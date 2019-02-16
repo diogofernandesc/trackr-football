@@ -24,7 +24,7 @@ class FootballData(ApiIntegration):
         self.api_key = api_key
 
     @sleep_and_retry
-    @limits(calls=10, period=MINUTE)
+    @limits(calls=9, period=MINUTE)
     def perform_get(self, built_uri):
         """
         Performs GET request and deals with any issues arising from call
@@ -42,11 +42,13 @@ class FootballData(ApiIntegration):
                 print(f"THIS IS THE SESSION API KEY: {self.session.headers['X-Auth-Token']}")
             if 'errorCode' in result:
                 if result['errorCode'] == 429:
+
+                    print("IT GOT TO 429")
                     wait_time = [int(s) for s in result['message'].split() if s.isdigit()][0]
                     sleep(wait_time + 10)  # Wait for rate limiting to end before performing request again
 
                     # test get, seems API fails first request after rate limit
-                    self.session.get(self.uri + 'competitions')
+                    # self.session.get(self.uri + 'competitions')
 
                     # Resume as necessary
                     self.perform_get(built_uri=built_uri)
@@ -69,6 +71,9 @@ class FootballData(ApiIntegration):
 
             elif 'error' in result:
                 result = {}
+
+            else:
+                return result
 
         except re.exceptions.ConnectionError:
             result = {}
