@@ -38,7 +38,7 @@ class FootballData(ApiIntegration):
             result = json.loads(result.text)
             if built_uri == "matches?dateTo=2018-09-15&dateFrom=2018-09-05&":
                 print("--------")
-                print(f"API RESULT: {result}")
+                print(f"API RESULT: {'matches' in result}")
                 print(f"THIS IS THE SESSION API KEY: {self.session.headers['X-Auth-Token']}")
                 print(f"THIS IS THE SELF.API_KEY: {self.api_key}")
             if 'errorCode' in result:
@@ -327,8 +327,8 @@ class FootballData(ApiIntegration):
             for name_filter, value in kwargs.items():
                 built_uri += f'{name_filter}={value}&'
 
+        print("EXECUTED")
         result = self.perform_get(built_uri=built_uri)
-        print(f"THIS IS THE RESULT WHEN YOU EXECUTE IT INSIDE REQUEST_MATCH(): {result}")
         total_results = []
         if result:
             if 'matches' in result:
