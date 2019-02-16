@@ -36,7 +36,7 @@ class FootballData(ApiIntegration):
         result = self.session.get(url=self.uri + built_uri)
         try:
             result = json.loads(result.text)
-            print(f"API RESULT: {result.text}")
+            print(f"API RESULT: {result}")
             if 'errorCode' in result:
                 if result['errorCode'] == 429:
                     wait_time = [int(s) for s in result['message'].split() if s.isdigit()][0]
