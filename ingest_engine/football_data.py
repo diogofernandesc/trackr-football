@@ -34,6 +34,7 @@ class FootballData(ApiIntegration):
         """
 
         result = self.session.get(url=self.uri + built_uri)
+        print(f"API RESULT: {result}")
         try:
             result = json.loads(result.text)
             if 'errorCode' in result:
