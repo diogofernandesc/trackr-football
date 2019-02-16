@@ -36,11 +36,11 @@ class FootballData(ApiIntegration):
         result = self.session.get(url=self.uri + built_uri)
         try:
             result = json.loads(result.text)
-            # print(f"API RESULT: {result}")
-
+            print("--------")
+            print(f"API RESULT: {result}")
+            print(f"THIS IS THE SESSION API KEY: {self.session.headers['X-Auth-Token']}")
+            print(f"THIS IS THE SELF.API_KEY: {self.api_key}")
             if 'errorCode' in result:
-                print(result['errorCode'])
-                print(type(result['errorCode']))
                 if result['errorCode'] == 429:
                     wait_time = [int(s) for s in result['message'].split() if s.isdigit()][0]
                     sleep(wait_time + 10)  # Wait for rate limiting to end before performing request again
@@ -53,8 +53,6 @@ class FootballData(ApiIntegration):
 
                 elif result['errorCode'] == 400:  # Buggy API endpoint results in faulty authentication
                     if 'message' in result:
-                        print(result['message'])
-                        print(self.session.headers['X-Auth-Token'])
                         if self.session.headers['X-Auth-Token'] != 'test':
                             sleep(5)  # Sleep and try again
 
@@ -329,6 +327,7 @@ class FootballData(ApiIntegration):
                 built_uri += f'{name_filter}={value}&'
 
         result = self.perform_get(built_uri=built_uri)
+        print(f"THIS IS THE RESULT WHEN YOU EXECUTE IT INSIDE REQUEST_MATCH(): {result}")
         total_results = []
         if result:
             if 'matches' in result:
