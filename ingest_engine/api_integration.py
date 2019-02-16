@@ -7,8 +7,11 @@ SECOND = 1
 
 class ApiIntegration(object):
 
-    def __init__(self):
+    def __init__(self, api_key=None):
         self.session = re.session()
+        if api_key:
+            self.session.headers.update({'X-Auth-Token': api_key})
+
 
     @sleep_and_retry
     @limits(calls=6, period=SECOND)
