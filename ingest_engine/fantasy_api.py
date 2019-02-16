@@ -281,15 +281,9 @@ class Fantasy(ApiIntegration):
         return total_result
 
 
-
-
-
-
-
 if __name__ == "__main__":
     fantasy = Fantasy()
-    # print(fantasy.request_player_data(player_id=176))
-    print(fantasy.request_matches())
+
 
 
 

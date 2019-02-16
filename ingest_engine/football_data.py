@@ -7,7 +7,7 @@ from ingest_engine.api_integration import ApiIntegration
 from ingest_engine.cons import Competition, Match, Team, Standings, Player
 from ingest_engine.cons import FootballDataApiFilters as fda
 
-HOUR = 3600
+MINUTE = 65  # Extra buffer of time
 
 
 class FootballData(ApiIntegration):
@@ -16,21 +16,21 @@ class FootballData(ApiIntegration):
     """
 
     def __init__(self, api_key=None):
-        super().__init__()
+        super().__init__(api_key=api_key)
         if not api_key:
             api_key = os.environ.get('FOOTBALL_DATA_API_KEY')
-        self.session.headers.update({'X-Auth-Token': api_key})
+            self.session.headers.update({'X-Auth-Token': api_key})
         self.uri = 'http://api.football-data.org/v2/'
+        self.api_key = api_key
 
-    @sleep_and_retry
-    @limits(calls=100, period=HOUR)
     def perform_get(self, built_uri):
-        '''
+        """
         Performs GET request and deals with any issues arising from call
         Handles API rate limits
         :param built_uri: endpoint to attach to the base API url
         :return: dict result of call, {} if failed
-        '''
+        """
+
         result = self.session.get(url=self.uri + built_uri)
         try:
             result = json.loads(result.text)
@@ -39,16 +39,26 @@ class FootballData(ApiIntegration):
                     wait_time = [int(s) for s in result['message'].split() if s.isdigit()][0]
                     sleep(wait_time + 10)  # Wait for rate limiting to end before performing request again
 
-                    # test get, seems API fails first request after rate limit
-                    self.session.get(self.uri + 'competitions')
-
                     # Resume as necessary
-                    self.perform_get(built_uri=built_uri)
+                    result = self.perform_get(built_uri=built_uri)
 
-                result = {}
+                elif result['errorCode'] == 400:  # Buggy API endpoint results in faulty authentication
+                    if 'message' in result:
+                        if self.session.headers['X-Auth-Token'] != 'test':
+                            sleep(5)  # Sleep and try again
+
+                            result = self.perform_get(built_uri=built_uri)
+
+                        result = {}
+
+                elif result['errorCode'] == 403:
+                    result = {}
 
             elif 'error' in result:
                 result = {}
+
+            else:
+                return result
 
         except re.exceptions.ConnectionError:
             result = {}
@@ -63,6 +73,7 @@ class FootballData(ApiIntegration):
         :param competition_id: Id of competition when getting specific competition results
         :return: Request result for competitions endpoint
         """
+
         built_uri = 'competitions/'
         if competition_id:
             built_uri += str(competition_id)
@@ -434,7 +445,8 @@ class FootballData(ApiIntegration):
         return data
 
 
-fd = FootballData()
+# if __name__ == "__main__":
+#     fd = FootballData(api_key=os.getenv("FOOTBALL_DATA_API_KEY"))
 
 
 # print(fd.request_player(player_id=1))
