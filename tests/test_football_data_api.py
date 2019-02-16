@@ -29,7 +29,7 @@ class ApiTest(unittest.TestCase):
         all_comps = self.fd.request_competitions()
         self.assertEqual(self.test_fd.request_competitions(), [])
         self.assertEqual(comps[0][Competition.FOOTBALL_DATA_API_ID], 2002)
-        self.assertTrue('competitions' in all_comps)
+        self.assertTrue(len(all_comps) > 100)
 
     def testCompetitionMatchEndPoint(self):
         comp_matches = self.fd.request_competition_match(competition_id=2003, **{Match.MATCHDAY: 11})
@@ -39,22 +39,26 @@ class ApiTest(unittest.TestCase):
     def testCompetitionTeamEndpoint(self):
         comp_teams = self.fd.request_competition_team(competition_id=2002)
         comp_season = self.fd.request_competition_team(competition_id=2002, season=2017)
-        self.assertEqual(comp_season[0][Team.FOOTBALL_DATA_ID], 2)
+        self.assertEqual(comp_season[0][Team.FOOTBALL_DATA_ID], 1)
         self.assertEqual(self.test_fd.request_competition_team(competition_id=2002), [])
         self.assertEqual(comp_teams[0][Team.FOOTBALL_DATA_ID], 2)
 
     def testCompetitionStandingsEndpoint(self):
         comp_standings_league = self.fd.request_competition_standings(competition_id=2002)
         comp_standings_non_league = self.fd.request_competition_standings(competition_id=2001)
+        comp_standing_type = self.fd.request_competition_standings(competition_id=2002, standing_type=fda.STANDING_HOME)
+        self.assertTrue(len(comp_standing_type['standings'][0]) > 5)
         self.assertEqual(self.test_fd.request_competition_standings(competition_id=2002), [])
         self.assertIsNone(comp_standings_league['standings'][0]['group'])
         self.assertIsInstance(comp_standings_non_league['standings'][0]['group'], str)
 
     def testCompetitionScorersEndpoint(self):
         comp_scorers = self.fd.request_competition_scorers(competition_id=2002)
+        comp_limit = self.fd.request_competition_scorers(competition_id=2002, limit=5)
         self.assertEqual(self.test_fd.request_competition_scorers(competition_id=2002), [])
         self.assertIsInstance(comp_scorers[0][Player.NUMBER_OF_GOALS], int)
         self.assertEqual(len(comp_scorers[0]), 10)
+        self.assertEqual(len(comp_limit), 5)
 
     def testMatchEndPoint(self):
         matches = self.fd.request_match(**{fda.TO_DATE: '2018-09-15', fda.FROM_DATE: '2018-09-05'})

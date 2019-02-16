@@ -44,7 +44,7 @@ class FastestLiveScores(ApiIntegration):
         request = self.session.get(built_uri)
         try:
             result = json.loads(request.text)
-            if 'errorText' in result or request.status_code == 400 or request.status_code == 404:
+            if request.status_code == 400 or request.status_code == 404:
                 result = {}
 
         except re.exceptions.ConnectionError:
@@ -300,10 +300,8 @@ class FastestLiveScores(ApiIntegration):
         return total_result
 
 
-
-
 if __name__ == "__main__":
     fls = FastestLiveScores(api_key=os.getenv('FASTEST_LIVE_SCORES_API_KEY'))
-    print(fls.request_player_details(team_ids=1))
+
 
 
