@@ -322,8 +322,34 @@ class FantasyGameWeek:
     FINISHED = 'finished'
     HIGHEST_SCORE = 'highest_score'
 
+
 # ----- API fields ---------
 
+
+class API_FANTASY_PLAYER:
+    ID = 'id'
+    PHOTO_URL = 'photo'
+    TEAM_CODE = 'team_code'
+    TEAM_ID = 'team'
+    CODE = 'code'
+    FIRST_NAME = 'first_name'
+    LASt_NAME = 'second_name'
+    SHIRT_NUMBER = 'squad_number'
+    STATUS = 'status'
+    NEWS = 'news'
+    CHANCE_OF_PLAYING_THIS_WEEK = 'chance_of_playing_this_round'
+    CHANCE_OF_PLAYING_NEXT_WEEK = 'chance_of_playing_next_round'
+    SEASON_VALUE = 'value_season'
+    OVERALL_PRICE_RISE = 'cost_change_start'
+    WEEK_PRICE_RISE = 'cost_change_event'
+    OVERALL_PRICE_FALL = 'cost_change_start_fall'
+    WEEK_PRICE_FALL = 'cost_change_event_fall'
+    DREAM_TEAM_MEMBER = 'in_dreamteam'
+    DREAM_TEAM_COUNT = 'dreamteam_count'
+    SELECTION_PERCENTAGE = 'selected_by_percent'
+    FORM = 'form'
+    
+    
 
 # ----- Mappers ------
 

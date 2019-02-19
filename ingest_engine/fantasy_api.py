@@ -280,6 +280,9 @@ class Fantasy(ApiIntegration):
 
         return total_result
 
+    def ingest_historical_csv(self, csv_file):
+        player_data = []
+
 
 if __name__ == "__main__":
     fantasy = Fantasy()
