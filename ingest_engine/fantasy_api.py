@@ -281,10 +281,11 @@ class Fantasy(ApiIntegration):
 
         return total_result
 
-    def ingest_historical_csv(self, csv_file):
+    def ingest_historical_csv(self, csv_file, season):
         """
         Parse historical CSVs to json
         :param csv_file: CSV file with player or fixture information
+        :param season: season description for historical ingest e.g. 201617 for 2016/2017
         :return: parsed json file
         """
         player_data = []
@@ -346,10 +347,16 @@ class Fantasy(ApiIntegration):
             Player.WINNING_GOALS,
             Player.YELLOW_CARDS
         )
+        gw_df.columns = field_names  # re-naming of columns
         gw_df = gw_df.transpose().to_dict()
 
         for count, player in gw_df.items():
+            name = player[Player.NAME].split("_")
+            player[Player.FIRST_NAME] = name[0]
+            player[Player.LAST_NAME] = name[1]
+            player[Player.FANTASY_WEEK_ID] = int(f'{season}{str(player[Player.FANTASY_WEEK]).zfill(2)}')
             player_data.append(player)
+
 
         print(player_data)
         # print(gw_df.transpose().to_dict())
@@ -375,7 +382,7 @@ class Fantasy(ApiIntegration):
 
 if __name__ == "__main__":
     fantasy = Fantasy()
-    fantasy.ingest_historical_csv(csv_file='../historical_fantasy/gw1.csv')
+    fantasy.ingest_historical_csv(csv_file='../historical_fantasy/gw1.csv', season='201718')
 
 
 

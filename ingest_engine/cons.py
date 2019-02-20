@@ -92,6 +92,7 @@ class Match:
     PENALTY_SHOOTOUT_SCORE = 'penalty_shootout_score'
     FINISHED = 'finished'
     FANTASY_GAME_WEEK = 'fantasy_game_week'
+    FANTASY_GAME_WEEK_ID = 'fantasy_game_week_id'
     GOALS_SCORED = 'goals_scored'
     ASSISTS = 'assists'
     OWN_GOALS = 'own_goals'
@@ -221,6 +222,7 @@ class Player:
     FANTASY_WEEK_PRICE_FALL = 'fantasy_week_price_fall'
     FANTASY_OVERALL_PRICE_FALL = 'fantasy_overall_price_fall'
     FANTASY_WEEK = 'fantasy_week'
+    FANTASY_WEEK_ID = 'fantasy_week_id'  # ID made up of season year and game week e.g. 20171801 for 2017/2018 week 1
     FANTASY_DREAM_TEAM_COUNT = 'dream_team_count'  # No. of times in dream team
     FANTASY_SELECTION_PERCENTAGE = 'selection_percentage'  # % of fantasy users selecting player
     FANTASY_FORM = 'fantasy_form'
