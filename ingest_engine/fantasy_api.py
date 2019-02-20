@@ -1,7 +1,8 @@
 from ingest_engine.cons import *
 from ingest_engine.cons import FANTASY_STATUS_MAPPER as st_mapper
 from ingest_engine.api_integration import ApiIntegration
-
+import csv
+import pandas as pd
 
 class Fantasy(ApiIntegration):
     """
@@ -281,11 +282,100 @@ class Fantasy(ApiIntegration):
         return total_result
 
     def ingest_historical_csv(self, csv_file):
+        """
+        Parse historical CSVs to json
+        :param csv_file: CSV file with player or fixture information
+        :return: parsed json file
+        """
         player_data = []
+        gw_df = pd.read_csv(csv_file, encoding='utf-8')
+        columns_to_drop = ['bonus', 'fixture', 'id', 'kickoff_time', 'ea_index',
+                           'kickoff_time_formatted', 'loaned_in', 'loaned_out',
+                           'team_a_score', 'team_h_score']
+
+        for column in columns_to_drop:
+            gw_df.drop(column, axis=1, inplace=True)
+
+        # updated_csv = f'd_{csv_file.split("gw")[1].split(".")[0]}'
+        # gw_df.to_csv(updated_csv, index=False)
+
+        field_names = (
+            Player.NAME,
+            Player.ASSISTS,
+            Player.ATTEMPTED_PASSES,
+            Player.BIG_CHANCES_CREATED,
+            Player.BIG_CHANCES_MISSED,
+            Player.FANTASY_TOTAL_BONUS,
+            Player.CLEAN_SHEETS,
+            Player.CLEARANCES_BLOCKS_INTERCEPTIONS,
+            Player.COMPLETED_PASSES,
+            Player.FANTASY_CREATIVITY,
+            Player.DRIBBLES,
+            Player.FANTASY_ID,
+            Player.ERRORS_LEADING_TO_GOAL,
+            Player.ERRORS_LEADING_TO_GOAL_ATTEMPT,
+            Player.FOULS,
+            Player.GOALS_CONCEDED,
+            Player.NUMBER_OF_GOALS,
+            Player.FANTASY_ICT_INDEX,
+            Player.FANTASY_INFLUENCE,
+            Player.KEY_PASSES,
+            Player.MINUTES_PLAYED,
+            Player.OFFSIDE,
+            Player.OPEN_PLAY_CROSSES,
+            Player.FANTASY_OPPONENT_TEAM_ID,
+            Player.OWN_GOALS,
+            Player.PENALTIES_CONCEDED,
+            Player.PENALTIES_MISSED,
+            Player.PENALTIES_SAVED,
+            Player.RECOVERIES,
+            Player.RED_CARDS,
+            Player.FANTASY_WEEK,
+            Player.SAVES,
+            Player.FANTASY_SELECTION_COUNT,
+            Player.TACKLED,
+            Player.TACKLES,
+            Player.TARGET_MISSED,
+            Player.FANTASY_THREAT,
+            Player.FANTASY_OVERALL_POINTS,
+            Player.FANTASY_TRANSFERS_BALANCE,
+            Player.FANTASY_WEEK_TRANSFERS_IN,
+            Player.FANTASY_WEEK_TRANSFERS_OUT,
+            Player.FANTASY_WEEK_VALUE,
+            Player.PLAYED_AT_HOME,
+            Player.WINNING_GOALS,
+            Player.YELLOW_CARDS
+        )
+        gw_df = gw_df.transpose().to_dict()
+
+        for count, player in gw_df.items():
+            player_data.append(player)
+
+        print(player_data)
+        # print(gw_df.transpose().to_dict())
+        # with open(updated_csv) as f:
+        #     gw_reader = csv.DictReader(f, fieldnames=field_names)
+        #
+        #     gw_reader = csv.reader(f, delimiter=',')
+            # next(gw_reader, None)  # skip the headers
+            # for row in gw_reader:
+            #     player_data.append(dict(row))
+
+        # Clean player dict
+        # for player in player_data:
+        #     name = player[Player.NAME].split("_")
+        #     player[Player.FIRST_NAME] = name[0]
+        #     player[Player.LAST_NAME] = name[1]
+        #     player[Player.ASSISTS] = int(player[Player.ASSISTS])
+        #     player[]
+        #
+        # print(player_data)
+
 
 
 if __name__ == "__main__":
     fantasy = Fantasy()
+    fantasy.ingest_historical_csv(csv_file='../historical_fantasy/gw1.csv')
 
 
 
