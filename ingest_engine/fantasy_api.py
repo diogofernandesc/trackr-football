@@ -281,7 +281,7 @@ class Fantasy(ApiIntegration):
 
         return total_result
 
-    def ingest_historical_csv(self, csv_file, season):
+    def ingest_historical_gameweek_csv(self, csv_file, season):
         """
         Parse historical CSVs to json
         :param csv_file: CSV file with player or fixture information
@@ -357,32 +357,33 @@ class Fantasy(ApiIntegration):
             player[Player.FANTASY_WEEK_ID] = int(f'{season}{str(player[Player.FANTASY_WEEK]).zfill(2)}')
             player_data.append(player)
 
-
-        print(player_data)
-        # print(gw_df.transpose().to_dict())
-        # with open(updated_csv) as f:
-        #     gw_reader = csv.DictReader(f, fieldnames=field_names)
-        #
-        #     gw_reader = csv.reader(f, delimiter=',')
-            # next(gw_reader, None)  # skip the headers
-            # for row in gw_reader:
-            #     player_data.append(dict(row))
-
-        # Clean player dict
-        # for player in player_data:
-        #     name = player[Player.NAME].split("_")
-        #     player[Player.FIRST_NAME] = name[0]
-        #     player[Player.LAST_NAME] = name[1]
-        #     player[Player.ASSISTS] = int(player[Player.ASSISTS])
-        #     player[]
-        #
-        # print(player_data)
-
+    def ingest_historical_base_csv(self, csv_file, season):
+        """
+        The equivalent to retrieving the base information at /bootstrap/ endpoint
+        :param csv_file: csv file with the base information
+        :param season: season string indicator
+        :return: parsed CSV into json
+        """
 
 
 if __name__ == "__main__":
     fantasy = Fantasy()
-    fantasy.ingest_historical_csv(csv_file='../historical_fantasy/gw1.csv', season='201718')
+
+    # Extracting week by week player data
+    for week_i in range(1, 38):
+        # Season 2016-2017
+        fantasy.ingest_historical_csv(csv_file=f'../historical_fantasy/2016-17/gw{week_i}.csv', season='201617')
+
+        # Season 2017-2018
+        fantasy.ingest_historical_csv(csv_file=f'../historical_fantasy/2017-18/gw{week_i}.csv', season='201718')
+
+
+    # Extracting historical player information (GIVEN SEASON DETAILED SUMMARY INFORMATION - players_raw.csv)
+    # This is equivalent to base information
+
+
+
+
 
 
 
