@@ -352,6 +352,7 @@ class Fantasy(ApiIntegration):
 
         for count, player in gw_df.items():
             name = player[Player.NAME].split("_")
+            player[Player.NAME] = " ".join(name)
             player[Player.FIRST_NAME] = name[0]
             player[Player.LAST_NAME] = name[1]
             player[Player.FANTASY_WEEK_ID] = int(f'{season}{str(player[Player.FANTASY_WEEK]).zfill(2)}')
