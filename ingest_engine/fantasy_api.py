@@ -297,9 +297,6 @@ class Fantasy(ApiIntegration):
         for column in columns_to_drop:
             gw_df.drop(column, axis=1, inplace=True)
 
-        # updated_csv = f'd_{csv_file.split("gw")[1].split(".")[0]}'
-        # gw_df.to_csv(updated_csv, index=False)
-
         field_names = (
             Player.NAME,
             Player.ASSISTS,
@@ -358,6 +355,8 @@ class Fantasy(ApiIntegration):
             player[Player.FANTASY_WEEK_ID] = int(f'{season}{str(player[Player.FANTASY_WEEK]).zfill(2)}')
             player_data.append(player)
 
+        return player_data
+
     def ingest_historical_base_csv(self, csv_file, season):
         """
         The equivalent to retrieving the base information at /bootstrap/ endpoint
@@ -365,6 +364,42 @@ class Fantasy(ApiIntegration):
         :param season: season string indicator
         :return: parsed CSV into json
         """
+        player_data = []
+        season_df = pd.read_csv(csv_file, encoding='utf-8')
+        columns_to_drop = ['bonus']
+        if season == '201718':
+            columns_to_drop.append('now_cost')
+
+        for column in columns_to_drop:
+            season_df.drop(column, axis=1, inplace=True)
+
+
+        field_names = (
+            Player.FIRST_NAME,
+            Player.LAST_NAME,
+            Player.NUMBER_OF_GOALS,
+            Player.ASSISTS,
+            Player.FANTASY_OVERALL_POINTS,
+            Player.MINUTES_PLAYED,
+            Player.GOALS_CONCEDED,
+            Player.FANTASY_CREATIVITY,
+            Player.FANTASY_INFLUENCE,
+            Player.FANTASY_THREAT,
+            Player.FANTASY_TOTAL_BONUS,
+            Player.FANTASY_ICT_INDEX,
+            Player.CLEAN_SHEETS,
+            Player.RED_CARDS,
+            Player.YELLOW_CARDS,
+            Player.FANTASY_SELECTION_PERCENTAGE,
+        )
+
+        season_df.columns = field_names
+        season_df = season_df.transpose().to_dict()
+        for count, player in season_df.items():
+            player[Season.NAME] = season
+            player_data.append(player)
+
+        return player_data
 
 
 if __name__ == "__main__":
@@ -373,14 +408,19 @@ if __name__ == "__main__":
     # Extracting week by week player data
     for week_i in range(1, 38):
         # Season 2016-2017
-        fantasy.ingest_historical_csv(csv_file=f'../historical_fantasy/2016-17/gw{week_i}.csv', season='201617')
+        fantasy.ingest_historical_gameweek_csv(csv_file=f'../historical_fantasy/2016-17/gw{week_i}.csv',
+                                               season='201617')
 
         # Season 2017-2018
-        fantasy.ingest_historical_csv(csv_file=f'../historical_fantasy/2017-18/gw{week_i}.csv', season='201718')
+        fantasy.ingest_historical_gameweek_csv(csv_file=f'../historical_fantasy/2017-18/gw{week_i}.csv',
+                                               season='201718')
 
-
-    # Extracting historical player information (GIVEN SEASON DETAILED SUMMARY INFORMATION - players_raw.csv)
+    # Extracting historical player information (GIVEN SEASON DETAILED SUMMARY INFORMATION - cleaned_players.csv)
     # This is equivalent to base information
+    for season in ['2016-17', '2017-18']:
+        fantasy.ingest_historical_base_csv(csv_file=f'../historical_fantasy/{season}/cleaned_players.csv',
+                                           season="".join(season.split("-")))
+
 
 
 
