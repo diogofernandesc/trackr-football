@@ -92,6 +92,7 @@ class Match:
     PENALTY_SHOOTOUT_SCORE = 'penalty_shootout_score'
     FINISHED = 'finished'
     FANTASY_GAME_WEEK = 'fantasy_game_week'
+    FANTASY_GAME_WEEK_ID = 'fantasy_game_week_id'
     GOALS_SCORED = 'goals_scored'
     ASSISTS = 'assists'
     OWN_GOALS = 'own_goals'
@@ -221,6 +222,7 @@ class Player:
     FANTASY_WEEK_PRICE_FALL = 'fantasy_week_price_fall'
     FANTASY_OVERALL_PRICE_FALL = 'fantasy_overall_price_fall'
     FANTASY_WEEK = 'fantasy_week'
+    FANTASY_WEEK_ID = 'fantasy_week_id'  # ID made up of season year and game week e.g. 20171801 for 2017/2018 week 1
     FANTASY_DREAM_TEAM_COUNT = 'dream_team_count'  # No. of times in dream team
     FANTASY_SELECTION_PERCENTAGE = 'selection_percentage'  # % of fantasy users selecting player
     FANTASY_FORM = 'fantasy_form'
@@ -322,11 +324,63 @@ class FantasyGameWeek:
     FINISHED = 'finished'
     HIGHEST_SCORE = 'highest_score'
 
+
 # ----- API fields ---------
 
 
-# ----- Mappers ------
+class API_FANTASY_PLAYER:
+    ID = 'id'
+    PHOTO_URL = 'photo'
+    TEAM_CODE = 'team_code'
+    TEAM_ID = 'team'
+    CODE = 'code'
+    FIRST_NAME = 'first_name'
+    LASt_NAME = 'second_name'
+    SHIRT_NUMBER = 'squad_number'
+    STATUS = 'status'
+    NEWS = 'news'
+    CHANCE_OF_PLAYING_THIS_WEEK = 'chance_of_playing_this_round'
+    CHANCE_OF_PLAYING_NEXT_WEEK = 'chance_of_playing_next_round'
+    SEASON_VALUE = 'value_season'
+    OVERALL_PRICE_RISE = 'cost_change_start'
+    WEEK_PRICE_RISE = 'cost_change_event'
+    OVERALL_PRICE_FALL = 'cost_change_start_fall'
+    WEEK_PRICE_FALL = 'cost_change_event_fall'
+    DREAM_TEAM_MEMBER = 'in_dreamteam'
+    DREAM_TEAM_COUNT = 'dreamteam_count'
+    SELECTION_PERCENTAGE = 'selected_by_percent'
+    FORM = 'form'
+    OVERALL_TRANSFERS_IN = 'transfers_in'
+    OVERALL_TRANSFERS_OUT = 'transfers_out'
+    WEEK_TRANSFERS_IN = 'transfers_in_event'
+    WEEK_TRANSFERS_OUT = 'transfers_out_event'
+    OVERALL_POINTS = 'total_point'
+    WEEK_POINTS = 'event_points'
+    POINT_AVERAGE = 'points_per_game'
+    ESTIMATED_WEEK_POINTS = 'ep_this'
+    ESTIMATED_NEXT_WEEK_POINTS = 'ep_next'
+    SPECIAL = 'special'
+    MINUTES_PLAYED = 'minutes'
+    NUMBER_OF_GOALS = 'goals_scored'
+    ASSISTS = 'assists'
+    CLEAN_SHEETS = 'clean_sheets'
+    GOALS_CONCEDED = 'goals_conceded'
+    OWN_GOALS = 'own_goals'
+    PENALTIES_SAVED = 'penalties_saved'
+    PENALTIES_MISSED = 'penalties_missed'
+    YELLOW_CARDS = 'yellow_cards'
+    RED_CARDS = 'red_cards'
+    SAVES = 'saves'
+    WEEK_BONUS = 'bonus'
+    TOTAL_BONUS = 'bps'
+    INFLUENCE = 'influence'
+    CREATIVITY = 'creativity'
+    THREAT = 'threat'
+    ICT_INDEX = 'ict_index'
+    CURRENT_WEEK = 'current-event'
 
+
+# ----- Mappers ------
 FLS_STATES_MAPPER = {
     0: "fixture",
     1: "first_half",

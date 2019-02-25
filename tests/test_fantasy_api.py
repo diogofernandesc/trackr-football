@@ -1,6 +1,9 @@
 import unittest
-from ingest_engine.fantasy_api import Fantasy
-from ingest_engine.cons import Team, Player, Match, FantasyGameWeek
+from ingest_engine.fantasy_api import Fantasy, ingest_historical_base_csv, ingest_historical_gameweek_csv
+from ingest_engine.cons import Team, Player, Match, FantasyGameWeek, Season
+from pathlib import Path
+from itertools import chain
+import os
 
 
 class ApiTest(unittest.TestCase):
@@ -69,6 +72,58 @@ class ApiTest(unittest.TestCase):
                                 <= set(match))
 
             self.assertTrue(len(set(match_constants) & set(match)) >= 11)
+
+    def testHistoricalIngestGameWeek(self):
+        current_path = os.path.dirname(os.path.abspath(__file__))
+        current_path = "/".join(current_path.split("/")[:-1])
+        gw_paths1 = Path(f'{current_path}/historical_fantasy/2016-17/gws').glob('**/*.csv')
+        gw_paths2 = Path(f'{current_path}/historical_fantasy/2017-18/gws').glob('**/*.csv')
+        gw_paths = chain(gw_paths1, gw_paths2)
+        for gw in gw_paths:
+            str_gw = str(gw)
+            gw_parsed = ingest_historical_gameweek_csv(csv_file=str_gw, season='201617')
+            for player_data in gw_parsed:
+                self.assertTrue(len(player_data) == 48)
+                self.assertTrue(Player.NAME in player_data)
+                self.assertTrue(Player.YELLOW_CARDS in player_data)
+
+    def testHistoricalIngestSeason(self):
+        current_path = os.path.dirname(os.path.abspath(__file__))
+        current_path = "/".join(current_path.split("/")[:-1])
+
+        season1 = ingest_historical_base_csv(
+            csv_file=f'{current_path}/historical_fantasy/2016-17/cleaned_players.csv', season='201617')
+
+        season2 = ingest_historical_base_csv(
+            csv_file=f'{current_path}/historical_fantasy/2017-18/cleaned_players.csv', season='201718')
+
+        seasons = season1 + season2
+        field_names = (
+            Player.FIRST_NAME,
+            Player.LAST_NAME,
+            Player.NUMBER_OF_GOALS,
+            Player.ASSISTS,
+            Player.FANTASY_OVERALL_POINTS,
+            Player.MINUTES_PLAYED,
+            Player.GOALS_CONCEDED,
+            Player.FANTASY_CREATIVITY,
+            Player.FANTASY_INFLUENCE,
+            Player.FANTASY_THREAT,
+            Player.FANTASY_TOTAL_BONUS,
+            Player.FANTASY_ICT_INDEX,
+            Player.CLEAN_SHEETS,
+            Player.RED_CARDS,
+            Player.YELLOW_CARDS,
+            Player.FANTASY_SELECTION_PERCENTAGE,
+        )
+        for player in seasons:
+            self.assertTrue(len(player) == 17)
+            for field_name in field_names:
+                self.assertTrue(field_name in player)
+            self.assertTrue(Season.NAME in player)
+
+
+
 
 
 
