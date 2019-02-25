@@ -1,5 +1,5 @@
 import unittest
-from ingest_engine.fantasy_api import Fantasy
+from ingest_engine.fantasy_api import Fantasy, ingest_historical_base_csv, ingest_historical_gameweek_csv
 from ingest_engine.cons import Team, Player, Match, FantasyGameWeek, Season
 from pathlib import Path
 from itertools import chain
@@ -77,17 +77,17 @@ class ApiTest(unittest.TestCase):
         gw_paths = chain(gw_paths1, gw_paths2)
         for gw in gw_paths:
             str_gw = str(gw)
-            gw_parsed = self.fantasy.ingest_historical_gameweek_csv(csv_file=str_gw, season='201617')
+            gw_parsed = ingest_historical_gameweek_csv(csv_file=str_gw, season='201617')
             for player_data in gw_parsed:
                 self.assertTrue(len(player_data) == 48)
                 self.assertTrue(Player.NAME in player_data)
                 self.assertTrue(Player.YELLOW_CARDS in player_data)
 
     def testHistoricalIngestSeason(self):
-        season1 = self.fantasy.ingest_historical_base_csv(
+        season1 = ingest_historical_base_csv(
             csv_file='../historical_fantasy/2016-17/cleaned_players.csv', season='201617')
 
-        season2 = self.fantasy.ingest_historical_base_csv(
+        season2 = ingest_historical_base_csv(
             csv_file='../historical_fantasy/2017-18/cleaned_players.csv', season='201718')
 
         seasons = season1 + season2
