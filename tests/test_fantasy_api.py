@@ -3,6 +3,8 @@ from ingest_engine.fantasy_api import Fantasy, ingest_historical_base_csv, inges
 from ingest_engine.cons import Team, Player, Match, FantasyGameWeek, Season
 from pathlib import Path
 from itertools import chain
+import os
+
 
 class ApiTest(unittest.TestCase):
     def setUp(self):
@@ -72,8 +74,10 @@ class ApiTest(unittest.TestCase):
             self.assertTrue(len(set(match_constants) & set(match)) >= 11)
 
     def testHistoricalIngestGameWeek(self):
-        gw_paths1 = Path("../historical_fantasy/2016-17/gws").glob('**/*.csv')
-        gw_paths2 = Path("../historical_fantasy/2017-18/gws").glob('**/*.csv')
+        current_path = os.path.dirname(os.path.abspath(__file__))
+        current_path = "/".join(current_path.split("/")[:-1])
+        gw_paths1 = Path(f'{current_path}/historical_fantasy/2016-17/gws').glob('**/*.csv')
+        gw_paths2 = Path(f'{current_path}/historical_fantasy/2017-18/gws').glob('**/*.csv')
         gw_paths = chain(gw_paths1, gw_paths2)
         for gw in gw_paths:
             str_gw = str(gw)
@@ -84,11 +88,14 @@ class ApiTest(unittest.TestCase):
                 self.assertTrue(Player.YELLOW_CARDS in player_data)
 
     def testHistoricalIngestSeason(self):
+        current_path = os.path.dirname(os.path.abspath(__file__))
+        current_path = "/".join(current_path.split("/")[:-1])
+
         season1 = ingest_historical_base_csv(
-            csv_file='../historical_fantasy/2016-17/cleaned_players.csv', season='201617')
+            csv_file=f'{current_path}/historical_fantasy/2016-17/cleaned_players.csv', season='201617')
 
         season2 = ingest_historical_base_csv(
-            csv_file='../historical_fantasy/2017-18/cleaned_players.csv', season='201718')
+            csv_file=f'{current_path}/historical_fantasy/2017-18/cleaned_players.csv', season='201718')
 
         seasons = season1 + season2
         field_names = (
