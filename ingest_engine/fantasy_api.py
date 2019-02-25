@@ -2,8 +2,129 @@ from ingest_engine.cons import *
 from ingest_engine.cons import FANTASY_STATUS_MAPPER as st_mapper
 from ingest_engine.api_integration import ApiIntegration
 import os
-from pathlib import Path
 import pandas as pd
+
+
+def ingest_historical_gameweek_csv(csv_file, season):
+    """
+    Parse historical CSVs to json
+    :param csv_file: CSV file with player or fixture information
+    :param season: season description for historical ingest e.g. 201617 for 2016/2017
+    :return: parsed json file
+    """
+    player_data = []
+    gw_df = pd.read_csv(csv_file, encoding='utf-8')
+    columns_to_drop = ['bonus', 'fixture', 'id', 'kickoff_time', 'ea_index',
+                       'kickoff_time_formatted', 'loaned_in', 'loaned_out',
+                       'team_a_score', 'team_h_score']
+
+    for column in columns_to_drop:
+        gw_df.drop(column, axis=1, inplace=True)
+
+    field_names = (
+        Player.NAME,
+        Player.ASSISTS,
+        Player.ATTEMPTED_PASSES,
+        Player.BIG_CHANCES_CREATED,
+        Player.BIG_CHANCES_MISSED,
+        Player.FANTASY_TOTAL_BONUS,
+        Player.CLEAN_SHEETS,
+        Player.CLEARANCES_BLOCKS_INTERCEPTIONS,
+        Player.COMPLETED_PASSES,
+        Player.FANTASY_CREATIVITY,
+        Player.DRIBBLES,
+        Player.FANTASY_ID,
+        Player.ERRORS_LEADING_TO_GOAL,
+        Player.ERRORS_LEADING_TO_GOAL_ATTEMPT,
+        Player.FOULS,
+        Player.GOALS_CONCEDED,
+        Player.NUMBER_OF_GOALS,
+        Player.FANTASY_ICT_INDEX,
+        Player.FANTASY_INFLUENCE,
+        Player.KEY_PASSES,
+        Player.MINUTES_PLAYED,
+        Player.OFFSIDE,
+        Player.OPEN_PLAY_CROSSES,
+        Player.FANTASY_OPPONENT_TEAM_ID,
+        Player.OWN_GOALS,
+        Player.PENALTIES_CONCEDED,
+        Player.PENALTIES_MISSED,
+        Player.PENALTIES_SAVED,
+        Player.RECOVERIES,
+        Player.RED_CARDS,
+        Player.FANTASY_WEEK,
+        Player.SAVES,
+        Player.FANTASY_SELECTION_COUNT,
+        Player.TACKLED,
+        Player.TACKLES,
+        Player.TARGET_MISSED,
+        Player.FANTASY_THREAT,
+        Player.FANTASY_OVERALL_POINTS,
+        Player.FANTASY_TRANSFERS_BALANCE,
+        Player.FANTASY_WEEK_TRANSFERS_IN,
+        Player.FANTASY_WEEK_TRANSFERS_OUT,
+        Player.FANTASY_WEEK_VALUE,
+        Player.PLAYED_AT_HOME,
+        Player.WINNING_GOALS,
+        Player.YELLOW_CARDS
+    )
+    gw_df.columns = field_names  # re-naming of columns
+    gw_df = gw_df.transpose().to_dict()
+
+    for player in gw_df.values():
+        name = player[Player.NAME].split("_")
+        player[Player.NAME] = " ".join(name)
+        player[Player.FIRST_NAME] = name[0]
+        player[Player.LAST_NAME] = name[1]
+        player[Player.FANTASY_WEEK_ID] = int(f'{season}{str(player[Player.FANTASY_WEEK]).zfill(2)}')
+        player_data.append(player)
+
+    return player_data
+
+
+def ingest_historical_base_csv(csv_file, season):
+    """
+    The equivalent to retrieving the base information at /bootstrap/ endpoint
+    :param csv_file: csv file with the base information
+    :param season: season string indicator
+    :return: parsed CSV into json
+    """
+    player_data = []
+    season_df = pd.read_csv(csv_file, encoding='utf-8')
+    columns_to_drop = ['bonus']
+    if season == '201718':
+        columns_to_drop.append('now_cost')
+
+    for column in columns_to_drop:
+        season_df.drop(column, axis=1, inplace=True)
+
+    field_names = (
+        Player.FIRST_NAME,
+        Player.LAST_NAME,
+        Player.NUMBER_OF_GOALS,
+        Player.ASSISTS,
+        Player.FANTASY_OVERALL_POINTS,
+        Player.MINUTES_PLAYED,
+        Player.GOALS_CONCEDED,
+        Player.FANTASY_CREATIVITY,
+        Player.FANTASY_INFLUENCE,
+        Player.FANTASY_THREAT,
+        Player.FANTASY_TOTAL_BONUS,
+        Player.FANTASY_ICT_INDEX,
+        Player.CLEAN_SHEETS,
+        Player.RED_CARDS,
+        Player.YELLOW_CARDS,
+        Player.FANTASY_SELECTION_PERCENTAGE,
+    )
+
+    season_df.columns = field_names
+    season_df = season_df.transpose().to_dict()
+    for player in season_df.values():
+        player[Season.NAME] = season
+        player_data.append(player)
+
+    return player_data
+
 
 class Fantasy(ApiIntegration):
     """
@@ -282,126 +403,6 @@ class Fantasy(ApiIntegration):
 
         return total_result
 
-    def ingest_historical_gameweek_csv(self, csv_file, season):
-        """
-        Parse historical CSVs to json
-        :param csv_file: CSV file with player or fixture information
-        :param season: season description for historical ingest e.g. 201617 for 2016/2017
-        :return: parsed json file
-        """
-        player_data = []
-        gw_df = pd.read_csv(csv_file, encoding='utf-8')
-        columns_to_drop = ['bonus', 'fixture', 'id', 'kickoff_time', 'ea_index',
-                           'kickoff_time_formatted', 'loaned_in', 'loaned_out',
-                           'team_a_score', 'team_h_score']
-
-        for column in columns_to_drop:
-            gw_df.drop(column, axis=1, inplace=True)
-
-        field_names = (
-            Player.NAME,
-            Player.ASSISTS,
-            Player.ATTEMPTED_PASSES,
-            Player.BIG_CHANCES_CREATED,
-            Player.BIG_CHANCES_MISSED,
-            Player.FANTASY_TOTAL_BONUS,
-            Player.CLEAN_SHEETS,
-            Player.CLEARANCES_BLOCKS_INTERCEPTIONS,
-            Player.COMPLETED_PASSES,
-            Player.FANTASY_CREATIVITY,
-            Player.DRIBBLES,
-            Player.FANTASY_ID,
-            Player.ERRORS_LEADING_TO_GOAL,
-            Player.ERRORS_LEADING_TO_GOAL_ATTEMPT,
-            Player.FOULS,
-            Player.GOALS_CONCEDED,
-            Player.NUMBER_OF_GOALS,
-            Player.FANTASY_ICT_INDEX,
-            Player.FANTASY_INFLUENCE,
-            Player.KEY_PASSES,
-            Player.MINUTES_PLAYED,
-            Player.OFFSIDE,
-            Player.OPEN_PLAY_CROSSES,
-            Player.FANTASY_OPPONENT_TEAM_ID,
-            Player.OWN_GOALS,
-            Player.PENALTIES_CONCEDED,
-            Player.PENALTIES_MISSED,
-            Player.PENALTIES_SAVED,
-            Player.RECOVERIES,
-            Player.RED_CARDS,
-            Player.FANTASY_WEEK,
-            Player.SAVES,
-            Player.FANTASY_SELECTION_COUNT,
-            Player.TACKLED,
-            Player.TACKLES,
-            Player.TARGET_MISSED,
-            Player.FANTASY_THREAT,
-            Player.FANTASY_OVERALL_POINTS,
-            Player.FANTASY_TRANSFERS_BALANCE,
-            Player.FANTASY_WEEK_TRANSFERS_IN,
-            Player.FANTASY_WEEK_TRANSFERS_OUT,
-            Player.FANTASY_WEEK_VALUE,
-            Player.PLAYED_AT_HOME,
-            Player.WINNING_GOALS,
-            Player.YELLOW_CARDS
-        )
-        gw_df.columns = field_names  # re-naming of columns
-        gw_df = gw_df.transpose().to_dict()
-
-        for count, player in gw_df.items():
-            name = player[Player.NAME].split("_")
-            player[Player.NAME] = " ".join(name)
-            player[Player.FIRST_NAME] = name[0]
-            player[Player.LAST_NAME] = name[1]
-            player[Player.FANTASY_WEEK_ID] = int(f'{season}{str(player[Player.FANTASY_WEEK]).zfill(2)}')
-            player_data.append(player)
-
-        return player_data
-
-    def ingest_historical_base_csv(self, csv_file, season):
-        """
-        The equivalent to retrieving the base information at /bootstrap/ endpoint
-        :param csv_file: csv file with the base information
-        :param season: season string indicator
-        :return: parsed CSV into json
-        """
-        player_data = []
-        season_df = pd.read_csv(csv_file, encoding='utf-8')
-        columns_to_drop = ['bonus']
-        if season == '201718':
-            columns_to_drop.append('now_cost')
-
-        for column in columns_to_drop:
-            season_df.drop(column, axis=1, inplace=True)
-
-
-        field_names = (
-            Player.FIRST_NAME,
-            Player.LAST_NAME,
-            Player.NUMBER_OF_GOALS,
-            Player.ASSISTS,
-            Player.FANTASY_OVERALL_POINTS,
-            Player.MINUTES_PLAYED,
-            Player.GOALS_CONCEDED,
-            Player.FANTASY_CREATIVITY,
-            Player.FANTASY_INFLUENCE,
-            Player.FANTASY_THREAT,
-            Player.FANTASY_TOTAL_BONUS,
-            Player.FANTASY_ICT_INDEX,
-            Player.CLEAN_SHEETS,
-            Player.RED_CARDS,
-            Player.YELLOW_CARDS,
-            Player.FANTASY_SELECTION_PERCENTAGE,
-        )
-
-        season_df.columns = field_names
-        season_df = season_df.transpose().to_dict()
-        for count, player in season_df.items():
-            player[Season.NAME] = season
-            player_data.append(player)
-
-        return player_data
-
 
 if __name__ == "__main__":
     fantasy = Fantasy()
@@ -411,20 +412,20 @@ if __name__ == "__main__":
     # Extracting week by week player data
     for week_i in range(1, 38):
         # Season 2016-2017
-        fantasy.ingest_historical_gameweek_csv(csv_file=f'{current_path}/historical_fantasy/2016-17/gw{week_i}.csv',
-                                               season='201617')
+        ingest_historical_gameweek_csv(csv_file=f'{current_path}/historical_fantasy/2016-17/gw{week_i}.csv',
+                                       season='201617')
 
         # Season 2017-2018
-        fantasy.ingest_historical_gameweek_csv(csv_file=f'{current_path}/historical_fantasy/2017-18/gw{week_i}.csv',
-                                               season='201718')
+        ingest_historical_gameweek_csv(csv_file=f'{current_path}/historical_fantasy/2017-18/gw{week_i}.csv',
+                                       season='201718')
 
     # Extracting historical player information (GIVEN SEASON DETAILED SUMMARY INFORMATION - cleaned_players.csv)
     # This is equivalent to base information
     for season in ['2016-17', '2017-18']:
-        fantasy.ingest_historical_base_csv(csv_file=f'{current_path}/historical_fantasy/{season}/cleaned_players.csv',
-                                           season="".join(season.split("-")))
+        ingest_historical_base_csv(csv_file=f'{current_path}/historical_fantasy/{season}/cleaned_players.csv',
+                                   season="".join(season.split("-")))
 
-        
+
 
 
 

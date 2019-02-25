@@ -378,10 +378,9 @@ class API_FANTASY_PLAYER:
     THREAT = 'threat'
     ICT_INDEX = 'ict_index'
     CURRENT_WEEK = 'current-event'
-    
+
 
 # ----- Mappers ------
-
 FLS_STATES_MAPPER = {
     0: "fixture",
     1: "first_half",
