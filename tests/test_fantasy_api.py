@@ -78,7 +78,6 @@ class ApiTest(unittest.TestCase):
         for gw in gw_paths:
             str_gw = str(gw)
             gw_parsed = self.fantasy.ingest_historical_gameweek_csv(csv_file=str_gw, season='201617')
-            print(gw_parsed[0])
             for player_data in gw_parsed:
                 self.assertTrue(len(player_data) == 48)
                 self.assertTrue(Player.NAME in player_data)

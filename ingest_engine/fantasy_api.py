@@ -1,7 +1,8 @@
 from ingest_engine.cons import *
 from ingest_engine.cons import FANTASY_STATUS_MAPPER as st_mapper
 from ingest_engine.api_integration import ApiIntegration
-import csv
+import os
+from pathlib import Path
 import pandas as pd
 
 class Fantasy(ApiIntegration):
@@ -404,22 +405,27 @@ class Fantasy(ApiIntegration):
 
 if __name__ == "__main__":
     fantasy = Fantasy()
+    current_path = os.path.dirname(os.path.abspath(__file__))
+    current_path = "/".join(current_path.split("/")[:-1])
 
     # Extracting week by week player data
     for week_i in range(1, 38):
         # Season 2016-2017
-        fantasy.ingest_historical_gameweek_csv(csv_file=f'../historical_fantasy/2016-17/gw{week_i}.csv',
+        fantasy.ingest_historical_gameweek_csv(csv_file=f'{current_path}/historical_fantasy/2016-17/gw{week_i}.csv',
                                                season='201617')
 
         # Season 2017-2018
-        fantasy.ingest_historical_gameweek_csv(csv_file=f'../historical_fantasy/2017-18/gw{week_i}.csv',
+        fantasy.ingest_historical_gameweek_csv(csv_file=f'{current_path}/historical_fantasy/2017-18/gw{week_i}.csv',
                                                season='201718')
 
     # Extracting historical player information (GIVEN SEASON DETAILED SUMMARY INFORMATION - cleaned_players.csv)
     # This is equivalent to base information
     for season in ['2016-17', '2017-18']:
-        fantasy.ingest_historical_base_csv(csv_file=f'../historical_fantasy/{season}/cleaned_players.csv',
+        fantasy.ingest_historical_base_csv(csv_file=f'{current_path}/historical_fantasy/{season}/cleaned_players.csv',
                                            season="".join(season.split("-")))
+
+        
+
 
 
 
