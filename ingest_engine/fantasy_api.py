@@ -245,14 +245,6 @@ class Fantasy(ApiIntegration):
 
         return total_result
 
-    def request_player_season_aggregate_data(self, player_id):
-        """
-        Returns summary data for a player's stats
-        :param player_id: The ID of the player for which to retrieve the data
-        :return: parsed season summary results
-        :rtype: dict
-        """
-
     def request_player_data(self, player_id, season_summaries=True, fixture_data=True, fixture_codes=True):
         """
         Returns stats tracked by fantasy football for the footballer given by the player_id param
