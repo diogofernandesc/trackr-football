@@ -42,6 +42,7 @@ class FootballDataApiFilters:
 
 class Match:
     ID = 'id'
+    FOOTBALL_DATA_ID = 'footbalL_data_id'
     SEASON_FOOTBALL_DATA_ID = 'season_football_data_id'
     SEASON_START_DATE = 'season_start_date'
     SEASON_END_DATE = 'season_end_date'
@@ -156,6 +157,7 @@ class Team:
     FANTASY_ATTACK_AWAY_STRENGTH = 'fantasy_attack_away_strength'
     FANTASY_DEFENCE_HOME_STRENGTH = 'fantasy_defence_home_strength'
     FANTASY_DEFENCE_AWAY_STRENGTH = 'fantasy_defence_away_strength'
+    FANTASY_ID = 'fantasy_id'
 
 class Standings:
     COMPETITION_NAME = 'competition_name'
@@ -197,6 +199,7 @@ class Player:
     RED_CARDS = 'red_cards'
     COMPETITION_FLS_ID = 'competition_fls_id'
     YELLOW_CARDS = 'yellow_cards'
+    FOOTBALL_DATA_API_ID = 'football_data_id'
     FASTEST_LIVE_SCORES_API_ID = 'fls_api_id'
     COMPETITION_STATS = 'competition_stats'
     PLAYED_AT_HOME = 'played_at_home'

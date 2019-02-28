@@ -213,6 +213,8 @@ class Fantasy(ApiIntegration):
                 for team in result['teams']:
                     teams.append({
                         Team.FANTASY_CODE: team['code'],
+                        Team.FANTASY_ID: team['id'],
+                        Team.NAME: team['name'],
                         Team.FANTASY_WEEK_STRENGTH: team['strength'],
                         Team.FANTASY_OVERALL_HOME_STRENGTH: team['strength_overall_home'],
                         Team.FANTASY_OVERALL_AWAY_STRENGTH: team['strength_overall_away'],
