@@ -126,6 +126,37 @@ def ingest_historical_base_csv(csv_file, season):
     return player_data
 
 
+def team_mapper(team_code):
+    """
+    Retrieve team name based on team_code
+    :param team_code: Fantasy code for a given team
+    :return: team name
+    """
+    mapper = {
+        1: "Arsenal",
+        2: "Bournemouth",
+        3: "Brighton",
+        4: "Burnley",
+        5: "Cardiff",
+        6: "Chelsea",
+        7: "Crystal Palace",
+        8: "Everton",
+        9: "Fulham",
+        10: "Huddersfield",
+        11: "Leicester",
+        12: "Liverpool",
+        13: "Manchester City",
+        14: "Manchester United",
+        15: "Newcastle",
+        16: "Southampton",
+        17: "Tottenham Hotspur",
+        18: "Watford",
+        19: "West Ham",
+        20: "Wolverhampton",
+    }
+    return mapper.get(team_code)
+
+
 class Fantasy(ApiIntegration):
     """
     Wrapper for API available at -> https://fantasy.premierleague.com/drf/
@@ -374,8 +405,10 @@ class Fantasy(ApiIntegration):
                         Match.FULL_TIME_HOME_SCORE: match["team_h_score"],
                         Match.FULL_TIME_AWAY_SCORE: match["team_a_score"],
                         Match.MINUTES: match["minutes"],
-                        Match.FANTASY_HOME_TEAM_CODE: match["team_h"],
-                        Match.FANTASY_AWAY_TEAM_CODE: match["team_a"]
+                        Match.FANTASY_HOME_TEAM_ID: match["team_h"],
+                        Match.FANTASY_AWAY_TEAM_ID: match["team_a"]
+                        # Match.FANTASY_HOME_TEAM_CODE: match["team_h"],
+                        # Match.FANTASY_AWAY_TEAM_CODE: match["team_a"]
                     }
 
                     stats = match["stats"]
@@ -400,6 +433,7 @@ class Fantasy(ApiIntegration):
 
 if __name__ == "__main__":
     fantasy = Fantasy()
+    fantasy.request_matches()
     current_path = os.path.dirname(os.path.abspath(__file__))
     current_path = "/".join(current_path.split("/")[:-1])
 

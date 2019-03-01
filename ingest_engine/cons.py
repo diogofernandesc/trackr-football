@@ -4,7 +4,7 @@ class FootballDataApiFilters:
     '''
     ID = 'id'
     MATCHDAY = 'matchday'  # Integer 0-49
-    SEASON = 'season'  # Integer for year e.g. 2018
+    SEASON = 'season'  # Integer for starting year e.g. 2018
 
     STATUS = 'status'  # SCHEDULED | LIVE | IN_PLAY | PAUSED | FINISHED | POSTPONED | SUSPENDED | CANCELLED
     STATUS_SCHEDULED = 'SCHEDULED'
@@ -39,10 +39,15 @@ class FootballDataApiFilters:
     STANDING_HOME = 'HOME'
     STANDING_AWAY = 'AWAY'
 
+class FLSApiFilters:
+    FROM_DATETIME = 'from'
+    TO_DATETIME = 'to'
+    COMPETITION_ID = 'competition_id'
+    TEAM_ID = 'team_id'
 
 class Match:
     ID = 'id'
-    FOOTBALL_DATA_ID = 'footbalL_data_id'
+    FOOTBALL_DATA_ID = 'football_data_id'
     SEASON_FOOTBALL_DATA_ID = 'season_football_data_id'
     SEASON_START_DATE = 'season_start_date'
     SEASON_END_DATE = 'season_end_date'
@@ -110,6 +115,8 @@ class Match:
     MINUTES = 'minutes'
     FANTASY_HOME_TEAM_CODE = 'fantasy_home_team_code'
     FANTASY_AWAY_TEAM_CODE = 'fantasy_away_team_code'
+    FANTASY_HOME_TEAM_ID = 'fantasy_home_team_id'
+    FANTASY_AWAY_TEAM_ID = 'fantasy_away_team_id'
     SIDE = 'side'
     GOAL_AMOUNT = 'amount'
 
@@ -169,6 +176,7 @@ class Standings:
     GROUP = 'group'
     POSITION = 'position'
     TEAM_NAME = 'team_name'
+    FOOTBALL_DATA_TEAM_ID = 'football_data_team_id'
     GAMES_PLAYED = 'games_played'
     GAMES_WON = 'games_won'
     GAMES_DRAWN = 'games_drawn'

@@ -222,6 +222,7 @@ class FootballData(ApiIntegration):
                         table.append({
                             Standings.POSITION: entry['position'],
                             Standings.TEAM_NAME: entry['team']['name'],
+                            Standings.FOOTBALL_DATA_TEAM_ID: entry['team']['id'],
                             Standings.GAMES_PLAYED: entry['playedGames'],
                             Standings.GAMES_WON: entry['won'],
                             Standings.GAMES_DRAWN: entry['draw'],
@@ -449,9 +450,10 @@ class FootballData(ApiIntegration):
 
 if __name__ == "__main__":
     fd = FootballData(api_key=os.getenv("FOOTBALL_DATA_API_KEY"))
-    # fd.request_competition_scorers(competition_id=2002)
+    # print(fd.request_competition_standings(competition_id=2002))
+    fd.request_competition_scorers(competition_id=2002)
 
-    print(fd.request_player(player_id=1))
+    # print(fd.request_player(player_id=1))
 # print(fd.request_competition_scorers(competition_id=2002))
 # print(fd.request_competition_standings(competition_id=2002))
 # print(fd.request_competition_team(competition_id=2002, season=2017))
