@@ -120,9 +120,7 @@ class Driver(object):
         for match in fd_matches:
             match_start_datetime = match[Match.MATCH_UTC_DATE]
             home_team = match[Match.HOME_TEAM]
-            match['fd_home_team'] = home_team
             away_team = match[Match.AWAY_TEAM]
-            match['fd_away_team'] = away_team
             home_score = match[Match.FULL_TIME_HOME_SCORE]
             away_score = match[Match.FULL_TIME_AWAY_SCORE]
             for fls_match in fls_matches:
@@ -135,8 +133,6 @@ class Driver(object):
                     for f_match in fantasy_matches:
                         f_home_team = team_mapper(f_match[Match.FANTASY_HOME_TEAM_ID])
                         f_away_team = team_mapper(f_match[Match.FANTASY_AWAY_TEAM_ID])
-                        f_match['f_home_team'] = f_home_team
-                        f_match['f_away_team'] = f_away_team
                         if f_match[Match.START_TIME] == match_start_datetime:
                             if f_home_team in home_team and f_away_team in away_team and \
                                     home_score == f_match[Match.FULL_TIME_HOME_SCORE] and \
@@ -159,5 +155,5 @@ class Driver(object):
 
 if __name__ == "__main__":
     driver = Driver()
-    driver.request_match("banter", game_week=1, season=2018)
+    print(driver.request_match("banter", game_week=1, season=2018))
     # driver.request_competitions()
