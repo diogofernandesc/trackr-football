@@ -69,6 +69,7 @@ class FastestLiveScores(ApiIntegration):
             for competition in result:
                 total_results.append({
                     Competition.NAME: competition['name'],
+                    Competition.LOCATION: competition['region']['name'],
                     Competition.FASTEST_LIVE_SCORES_API_ID: competition['dbid'],
                 })
 
