@@ -88,5 +88,52 @@ class ApiTest(unittest.TestCase):
                                                      Match.HOME_TEAM,
                                                      Match.AWAY_TEAM]))
 
+    def testRequestTeams(self):
+        teams = self.driver.request_teams(competition_name="test", season=2018)
+        # Testing
+        fls_comp_id = 2
+        fd_comp_id = 2021
+        fls_teams = self.driver.fls.request_teams(**{flsf.COMPETITION_ID: fls_comp_id})
+        f_teams = self.driver.fantasy.request_base_information()['teams']
+
+        for team in teams:
+            for fls_team in fls_teams:
+                if str_comparator(team[Team.NAME], fls_team[Team.NAME]) >= 0.9:
+                    self.assertEqual(team[Team.FASTEST_LIVE_SCORES_API_ID], fls_team[Team.FASTEST_LIVE_SCORES_API_ID])
+                    self.assertTrue(all(k in team for k in fls_team))
+
+            for f_team in f_teams:
+                if str_comparator(team[Team.NAME], f_team[Team.NAME]) >= 0.9:
+                    self.assertEqual(team[Team.FANTASY_ID], f_team[Team.FANTASY_ID])
+                    self.assertTrue(all(k in team for k in f_team))
+
+            self.assertTrue(all(k in team for k in [Team.FOOTBALL_DATA_ID,
+                                                    Team.NAME,
+                                                    Team.SHORT_NAME,
+                                                    Team.COUNTRY,
+                                                    Team.CREST_URL,
+                                                    Team.ADDRESS,
+                                                    Team.PHONE,
+                                                    Team.WEBSITE,
+                                                    Team.EMAIL,
+                                                    Team.YEAR_FOUNDED,
+                                                    Team.CLUB_COLOURS,
+                                                    Team.STADIUM]))
+
+            if Team.ACTIVE_COMPETITIONS in team:
+                for competition in team[Team.ACTIVE_COMPETITIONS]:
+                    self.assertTrue(all(k in competition for k in [Competition.FOOTBALL_DATA_API_ID,
+                                                                   Competition.LOCATION,
+                                                                   Competition.NAME,
+                                                                   Competition.CODE]))
+            if Team.SQUAD in team:
+                for member in team[Team.SQUAD]:
+                    self.assertTrue(all(k in member for k in [Player.NAME,
+                                                              Player.POSITION,
+                                                              Player.DATE_OF_BIRTH,
+                                                              Player.COUNTRY_OF_BIRTH,
+                                                              Player.NATIONALITY,
+                                                              Player.SHIRT_NUMBER,
+                                                              Team.SQUAD_ROLE]))
 
 

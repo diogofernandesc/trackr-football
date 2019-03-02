@@ -126,7 +126,7 @@ def ingest_historical_base_csv(csv_file, season):
     return player_data
 
 
-def team_mapper(team_code):
+def team_mapper(team_id):
     """
     Retrieve team name based on team_code
     :param team_code: Fantasy code for a given team
@@ -135,26 +135,26 @@ def team_mapper(team_code):
     mapper = {
         1: "Arsenal",
         2: "Bournemouth",
-        3: "Brighton",
+        3: "Brighton & Hove Albion",
         4: "Burnley",
-        5: "Cardiff",
+        5: "Cardiff City",
         6: "Chelsea",
         7: "Crystal Palace",
         8: "Everton",
         9: "Fulham",
-        10: "Huddersfield",
-        11: "Leicester",
+        10: "Huddersfield Town",
+        11: "Leicester City",
         12: "Liverpool",
         13: "Manchester City",
         14: "Manchester United",
-        15: "Newcastle",
+        15: "Newcastle United",
         16: "Southampton",
         17: "Tottenham Hotspur",
         18: "Watford",
-        19: "West Ham",
-        20: "Wolverhampton",
+        19: "West Ham United",
+        20: "Wolverhampton Wanderers",
     }
-    return mapper.get(team_code)
+    return mapper.get(team_id)
 
 
 class Fantasy(ApiIntegration):
