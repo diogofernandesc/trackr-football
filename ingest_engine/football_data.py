@@ -402,6 +402,7 @@ class FootballData(ApiIntegration):
                     for entry in result['squad']:
                         squad.append({
                             Player.NAME: entry['name'],
+                            Player.FOOTBALL_DATA_API_ID: entry['id'],
                             Player.POSITION: entry['position'],
                             Player.DATE_OF_BIRTH: entry['dateOfBirth'],
                             Player.COUNTRY_OF_BIRTH: entry['countryOfBirth'],

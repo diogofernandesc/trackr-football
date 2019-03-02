@@ -44,6 +44,7 @@ class FLSApiFilters:
     TO_DATETIME = 'to'
     COMPETITION_ID = 'competition_id'
     TEAM_ID = 'team_id'
+    TEAM_IDS = 'team_ids'
 
 class Match:
     ID = 'id'
@@ -216,6 +217,7 @@ class Player:
     FUTURE_FIXTURES = 'future_fixtures'
 
     # Fantasy fields:
+    FANTASY_WEB_NAME = 'web_name'
     FANTASY_TEAM_CODE = 'fantasy_team_code'
     FANTASY_ID = 'fantasy_player_id'
     FANTASY_STATUS = 'fantasy_status'

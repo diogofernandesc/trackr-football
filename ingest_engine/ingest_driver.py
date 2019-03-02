@@ -1,12 +1,12 @@
 from ingest_engine.football_data import FootballData
 from ingest_engine.fastest_live_scores_api import FastestLiveScores
-from ingest_engine.fantasy_api import Fantasy, team_mapper
-from ingest_engine.cons import Competition, Match, Team
+from ingest_engine.fantasy_api import Fantasy, team_mapper, ingest_historical_base_csv, ingest_historical_gameweek_csv
+from ingest_engine.cons import Competition, Match, Team, Player
 from ingest_engine.cons import FootballDataApiFilters as fdf
 from ingest_engine.cons import FLSApiFilters as flsf
 from Levenshtein import ratio
 import re
-
+import os
 
 def str_comparator(str1, str2):
     """
@@ -44,6 +44,11 @@ class Driver(object):
         self.fd = FootballData()
         self.fls = FastestLiveScores()
         self.fantasy = Fantasy()
+
+        # Indicator of whether or not historical fantasy data has been collected
+        self.historical_player_data_collected = False
+        self.historical_fantasy_gameweek_data = []
+        self.historical_fantasy_base_data = []
 
     def request_competitions(self):
         """
@@ -183,23 +188,84 @@ class Driver(object):
                     joint_teams.append(final_dict)
                     break
 
-
         return joint_teams
 
+    def get_historical_fantasy_data(self):
+        current_path = os.path.dirname(os.path.abspath(__file__))
+        current_path = "/".join(current_path.split("/")[:-1])
+        for week_i in range(1, 38):
+            # Season 2016-2017
+            temp_list = self.historical_fantasy_gameweek_data
 
+            # Merge the current record of historical gameweek data with this one
+            self.historical_fantasy_gameweek_data =\
+                ingest_historical_gameweek_csv(csv_file=f'{current_path}/historical_fantasy/2016-17/gw{week_i}.csv',
+                                               season='201617') + temp_list
 
+            temp_list = self.historical_fantasy_gameweek_data
+            # Season 2017-2018
+            self.historical_fantasy_gameweek_data = \
+                ingest_historical_gameweek_csv(csv_file=f'{current_path}/historical_fantasy/2017-18/gw{week_i}.csv',
+                                               season='201718') + temp_list
 
+        for season in ['2016-17', '2017-18']:
+            temp_list = self.historical_fantasy_base_data
+            self.historical_fantasy_base_data =  ingest_historical_base_csv(
+                csv_file=f'{current_path}/historical_fantasy/{season}/cleaned_players.csv',
+                season="".join(season.split("-"))) + temp_list
 
-    def request_player_details(self):
+    def request_player_details(self, team_name, competition_name):
         """
         Join and retrieve player details from different sources
-        :return:
+        :return: List of player details from a given team
+        :rtype: list
         """
-        pass
+        total_players = []
+
+        # Liverpool example
+        # Liverpool FD id = 64, FLS = 1
+        # In FLS, 2 is id for premier league, 2021 in football-data
+        # Testing
+        fls_comp_id = 2
+        fd_comp_id = 2021
+
+        # fls_players = self.fls.request_player_details(**{flsf.COMPETITION_ID: 2})
+        fls_players = self.fls.request_player_details(**{flsf.TEAM_IDS: 1})
+        f_players_base = self.fantasy.request_base_information()['players']
+
+        # TODO: This will be done in its own separate function
+        # Ingest historical data to match player data with if not already collected
+        # if not self.historical_fantasy_gameweek_data or not self.historical_fantasy_base_data:
+        #     self.get_historical_fantasy_data()
+
+        # Join together data from fantasy football
+        for idx, player in enumerate(f_players_base):
+            extra_player_data = self.fantasy.request_player_data(player_id=player[Player.FANTASY_ID])
+            f_players_base[idx] = {**extra_player_data, **player}
+
+        # print(f_players_base)
+        for player in fls_players:
+            for f_player in f_players_base:
+                if str_comparator(player[Player.NAME], f_player[Player.NAME]) >= 0.8:
+                    final_dict = player
+                    # final_dict = {**player, **f_player}
+                    total_players.append(final_dict)
+
+                elif str_comparator(player[Player.NAME].split(" ")[0], f_player[Player.FIRST_NAME]) >= 0.8 or \
+                        str_comparator(player[Player.NAME].split(" ")[0], f_player[Player.FANTASY_WEB_NAME]) >= 0.8:
+                    if str_comparator(team_name, team_mapper(f_player[Player.FANTASY_TEAM_ID])) >= 0.8:
+                        final_dict = player
+                        # final_dict = {**player, **f_player}
+                        total_players.append(final_dict)
+
+
+        return total_players
+
 
 
 if __name__ == "__main__":
     driver = Driver()
-    print(driver.request_teams("banter", 2018))
+    print(driver.request_player_details(team_name="Liverpool", competition_name="test"))
+    # print(driver.request_teams("banter", 2018))
     # print(driver.request_match("banter", game_week=1, season=2018))
     # driver.request_competitions()

@@ -121,6 +121,7 @@ def ingest_historical_base_csv(csv_file, season):
     season_df = season_df.transpose().to_dict()
     for player in season_df.values():
         player[Season.NAME] = season
+        player[Player.NAME] = f'{player[Player.FIRST_NAME]} {player[Player.LAST_NAME]}'
         player_data.append(player)
 
     return player_data
@@ -194,6 +195,8 @@ class Fantasy(ApiIntegration):
                     Player.FANTASY_CODE: player['code'],
                     Player.FIRST_NAME: player['first_name'],
                     Player.LAST_NAME: player['second_name'],
+                    Player.FANTASY_WEB_NAME: player['web_name'],
+                    Player.NAME: f"{player['first_name']} {player['second_name']}",
                     Player.SHIRT_NUMBER: player['squad_number'],
                     Player.FANTASY_STATUS: st_mapper.get(player['status']),
                     Player.FANTASY_NEWS: player['news'],
@@ -433,18 +436,18 @@ class Fantasy(ApiIntegration):
 
 if __name__ == "__main__":
     fantasy = Fantasy()
-    fantasy.request_matches()
+    # fantasy.request_matches()
     current_path = os.path.dirname(os.path.abspath(__file__))
     current_path = "/".join(current_path.split("/")[:-1])
 
     # Extracting week by week player data
     for week_i in range(1, 38):
         # Season 2016-2017
-        ingest_historical_gameweek_csv(csv_file=f'{current_path}/historical_fantasy/2016-17/gw{week_i}.csv',
+        ingest_historical_gameweek_csv(csv_file=f'{current_path}/historical_fantasy/2016-17/gws/gw{week_i}.csv',
                                        season='201617')
 
         # Season 2017-2018
-        ingest_historical_gameweek_csv(csv_file=f'{current_path}/historical_fantasy/2017-18/gw{week_i}.csv',
+        ingest_historical_gameweek_csv(csv_file=f'{current_path}/historical_fantasy/2017-18/gws/gw{week_i}.csv',
                                        season='201718')
 
     # Extracting historical player information (GIVEN SEASON DETAILED SUMMARY INFORMATION - cleaned_players.csv)
