@@ -436,6 +436,8 @@ class Fantasy(ApiIntegration):
 
 if __name__ == "__main__":
     fantasy = Fantasy()
+    # fantasy.request_base_information()
+    fantasy.request_player_data(player_id=1)
     # fantasy.request_matches()
     current_path = os.path.dirname(os.path.abspath(__file__))
     current_path = "/".join(current_path.split("/")[:-1])

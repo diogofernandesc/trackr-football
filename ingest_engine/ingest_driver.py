@@ -247,15 +247,13 @@ class Driver(object):
         for player in fls_players:
             for f_player in f_players_base:
                 if str_comparator(player[Player.NAME], f_player[Player.NAME]) >= 0.8:
-                    final_dict = player
-                    # final_dict = {**player, **f_player}
+                    final_dict = {**player, **f_player}
                     total_players.append(final_dict)
 
                 elif str_comparator(player[Player.NAME].split(" ")[0], f_player[Player.FIRST_NAME]) >= 0.8 or \
                         str_comparator(player[Player.NAME].split(" ")[0], f_player[Player.FANTASY_WEB_NAME]) >= 0.8:
                     if str_comparator(team_name, team_mapper(f_player[Player.FANTASY_TEAM_ID])) >= 0.8:
-                        final_dict = player
-                        # final_dict = {**player, **f_player}
+                        final_dict = {**player, **f_player}
                         total_players.append(final_dict)
 
 

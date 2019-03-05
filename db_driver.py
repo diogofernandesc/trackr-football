@@ -2,7 +2,7 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 import os
 from ingest_engine.cons import Competition as COMP, \
-    Standings as STANDINGS, Team as TEAM, Match as MATCH
+    Standings as STANDINGS, Team as TEAM, Match as MATCH, Player as PLAYER
 
 
 app = Flask(__name__)
@@ -13,10 +13,10 @@ db = SQLAlchemy(app)
 class Competition(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(80), unique=False, nullable=False)
-    code = db.column(db.String(20), unique=False, nullable=True)
-    location = db.column(db.String(80), unique=False, nullable=False)
-    fd_api_id = db.column(COMP.FOOTBALL_DATA_API_ID, db.Integer, unique=True, nullable=False)
-    fls_api_id = db.column(COMP.FASTEST_LIVE_SCORES_API_ID, db.Integer, unique=True, nullable=False)
+    code = db.Column(db.String(20), unique=False, nullable=True)
+    location = db.Column(db.String(80), unique=False, nullable=False)
+    fd_api_id = db.Column(COMP.FOOTBALL_DATA_API_ID, db.Integer, unique=True, nullable=False)
+    fls_api_id = db.Column(COMP.FASTEST_LIVE_SCORES_API_ID, db.Integer, unique=True, nullable=False)
 
 
 class Standings(db.Model):
@@ -43,7 +43,7 @@ class StandingsEntry(db.Model):
 
 class Match(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    fd_id = db.Column(MATCH.FOOTBALL_DATA_ID, unique=True, nullable=False)
+    fd_id = db.Column(MATCH.FOOTBALL_DATA_ID, db.Integer, unique=True, nullable=False)
     season_start_date = db.Column(db.Date, unique=False, nullable=False)
     season_end_date = db.Column(db.Date, unique=False, nullable=False)
     season_year = db.Column(db.Integer, unique=False, nullable=False)
@@ -64,9 +64,9 @@ class Match(db.Model):
     home_team = db.Column(db.String(80), unique=False, nullable=False)
     away_team = db.Column(db.String(80), unique=False, nullable=False)
     # referee_group # TODO foreign key
-    fls_match_id = db.Column(MATCH.FLS_MATCH_ID, unique=True, nullable=False)
-    fls_competition_id = db.Column(MATCH.FLS_API_COMPETITION_ID, unique=False, nullable=False)
-    competition = db.Column(MATCH.COMPETITION, unique=False, nullable=False)
+    fls_match_id = db.Column(MATCH.FLS_MATCH_ID, db.Integer, unique=True, nullable=False)
+    fls_competition_id = db.Column(MATCH.FLS_API_COMPETITION_ID, db.Integer, unique=False, nullable=False)
+    competition = db.Column(MATCH.COMPETITION, db.String, unique=False, nullable=False)
     # events # TODO foreign key
     home_score_probability = db.Column(db.Float, unique=False, nullable=False)
     away_score_probability = db.Column(db.Float, unique=False, nullable=False)
@@ -84,27 +84,34 @@ class Match(db.Model):
     away_u15_prob = db.Column(MATCH.AWAY_SCORE_PROBABILITY_UNDER_1_5, db.Float, unique=False, nullable=False)
     away_u25_prob = db.Column(MATCH.AWAY_SCORE_PROBABILITY_UNDER_2_5, db.Float, unique=False, nullable=False)
     away_u35_prob = db.Column(MATCH.AWAY_SCORE_PROBABILITY_UNDER_3_5, db.Float, unique=False, nullable=False)
-    home_form = db.Column(db.ARRAY, unique=False, nullable=False)
-    away_form = db.Column(db.ARRAY, unique=False, nullable=False)
+    home_form = db.Column(db.ARRAY(db.String), unique=False, nullable=False)
+    away_form = db.Column(db.ARRAY(db.String), unique=False, nullable=False)
     h_fls_id = db.Column(MATCH.HOME_TEAM_FLS_ID, db.Integer, unique=False, nullable=False)
     a_fls_id = db.Column(MATCH.AWAY_TEAM_FLS_ID, db.Integer, unique=False, nullable=False)
     # previous encounters TODO foreign key and table
     psc = db.Column(MATCH.PENALTY_SHOOTOUT_SCORE, db.String, unique=False, nullable=False)
     finished = db.Column(db.Boolean, unique=False, nullable=False)
-    fantasy_game_week = db.Col
+    fantasy_game_week = db.Column(db.Integer, unique=False, nullable=False)
 
-
-
-
-
-
-
-
-
-
-
-
-
+    # game metrics: # TODO each per table
+    # goals_scored = db.Column(db.Integer, unique=False, nullable=False)
+    # assists = db.Column(db.Integer, unique=False, nullable=False)
+    # own_goals = db.Column(db.Integer, unique=False, nullable=False)
+    # penalties_saved = db.Column(db.Integer, unique=False, nullable=False)
+    # penalties_missed = db.Column(db.Integer, unique=False, nullable=False)
+    # yellow_cards = db.Column(db.Integer, unique=False, nullable=False)
+    # red_cards = db.Column(db.Integer, unique=False, nullable=False)
+    # saves = db.Column(db.Integer, unique=False, nullable=False)
+    # bonus
+    # bps
+    home_team_difficulty = db.Column(db.Integer, unique=False, nullable=False)
+    away_team_difficulty = db.Column(db.Integer, unique=False, nullable=False)
+    fantasy_match_code = db.Column(db.Integer, unique=True, nullable=False)
+    minutes = db.Column(db.Integer, unique=False, nullable=False)
+    f_home_team_code = db.Column(MATCH.FANTASY_HOME_TEAM_CODE, db.Integer, unique=False, nullable=False)
+    f_away_team_code = db.Column(MATCH.FANTASY_AWAY_TEAM_CODE, db.Integer, unique=False, nullable=False)
+    f_home_team_id = db.Column(MATCH.FANTASY_HOME_TEAM_ID, db.Integer, unique=False, nullable=False)
+    f_away_team_id = db.Column(MATCH.FANTASY_AWAY_TEAM_ID, db.Integer, unique=False, nullable=False)
 
 
 class Team(db.Model):
@@ -117,7 +124,7 @@ class Team(db.Model):
     acronym = db.Column(db.String(20), unique=False, nullable=False)
     crest_url = db.Column(db.String(120), unique=True, nullable=False)
     address = db.Column(db.String(120), unique=True, nullable=False)
-    phone = db.Column(db.Integer(80), unique=True, nullable=False)
+    phone = db.Column(db.Integer, unique=True, nullable=False)
     website = db.Column(db.String(120), unique=True, nullable=False)
     email = db.Column(db.String(80), unique=True, nullable=False)
     year_founded = db.Column(db.Integer, unique=False, nullable=False)
@@ -126,7 +133,7 @@ class Team(db.Model):
     stadium_lat = db.Column(db.Float, unique=False, nullable=False)
     stadium_long = db.Column(db.Float, unique=False, nullable=False)
     stadium_capacity = db.Column(db.Integer, unique=False, nullable=False)
-    fls_api_id = db.Column(TEAM.FASTEST_LIVE_SCORES_API_ID, unique=True, nullable=False)
+    fls_api_id = db.Column(TEAM.FASTEST_LIVE_SCORES_API_ID, db.Integer, unique=True, nullable=False)
     fantasy_code = db.Column(db.Integer, unique=True, nullable=False)
     home_strength = db.Column(TEAM.FANTASY_OVERALL_HOME_STRENGTH, db.Integer, unique=False, nullable=False)
     away_strength = db.Column(TEAM.FANTASY_OVERALL_AWAY_STRENGTH, db.Integer, unique=False, nullable=False)
@@ -135,76 +142,88 @@ class Team(db.Model):
     defense_home_strength = db.Column(TEAM.FANTASY_DEFENCE_HOME_STRENGTH, db.Integer, unique=False, nullable=False)
     defense_away_strength = db.Column(TEAM.FANTASY_DEFENCE_AWAY_STRENGTH, db.Integer, unique=False, nullable=False)
 
-    ID = 'id'
-    FOOTBALL_DATA_ID = 'football_data_id'
-    SEASON_FOOTBALL_DATA_ID = 'season_football_data_id'
-    SEASON_START_DATE = 'season_start_date'
-    SEASON_END_DATE = 'season_end_date'
-    SEASON_YEAR = 'season_year'
-    MATCH_UTC_DATE = 'utc_date'
-    START_TIME_EPOCH = 'start_time_epoch'
-    START_TIME = 'start_time'
-    STATUS = 'status'
-    MATCHDAY = 'matchday'
-    FULL_TIME_HOME_SCORE = 'full_time_home_score'
-    FULL_TIME_AWAY_SCORE = 'full_time_away_score'
-    HALF_TIME_HOME_SCORE = 'half_time_home_score'
-    HALF_TIME_AWAY_SCORE = 'half_time_away_score'
-    EXTRA_TIME_HOME_SCORE = 'extra_time_home_score'
-    EXTRA_TIME_AWAY_SCORE = 'extra_time_away_score'
-    PENALTY_HOME_SCORE = 'penalty_home_score'
-    PENALTY_AWAY_SCORE = 'penalty_away_score'
-    WINNER = 'winner'
-    HOME_TEAM = 'home_team'
-    AWAY_TEAM = 'away_team'
-    REFEREES = 'referees'
-    FILTERS = 'filters'
-    FLS_MATCH_ID = 'fls_match_id'
-    FLS_API_COMPETITION_ID = 'fls_competition_id'
-    COMPETITION = 'competition'
-    EVENTS = 'events'
-    HOME_SCORE_PROBABILITY = 'home_score_probability'
-    HOME_CONCEDE_PROBABILITY = 'home_concede_probability'
-    AWAY_SCORE_PROBABILITY = 'away_score_probability'
-    AWAY_CONCEDE_PROBABILITY = 'away_concede_probability'
-    HOME_SCORE_PROBABILITY_OVER_1_5 = 'home_score_probability_over_1_5'  # THESE STATS ARE BASED ON THE LAST 5 GAMES
-    HOME_SCORE_PROBABILITY_OVER_2_5 = 'home_score_probability_over_2_5'
-    HOME_SCORE_PROBABILITY_OVER_3_5 = 'home_score_probability_over_3_5'
-    HOME_SCORE_PROBABILITY_UNDER_1_5 = 'home_score_probability_under_1_5'
-    HOME_SCORE_PROBABILITY_UNDER_2_5 = 'home_score_probability_under_2_5'
-    HOME_SCORE_PROBABILITY_UNDER_3_5 = 'home_score_probability_under_3_5'
-    AWAY_SCORE_PROBABILITY_OVER_1_5 = 'away_score_probability_over_1_5'
-    AWAY_SCORE_PROBABILITY_OVER_2_5 = 'away_score_probability_over_2_5'
-    AWAY_SCORE_PROBABILITY_OVER_3_5 = 'away_score_probability_over_3_5'
-    AWAY_SCORE_PROBABILITY_UNDER_1_5 = 'away_score_probability_under_1_5'
-    AWAY_SCORE_PROBABILITY_UNDER_2_5 = 'away_score_probability_under_2_5'
-    AWAY_SCORE_PROBABILITY_UNDER_3_5 = 'away_score_probability_under_3_5'
-    HOME_FORM = 'home_form'
-    AWAY_FORM = 'away_form'
-    HOME_TEAM_FLS_ID = 'home_team_fls_id'
-    AWAY_TEAM_FLS_ID = 'away_team_fls_id'
-    PREVIOUS_ENCOUNTERS = 'previous_encounters'
-    PENALTY_SHOOTOUT_SCORE = 'penalty_shootout_score'
-    FINISHED = 'finished'
-    FANTASY_GAME_WEEK = 'fantasy_game_week'
-    FANTASY_GAME_WEEK_ID = 'fantasy_game_week_id'
-    GOALS_SCORED = 'goals_scored'
-    ASSISTS = 'assists'
-    OWN_GOALS = 'own_goals'
-    PENALTIES_SAVED = 'penalties_saved'
-    PENALTIES_MISSED = 'penalties_missed'
-    YELLOW_CARDS = 'yellow_cards'
-    RED_CARDS = 'red_cards'
-    SAVES = 'saves'
-    BONUS = 'bonus'
-    BPS = 'bps'
-    FANTASY_HOME_TEAM_DIFFICULTY = 'fantasy_home_team_difficulty'
-    FANTASY_AWAY_TEAM_DIFFICULTY = 'fantasy_away_team_difficulty'
-    FANTASY_MATCH_CODE = 'fantasy_match_code'
-    MINUTES = 'minutes'
-    FANTASY_HOME_TEAM_CODE = 'fantasy_home_team_code'
-    FANTASY_AWAY_TEAM_CODE = 'fantasy_away_team_code'
-    FANTASY_HOME_TEAM_ID = 'fantasy_home_team_id'
-    FANTASY_AWAY_TEAM_ID = 'fantasy_away_team_id'
-    SIDE = 'side'
-    GOAL_AMOUNT = 'amount'
+
+class Player(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    first_name = db.Column(db.String(80), unique=False, nullable=False)
+    last_name = db.Column(db.String(80), unique=False, nullable=False)
+    date_of_birth = db.Column(db.Date, unique=False, nullable=False)
+    date_of_birth_epoch = db.Column(db.TIMESTAMP, unique=False, nullable=False)
+    country_of_birth = db.Column(db.String(80), unique=False, nullable=False)
+    nationality = db.Column(db.String(80), unique=False, nullable=False)
+    position = db.Column(db.String(80), unique=False, nullable=False)
+    shirt_number = db.Column(db.Integer, unique=False, nullable=False)
+    team = db.Column(db.String(80), unique=False, nullable=False)
+    number_of_goals = db.Column(db.Integer, unique=False, nullable=False)
+    weight = db.Column(db.Float, unique=False, nullable=False)
+    gender = db.Column(db.String(20), unique=False, nullable=False)
+    height = db.Column(db.Float, unique=False, nullable=False)
+    team_fls_id = db.Column(db.Integer, unique=False, nullable=False)
+    assists = db.Column(db.Integer, unique=False, nullable=False)
+    red_cards = db.Column(db.Integer, unique=False, nullable=False)
+    yellow_cards = db.Column(db.Integer, unique=False, nullable=False)
+    fd_api_id = db.Column(PLAYER.FOOTBALL_DATA_API_ID, db.Integer, unique=False, nullable=False)
+    fls_api_id = db.Column(PLAYER.FASTEST_LIVE_SCORES_API_ID, db.Integer, unique=False, nullable=False)
+    web_name = db.Column(PLAYER.FANTASY_WEB_NAME, db.String(80), unique=False, nullable=False)
+    f_team_code = db.Column(PLAYER.FANTASY_TEAM_CODE, db.Integer, unique=False, nullable=False)
+    f_id = db.Column(PLAYER.FANTASY_ID, db.Integer, unique=False, nullable=False)
+    fantasy_status = db.Column(db.String(80), unique=False, nullable=False)
+    fantasy_code = db.Column(db.Integer, unique=False, nullable=False)
+    fantasy_price = db.Column(db.Float, unique=False, nullable=False)
+    fantasy_news = db.Column(db.String(200), unique=False, nullable=False)
+    fantasy_news_timestamp = db.Column(db.TIMESTAMP, unique=False, nullable=False)
+
+
+class PlayerWeekInfo(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+
+
+    """
+    # Separate # TODO: chance of playing this week and next
+    # week fields
+    # dream_team_member
+    # fantasy_week_value
+    ...
+    """
+
+    fantasy_overall_price_rise = db.Column(db.Float, unique=False, nullable=False)
+    fantasy_overall_price_fall = db.Column(db.Float, unique=False, nullable=False)
+    fantasy_overall_transfers_in = db.Column(db.Integer, unique=False, nullable=False)
+    fantasy_overall_transfers_out = db.Column(db.Integer, unique=False, nullable=False)
+    fantasy_overall_points = db.Column(db.Integer, unique=False, nullable=False)
+    fantasy_point_average = db.Column(db.Float, unique=False, nullable=False)
+    minutes_played = db.Column(db.Integer, unique=False, nullable=False)
+    clean_sheets = db.Column(db.Integer, unique=False, nullable=False)
+    goals_conceded = db.Column(db.Integer, unique=False, nullable=False)
+    own_goals = db.Column(db.Integer, unique=False, nullable=False)
+    penalties_saved = db.Column(db.Integer, unique=False, nullable=False)
+    penalties_missed = db.Column(db.Integer, unique=False, nullable=False)
+    saves = db.Column(db.Integer, unique=False, nullable=False)
+    fantasy_total_bonus = db.Column(db.Float, unique=False, nullable=False)
+    fantasy_influence = db.Column(db.Float, unique=False, nullable=False)
+    fantasy_creativity = db.Column(db.Float, unique=False, nullable=False)
+    fantasy_threat = db.Column(db.Float, unique=False, nullable=False)
+    fantasy_ict_index = db.Column(db.Float, unique=False, nullable=False)
+    fantasy_team_id = db.Column(db.Integer, unique=False, nullable=False)
+    photo_url = db.Column(db.String(200), unique=False, nullable=False)
+
+    # Season end
+    # fantasy_season_start_price = db.Column(db.Float, unique=False, nullable=False)
+    # fantasy_season_end_price = db.Column(db.)
+
+
+db.create_all()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
