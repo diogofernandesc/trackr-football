@@ -167,6 +167,7 @@ class Team:
     FANTASY_DEFENCE_AWAY_STRENGTH = 'fantasy_defence_away_strength'
     FANTASY_ID = 'fantasy_id'
 
+
 class Standings:
     COMPETITION_NAME = 'competition_name'
     STAGE = 'stage'

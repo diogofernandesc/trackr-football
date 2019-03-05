@@ -2,3 +2,5 @@ requests
 ratelimit
 pandas
 python-Levenshtein
+flask
+flask_sqlalchemy
