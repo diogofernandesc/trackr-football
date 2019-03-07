@@ -63,11 +63,10 @@ class Match(db.Model):
     winner = db.Column(db.String(10), unique=False, nullable=False)
     home_team = db.Column(db.String(80), unique=False, nullable=False)
     away_team = db.Column(db.String(80), unique=False, nullable=False)
-    # referee_group # TODO foreign key
+    referees = db.Column(db.ARRAY(db.String), unique=False, nullable=False)
     fls_match_id = db.Column(MATCH.FLS_MATCH_ID, db.Integer, unique=True, nullable=False)
     fls_competition_id = db.Column(MATCH.FLS_API_COMPETITION_ID, db.Integer, unique=False, nullable=False)
     competition = db.Column(MATCH.COMPETITION, db.String, unique=False, nullable=False)
-    # events # TODO foreign key
     home_score_probability = db.Column(db.Float, unique=False, nullable=False)
     away_score_probability = db.Column(db.Float, unique=False, nullable=False)
     home_concede_probability = db.Column(db.Float, unique=False, nullable=False)
@@ -88,22 +87,9 @@ class Match(db.Model):
     away_form = db.Column(db.ARRAY(db.String), unique=False, nullable=False)
     h_fls_id = db.Column(MATCH.HOME_TEAM_FLS_ID, db.Integer, unique=False, nullable=False)
     a_fls_id = db.Column(MATCH.AWAY_TEAM_FLS_ID, db.Integer, unique=False, nullable=False)
-    # previous encounters TODO foreign key and table
     psc = db.Column(MATCH.PENALTY_SHOOTOUT_SCORE, db.String, unique=False, nullable=False)
     finished = db.Column(db.Boolean, unique=False, nullable=False)
     fantasy_game_week = db.Column(db.Integer, unique=False, nullable=False)
-
-    # game metrics: # TODO each per table
-    # goals_scored = db.Column(db.Integer, unique=False, nullable=False)
-    # assists = db.Column(db.Integer, unique=False, nullable=False)
-    # own_goals = db.Column(db.Integer, unique=False, nullable=False)
-    # penalties_saved = db.Column(db.Integer, unique=False, nullable=False)
-    # penalties_missed = db.Column(db.Integer, unique=False, nullable=False)
-    # yellow_cards = db.Column(db.Integer, unique=False, nullable=False)
-    # red_cards = db.Column(db.Integer, unique=False, nullable=False)
-    # saves = db.Column(db.Integer, unique=False, nullable=False)
-    # bonus
-    # bps
     home_team_difficulty = db.Column(db.Integer, unique=False, nullable=False)
     away_team_difficulty = db.Column(db.Integer, unique=False, nullable=False)
     fantasy_match_code = db.Column(db.Integer, unique=True, nullable=False)
@@ -112,6 +98,25 @@ class Match(db.Model):
     f_away_team_code = db.Column(MATCH.FANTASY_AWAY_TEAM_CODE, db.Integer, unique=False, nullable=False)
     f_home_team_id = db.Column(MATCH.FANTASY_HOME_TEAM_ID, db.Integer, unique=False, nullable=False)
     f_away_team_id = db.Column(MATCH.FANTASY_AWAY_TEAM_ID, db.Integer, unique=False, nullable=False)
+
+
+class MatchStats(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    match_id = db.Column(db.Integer, unique=False, nullable=False)
+    player_id = db.Column(db.Integer, unique=False, nullable=False)
+    minutes_passed = db.Column(db.Integer, unique=False, nullable=True)
+    occurred_timestamp = db.Column(db.TIMESTAMP, unique=False, nullable=True)
+    goals_scored = db.Column(db.Integer, unique=False, nullable=True)
+    assists = db.Column(db.Integer, unique=False, nullable=True)
+    own_goals = db.Column(db.Integer, unique=False, nullable=True)
+    penalties_saved = db.Column(db.Integer, unique=False, nullable=True)
+    penalties_missed = db.Column(db.Integer, unique=False, nullable=True)
+    yellow_cards = db.Column(db.Integer, unique=False, nullable=True)
+    red_cards = db.Column(db.Integer, unique=False, nullable=True)
+    saves = db.Column(db.Integer, unique=False, nullable=True)
+    bonus = db.Column(db.Integer, unique=False, nullable=True)
+    bps = db.Column(db.Integer, unique=False, nullable=True)
+    substitution = db.Column(db.Integer, unique=False, nullable=True)
 
 
 class Team(db.Model):
@@ -159,9 +164,6 @@ class Player(db.Model):
     gender = db.Column(db.String(20), unique=False, nullable=False)
     height = db.Column(db.Float, unique=False, nullable=False)
     team_fls_id = db.Column(db.Integer, unique=False, nullable=False)
-    assists = db.Column(db.Integer, unique=False, nullable=False)
-    red_cards = db.Column(db.Integer, unique=False, nullable=False)
-    yellow_cards = db.Column(db.Integer, unique=False, nullable=False)
     fd_api_id = db.Column(PLAYER.FOOTBALL_DATA_API_ID, db.Integer, unique=False, nullable=False)
     fls_api_id = db.Column(PLAYER.FASTEST_LIVE_SCORES_API_ID, db.Integer, unique=False, nullable=False)
     web_name = db.Column(PLAYER.FANTASY_WEB_NAME, db.String(80), unique=False, nullable=False)
@@ -172,6 +174,8 @@ class Player(db.Model):
     fantasy_price = db.Column(db.Float, unique=False, nullable=False)
     fantasy_news = db.Column(db.String(200), unique=False, nullable=False)
     fantasy_news_timestamp = db.Column(db.TIMESTAMP, unique=False, nullable=False)
+    photo_url = db.Column(db.String(200), unique=False, nullable=False)
+    fantasy_team_id = db.Column(db.Integer, unique=False, nullable=False)
 
 
 class PlayerWeekInfo(db.Model):
@@ -194,25 +198,15 @@ class PlayerWeekInfo(db.Model):
     fantasy_point_average = db.Column(db.Float, unique=False, nullable=False)
     minutes_played = db.Column(db.Integer, unique=False, nullable=False)
     clean_sheets = db.Column(db.Integer, unique=False, nullable=False)
-    goals_conceded = db.Column(db.Integer, unique=False, nullable=False)
-    own_goals = db.Column(db.Integer, unique=False, nullable=False)
-    penalties_saved = db.Column(db.Integer, unique=False, nullable=False)
-    penalties_missed = db.Column(db.Integer, unique=False, nullable=False)
-    saves = db.Column(db.Integer, unique=False, nullable=False)
     fantasy_total_bonus = db.Column(db.Float, unique=False, nullable=False)
     fantasy_influence = db.Column(db.Float, unique=False, nullable=False)
     fantasy_creativity = db.Column(db.Float, unique=False, nullable=False)
     fantasy_threat = db.Column(db.Float, unique=False, nullable=False)
     fantasy_ict_index = db.Column(db.Float, unique=False, nullable=False)
-    fantasy_team_id = db.Column(db.Integer, unique=False, nullable=False)
-    photo_url = db.Column(db.String(200), unique=False, nullable=False)
-
-    # Season end
-    # fantasy_season_start_price = db.Column(db.Float, unique=False, nullable=False)
-    # fantasy_season_end_price = db.Column(db.)
 
 
-db.create_all()
+
+# db.create_all()
 
 
 
