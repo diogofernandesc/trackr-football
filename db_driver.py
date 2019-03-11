@@ -10,8 +10,17 @@ app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('POSTGRES_CONNECTION_STR')
 db = SQLAlchemy(app)
 
 
+# Used for the many-many relationship between competition and team
+comp_team_table = db.Table('teams',
+                           db.Column('team_id', db.Integer, db.ForeignKey('team.id'), primary_key=True),
+                           db.Column('competition_id', db.Integer, db.ForeignKey('competition_id'), primary_key=True)
+                           )
+
+
 class Competition(db.Model):
     id = db.Column(db.Integer, primary_key=True)
+    standings = db.relationship('Standings', backref='competition', lazy=True)
+    # teams =
     name = db.Column(db.String(80), unique=False, nullable=False)
     code = db.Column(db.String(20), unique=False, nullable=True)
     location = db.Column(db.String(80), unique=False, nullable=False)
@@ -21,6 +30,8 @@ class Competition(db.Model):
 
 class Standings(db.Model):
     id = db.Column(db.Integer, primary_key=True)
+    standings_entry = db.relationship('StandingsEntry', backref='standings_entry', lazy=True)
+    competition_id = db.Column(db.Integer, db.ForeignKey('competition.id'), nullable=False)
     type = db.Column(db.String(20), unique=False, nullable=False)
     season = db.Column(db.String(20), unique=False, nullable=False)
     match_day = db.Column(db.Integer, unique=False, nullable=False)
@@ -28,6 +39,7 @@ class Standings(db.Model):
 
 class StandingsEntry(db.Model):
     id = db.Column(db.Integer, primary_key=True)
+    standings_id = db.Column(db.Integer, db.ForeignKey('standings_entry.id'), nullable=False)
     position = db.Column(db.Integer, unique=False, nullable=False)
     team_name = db.Column(db.String(80), unique=False, nullable=False)
     fd_team_id = db.Column(STANDINGS.FOOTBALL_DATA_TEAM_ID, db.Integer, unique=False, nullable=False)
@@ -104,9 +116,9 @@ class MatchStats(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     match_id = db.Column(db.Integer, unique=False, nullable=False)
     player_id = db.Column(db.Integer, unique=False, nullable=False)
-    minutes_passed = db.Column(db.Integer, unique=False, nullable=True)
     occurred_timestamp = db.Column(db.TIMESTAMP, unique=False, nullable=True)
     goals_scored = db.Column(db.Integer, unique=False, nullable=True)
+    goals_conceded = db.Column(db.Integer, unique=False, nullable=True)
     assists = db.Column(db.Integer, unique=False, nullable=True)
     own_goals = db.Column(db.Integer, unique=False, nullable=True)
     penalties_saved = db.Column(db.Integer, unique=False, nullable=True)
@@ -117,6 +129,40 @@ class MatchStats(db.Model):
     bonus = db.Column(db.Integer, unique=False, nullable=True)
     bps = db.Column(db.Integer, unique=False, nullable=True)
     substitution = db.Column(db.Integer, unique=False, nullable=True)
+    clean_sheet = db.Column(db.Boolean, unique=False, nullable=True)
+    fantasy_influence = db.Column(db.Float, unique=False, nullable=True)
+    fantasy_creativity = db.Column(db.Float, unique=False, nullable=True)
+    fantasy_threat = db.Column(db.Float, unique=False, nullable=True)
+    fantasy_ict_index = db.Column(db.Float, unique=False, nullable=True)
+    open_play_crosses = db.Column(db.Integer, unique=False, nullable=True)
+    big_chances_created = db.Column(db.Integer, unique=False, nullable=True)
+    big_chances_missed = db.Column(db.Integer, unique=False, nullable=True)
+    clearances_blocks_interceptions = db.Column(db.Integer, unique=False, nullable=True)
+    recoveries = db.Column(db.Integer, unique=False, nullable=True)
+    key_passes = db.Column(db.Integer, unique=False, nullable=True)
+    tackles = db.Column(db.Integer, unique=False, nullable=True)
+    winning_goals = db.Column(db.Integer, unique=False, nullable=True)
+    attempted_passes = db.Column(db.Integer, unique=False, nullable=True)
+    completed_passes = db.Column(db.Integer, unique=False, nullable=True)
+    penalties_conceded = db.Column(db.Integer, unique=False, nullable=True)
+    errors_leading_to_goal = db.Column(db.Integer, unique=False, nullable=True)
+    errors_leading_to_goal_attempt = db.Column(db.Integer, unique=False, nullable=True)
+    tackled = db.Column(db.Integer, unique=False, nullable=True)
+    offside = db.Column(db.Integer, unique=False, nullable=True)
+    target_missed = db.Column(db.Integer, unique=False, nullable=True)
+    fouls = db.Column(db.Integer, unique=False, nullable=True)
+    dribbles = db.Column(db.Integer, unique=False, nullable=True)
+    played_at_home = db.Column(db.Boolean, unique=False, nullable=True)
+
+
+class FantasyWeekStats(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    season_value = db.Column(db.Integer, unique=False, nullable=True)  # Fantasy value
+    week_points = db.Column(db.Integer, unique=False, nullable=True)
+    transfers_balance = db.Column(db.Integer, unique=False, nullable=True)
+    selection_count = db.Column(db.Integer, unique=False, nullable=True)
+    transfers_in = db.Column(db.Integer, unique=False, nullable=True)
+    transfers_out = db.Column(db.Integer, unique=False, nullable=True)
 
 
 class Team(db.Model):

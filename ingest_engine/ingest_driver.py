@@ -238,6 +238,9 @@ class Driver(object):
         # if not self.historical_fantasy_gameweek_data or not self.historical_fantasy_base_data:
         #     self.get_historical_fantasy_data()
 
+        # TODO: match player MATCH info e.g. clean sheets to match stats
+
+
         # Join together data from fantasy football
         for idx, player in enumerate(f_players_base):
             extra_player_data = self.fantasy.request_player_data(player_id=player[Player.FANTASY_ID])
@@ -260,11 +263,10 @@ class Driver(object):
         return total_players
 
 
-
 if __name__ == "__main__":
     driver = Driver()
     # print(driver.request_standings(competition_id=2002))
-    print(driver.request_player_details(team_name="Liverpool", competition_name="test"))
+    # print(driver.request_player_details(team_name="Liverpool", competition_name="test"))
     # print(driver.request_teams("banter", 2018))
-    # print(driver.request_match("banter", game_week=1, season=2018))
+    print(driver.request_match("banter", game_week=1, season=2018))
     # driver.request_competitions()
