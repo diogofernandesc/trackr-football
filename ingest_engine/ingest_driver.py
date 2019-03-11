@@ -8,6 +8,7 @@ from Levenshtein import ratio
 import re
 import os
 
+
 def str_comparator(str1, str2):
     """
     Implements levenshtein distance algorithm to calculate similarity between two strings
@@ -268,5 +269,9 @@ if __name__ == "__main__":
     # print(driver.request_standings(competition_id=2002))
     # print(driver.request_player_details(team_name="Liverpool", competition_name="test"))
     # print(driver.request_teams("banter", 2018))
-    print(driver.request_match("banter", game_week=1, season=2018))
-    # driver.request_competitions()
+    # print(driver.request_match("banter", game_week=1, season=2018))
+    print(driver.request_competitions())
+
+
+    # Ingesting competition data into DB
+

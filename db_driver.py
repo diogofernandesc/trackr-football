@@ -1,26 +1,38 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 import os
+from ingest_engine.ingest_driver import Driver
 from ingest_engine.cons import Competition as COMP, \
     Standings as STANDINGS, Team as TEAM, Match as MATCH, Player as PLAYER
 
-
+driver = Driver()
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('POSTGRES_CONNECTION_STR')
 db = SQLAlchemy(app)
 
 
 # Used for the many-many relationship between competition and team
-comp_team_table = db.Table('teams',
-                           db.Column('team_id', db.Integer, db.ForeignKey('team.id'), primary_key=True),
-                           db.Column('competition_id', db.Integer, db.ForeignKey('competition_id'), primary_key=True)
+comp_team_table = db.Table('competitions',
+                           db.Column('competition_id', db.Integer, db.ForeignKey('competition.id'), primary_key=True),
+                           db.Column('team_id', db.Integer, db.ForeignKey('team.id'), primary_key=True)
                            )
+
+# Used for the many-many relationship between team and match
+team_match_table = db.Table('matches',
+                            db.Column('match_id', db.Integer, db.ForeignKey('match.id'), primary_key=True),
+                            db.Column('team_id', db.Integer, db.ForeignKey('team.id'), primary_key=True)
+                            )
+
+# Used for the many-many relationship between player and match
+player_match_table = db.Table('player_matches',
+                              db.Column('match_id', db.Integer, db.ForeignKey('match.id'), primary_key=True),
+                              db.Column('player_id', db.Integer, db.ForeignKey('player.id'), primary_key=True)
+                              )
 
 
 class Competition(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     standings = db.relationship('Standings', backref='competition', lazy=True)
-    # teams =
     name = db.Column(db.String(80), unique=False, nullable=False)
     code = db.Column(db.String(20), unique=False, nullable=True)
     location = db.Column(db.String(80), unique=False, nullable=False)
@@ -30,7 +42,9 @@ class Competition(db.Model):
 
 class Standings(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    standings_entry = db.relationship('StandingsEntry', backref='standings_entry', lazy=True)
+    # standings_entries = db.relationship('StandingsEntry', backpopulates="standings")
+    standings_entries = db.relationship('StandingsEntry', backref='standings', lazy=True)
+                                        # primaryjoin="standings.id==standings_entry.standings_id")
     competition_id = db.Column(db.Integer, db.ForeignKey('competition.id'), nullable=False)
     type = db.Column(db.String(20), unique=False, nullable=False)
     season = db.Column(db.String(20), unique=False, nullable=False)
@@ -39,7 +53,7 @@ class Standings(db.Model):
 
 class StandingsEntry(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    standings_id = db.Column(db.Integer, db.ForeignKey('standings_entry.id'), nullable=False)
+    standings_id = db.Column(db.Integer, db.ForeignKey('standings.id'), nullable=False)
     position = db.Column(db.Integer, unique=False, nullable=False)
     team_name = db.Column(db.String(80), unique=False, nullable=False)
     fd_team_id = db.Column(STANDINGS.FOOTBALL_DATA_TEAM_ID, db.Integer, unique=False, nullable=False)
@@ -55,6 +69,7 @@ class StandingsEntry(db.Model):
 
 class Match(db.Model):
     id = db.Column(db.Integer, primary_key=True)
+    stats = db.relationship('MatchStats', uselist=False, backref='match')
     fd_id = db.Column(MATCH.FOOTBALL_DATA_ID, db.Integer, unique=True, nullable=False)
     season_start_date = db.Column(db.Date, unique=False, nullable=False)
     season_end_date = db.Column(db.Date, unique=False, nullable=False)
@@ -114,8 +129,8 @@ class Match(db.Model):
 
 class MatchStats(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    match_id = db.Column(db.Integer, unique=False, nullable=False)
-    player_id = db.Column(db.Integer, unique=False, nullable=False)
+    match_id = db.Column(db.Integer, db.ForeignKey('match.id'), nullable=False)
+    player_id = db.Column(db.Integer, db.ForeignKey('player.id'), nullable=False)
     occurred_timestamp = db.Column(db.TIMESTAMP, unique=False, nullable=True)
     goals_scored = db.Column(db.Integer, unique=False, nullable=True)
     goals_conceded = db.Column(db.Integer, unique=False, nullable=True)
@@ -157,16 +172,32 @@ class MatchStats(db.Model):
 
 class FantasyWeekStats(db.Model):
     id = db.Column(db.Integer, primary_key=True)
+    player_id = db.Column(db.Integer, db.ForeignKey('player.id'), nullable=False)
     season_value = db.Column(db.Integer, unique=False, nullable=True)  # Fantasy value
     week_points = db.Column(db.Integer, unique=False, nullable=True)
     transfers_balance = db.Column(db.Integer, unique=False, nullable=True)
     selection_count = db.Column(db.Integer, unique=False, nullable=True)
     transfers_in = db.Column(db.Integer, unique=False, nullable=True)
     transfers_out = db.Column(db.Integer, unique=False, nullable=True)
+    fantasy_overall_price_rise = db.Column(db.Float, unique=False, nullable=False)
+    fantasy_overall_price_fall = db.Column(db.Float, unique=False, nullable=False)
+    fantasy_overall_transfers_in = db.Column(db.Integer, unique=False, nullable=False)
+    fantasy_overall_transfers_out = db.Column(db.Integer, unique=False, nullable=False)
+    fantasy_overall_points = db.Column(db.Integer, unique=False, nullable=False)
+    fantasy_point_average = db.Column(db.Float, unique=False, nullable=False)
+    fantasy_total_bonus = db.Column(db.Float, unique=False, nullable=False)
+    fantasy_influence = db.Column(db.Float, unique=False, nullable=False)
+    fantasy_creativity = db.Column(db.Float, unique=False, nullable=False)
+    fantasy_threat = db.Column(db.Float, unique=False, nullable=False)
+    fantasy_ict_index = db.Column(db.Float, unique=False, nullable=False)
 
 
 class Team(db.Model):
     id = db.Column(db.Integer, primary_key=True)
+    competitions = db.relationship('Competition', secondary=comp_team_table, lazy='subquery',
+                                   backref=db.backref('comp_teams', lazy=True))
+    matches = db.relationship('Match', secondary=team_match_table, lazy='subquery',
+                              backref=db.backref('match_teams', lazy=True))
     fantasy_id = db.Column(db.Integer, unique=True, nullable=False)
     fd_id = db.Column(TEAM.FOOTBALL_DATA_ID, db.Integer, unique=False, nullable=False)
     name = db.Column(db.String(80), unique=False, nullable=False)
@@ -196,6 +227,10 @@ class Team(db.Model):
 
 class Player(db.Model):
     id = db.Column(db.Integer, primary_key=True)
+    matches = db.relationship('Match', secondary=player_match_table, lazy='subquery',
+                              backref=db.backref('player_teams', lazy=True))
+    match_stats = db.relationship('MatchStats', backref='stats_player')
+    week_stats = db.relationship('FantasyWeekStats', backref='week_stats_player', lazy=True)
     first_name = db.Column(db.String(80), unique=False, nullable=False)
     last_name = db.Column(db.String(80), unique=False, nullable=False)
     date_of_birth = db.Column(db.Date, unique=False, nullable=False)
@@ -224,35 +259,49 @@ class Player(db.Model):
     fantasy_team_id = db.Column(db.Integer, unique=False, nullable=False)
 
 
-class PlayerWeekInfo(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-
-
-    """
-    # Separate # TODO: chance of playing this week and next
-    # week fields
-    # dream_team_member
-    # fantasy_week_value
-    ...
-    """
-
-    fantasy_overall_price_rise = db.Column(db.Float, unique=False, nullable=False)
-    fantasy_overall_price_fall = db.Column(db.Float, unique=False, nullable=False)
-    fantasy_overall_transfers_in = db.Column(db.Integer, unique=False, nullable=False)
-    fantasy_overall_transfers_out = db.Column(db.Integer, unique=False, nullable=False)
-    fantasy_overall_points = db.Column(db.Integer, unique=False, nullable=False)
-    fantasy_point_average = db.Column(db.Float, unique=False, nullable=False)
-    minutes_played = db.Column(db.Integer, unique=False, nullable=False)
-    clean_sheets = db.Column(db.Integer, unique=False, nullable=False)
-    fantasy_total_bonus = db.Column(db.Float, unique=False, nullable=False)
-    fantasy_influence = db.Column(db.Float, unique=False, nullable=False)
-    fantasy_creativity = db.Column(db.Float, unique=False, nullable=False)
-    fantasy_threat = db.Column(db.Float, unique=False, nullable=False)
-    fantasy_ict_index = db.Column(db.Float, unique=False, nullable=False)
-
-
-
 # db.create_all()
+def ingest_competitions():
+    competitions = driver.request_competitions()
+    for comp in competitions:
+        print(comp[COMP.FASTEST_LIVE_SCORES_API_ID])
+        db_comp = Competition(name=comp[COMP.NAME],
+                              code=comp[COMP.CODE],
+                              location=comp[COMP.LOCATION],
+                              fd_api_id=comp[COMP.FOOTBALL_DATA_API_ID],
+                              fls_api_id=comp[COMP.FASTEST_LIVE_SCORES_API_ID]
+                              )
+        standings = driver.request_standings(competition_id=comp[COMP.FOOTBALL_DATA_API_ID])
+        if standings:
+            for stan in standings['standings']:
+                db_standing = Standings(type=stan[STANDINGS.TYPE],
+                                        season=stan[STANDINGS.SEASON],
+                                        match_day=stan[STANDINGS.MATCH_DAY])
+                for entry in stan[STANDINGS.TABLE]:
+                    se = StandingsEntry(
+                        position=entry[STANDINGS.POSITION],
+                        team_name=entry[STANDINGS.TEAM_NAME],
+                        fd_team_id=entry[STANDINGS.FOOTBALL_DATA_TEAM_ID],
+                        games_played=entry[STANDINGS.GAMES_PLAYED],
+                        games_won=entry[STANDINGS.GAMES_WON],
+                        games_drawn=entry[STANDINGS.GAMES_DRAWN],
+                        games_lost=entry[STANDINGS.GAMES_LOST],
+                        points=entry[STANDINGS.POINTS],
+                        goals_for=entry[STANDINGS.GOALS_FOR],
+                        goals_against=entry[STANDINGS.GOALS_AGAINST],
+                        goals_difference=entry[STANDINGS.GOAL_DIFFERENCE]
+                    )
+                    db_standing.standings_entries.append(se)
+
+                db_comp.standings.append(db_standing)
+
+            db.session.add(db_comp)
+            db.session.commit()
+
+
+if __name__ == "__main__":
+    # db.create_all()
+    ingest_competitions()
+
 
 
 
