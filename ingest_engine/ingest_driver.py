@@ -148,11 +148,12 @@ class Driver(object):
 
         return joint_matches
 
-    def request_teams(self, fd_comp_id, fls_comp_id):
+    def request_teams(self, fd_comp_id, fls_comp_id, season):
         """
         Retrieve team information from a given competition
         :param fls_comp_id: Competition id from FLS
         :param fd_comp_id: Competition id from FootballData.org
+        :param season: season for which to retrieve info
         :return: list of team info
         :rtype: list
         """
@@ -163,7 +164,7 @@ class Driver(object):
         # fd_comp_id = 2021
 
         joint_teams = []
-        fd_teams = self.fd.request_competition_team(competition_id=fd_comp_id, season=2018)
+        fd_teams = self.fd.request_competition_team(competition_id=fd_comp_id, season=season)
         for idx, team in enumerate(fd_teams):
             fd_team_extra = self.fd.request_team(team_id=team[Team.FOOTBALL_DATA_ID])
             fd_teams[idx] = {**team, **fd_team_extra}
@@ -226,11 +227,11 @@ class Driver(object):
         # Liverpool FD id = 64, FLS = 1
         # In FLS, 2 is id for premier league, 2021 in football-data
         # Testing
-        fls_comp_id = 2
-        fd_comp_id = 2021
+        # fls_comp_id = 2
+        # fd_comp_id = 2021
 
         # fls_players = self.fls.request_player_details(**{flsf.COMPETITION_ID: 2})
-        fls_players = self.fls.request_player_details(**{flsf.TEAM_IDS: 1})
+        fls_players = self.fls.request_player_details(**{flsf.TEAM_IDS: team_fls_id})
         f_players_base = self.fantasy.request_base_information()['players']
 
         # TODO: This will be done in its own separate function

@@ -216,6 +216,7 @@ class Player:
     PLAYED = 'played'
     NOT_PLAYED = 'not_played'
     FUTURE_FIXTURES = 'future_fixtures'
+    SEASON_MATCH_HISTORY = 'season_match_history'
 
     # Fantasy fields:
     FANTASY_WEB_NAME = 'web_name'

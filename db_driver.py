@@ -173,23 +173,32 @@ class MatchStats(db.Model):
 class FantasyWeekStats(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     player_id = db.Column(db.Integer, db.ForeignKey('player.id'), nullable=False)
+    game_week = db.Column(db.Integer, unique=False, nullable=True)
+    fantasy_price = db.Column(db.Integer, unique=False, nullable=True)
     season_value = db.Column(db.Integer, unique=False, nullable=True)  # Fantasy value
     week_points = db.Column(db.Integer, unique=False, nullable=True)
     transfers_balance = db.Column(db.Integer, unique=False, nullable=True)
     selection_count = db.Column(db.Integer, unique=False, nullable=True)
     transfers_in = db.Column(db.Integer, unique=False, nullable=True)
     transfers_out = db.Column(db.Integer, unique=False, nullable=True)
-    fantasy_overall_price_rise = db.Column(db.Float, unique=False, nullable=False)
-    fantasy_overall_price_fall = db.Column(db.Float, unique=False, nullable=False)
-    fantasy_overall_transfers_in = db.Column(db.Integer, unique=False, nullable=False)
-    fantasy_overall_transfers_out = db.Column(db.Integer, unique=False, nullable=False)
-    fantasy_overall_points = db.Column(db.Integer, unique=False, nullable=False)
-    fantasy_point_average = db.Column(db.Float, unique=False, nullable=False)
-    fantasy_total_bonus = db.Column(db.Float, unique=False, nullable=False)
-    fantasy_influence = db.Column(db.Float, unique=False, nullable=False)
-    fantasy_creativity = db.Column(db.Float, unique=False, nullable=False)
-    fantasy_threat = db.Column(db.Float, unique=False, nullable=False)
-    fantasy_ict_index = db.Column(db.Float, unique=False, nullable=False)
+    fantasy_overall_price_rise = db.Column(db.Float, unique=False, nullable=True)
+    fantasy_overall_price_fall = db.Column(db.Float, unique=False, nullable=True)
+    fantasy_week_price_rise = db.Column(db.Integer, unique=False, nullable=True)
+    fantasy_week_price_fall = db.Column(db.Integer, unique=False, nullable=True)
+    fantasy_overall_transfers_in = db.Column(db.Integer, unique=False, nullable=True)
+    fantasy_overall_transfers_out = db.Column(db.Integer, unique=False, nullable=True)
+    fantasy_overall_points = db.Column(db.Integer, unique=False, nullable=True)
+    fantasy_point_average = db.Column(db.Float, unique=False, nullable=True)
+    fantasy_total_bonus = db.Column(db.Float, unique=False, nullable=True)
+    week_bonus = db.Column(db.Integer, unique=False, nullable=True)
+    chance_of_playing_this_week = db.Column(db.Integer, unique=False, nullable=True)
+    chance_of_playing_next_week = db.Column(db.Integer, unique=False, nullable=True)
+    fantasy_dream_team_member = db.Column(db.Boolean, unique=False, nullable=True)
+    dream_team_count = db.Column(db.Integer, unique=False, nullable=True)
+    selection_percentage = db.Column(db.Integer, unique=False, nullable=True)
+    fantasy_form = db.Column(db.Integer, unique=False, nullable=True)
+    fantasy_special = db.Column(db.Boolean, unique=False, nullable=True)
+    total_minutes_played = db.Column(db.Integer, unique=False, nullable=True)
 
 
 class Team(db.Model):
@@ -304,7 +313,7 @@ def ingest_competitions():
             db.session.commit()
 
 
-def ingest_teams(db_id, fls_comp_id, fd_comp_id):
+def ingest_teams(db_id, fls_comp_id, fd_comp_id, season):
     """
     Parsed ingest_engine result into database
     :param db_id: Postgres ID for the competition for which team belongs
@@ -312,9 +321,9 @@ def ingest_teams(db_id, fls_comp_id, fd_comp_id):
     :param fd_comp_id: Competition id from FootballData.org
     :return: Team records in DB
     """
-    teams = driver.request_teams(fd_comp_id=fd_comp_id, fls_comp_id=fls_comp_id)
+    teams = driver.request_teams(fd_comp_id=fd_comp_id, fls_comp_id=fls_comp_id, season=season)
 
-    for team in teams:
+    for team in teams[:1]:
         team_players = driver.request_player_details(team_name=team[TEAM.NAME],
                                                      team_fls_id=team[TEAM.FASTEST_LIVE_SCORES_API_ID])
         db_team = Team(fantasy_id=team[TEAM.FANTASY_ID],
@@ -343,7 +352,7 @@ def ingest_teams(db_id, fls_comp_id, fd_comp_id):
                        defense_home_strength=team[TEAM.FANTASY_DEFENCE_HOME_STRENGTH],
                        defense_away_strength=team[TEAM.FANTASY_DEFENCE_AWAY_STRENGTH]
                        )
-        for player in team[TEAM.SQUAD]:
+        for player in team[TEAM.SQUAD][:1]:
             for pl in team_players:
                 if str_comparator(player[PLAYER.NAME].split(" ")[0], pl[PLAYER.NAME].split(" ")[0] >= 0.8) and \
                    str_comparator(player[PLAYER.NAME].split(" ")[1], pl[PLAYER.NAME].split(" ")[1] >= 0.8):
@@ -377,27 +386,70 @@ def ingest_teams(db_id, fls_comp_id, fd_comp_id):
                         photo_url=full_player[PLAYER.FANTASY_PHOTO_URL],
                         fantasy_team_id=full_player[PLAYER.FANTASY_TEAM_ID]
                     )
-                    
 
+                    if PLAYER.SEASON_MATCH_HISTORY in full_player:
+                        week_count = 1
+                        week_list = []
+                        for week in full_player[PLAYER.SEASON_MATCH_HISTORY]:
+                            week_stats = FantasyWeekStats(
+                                game_week=week_count,
+                                season_value=week[PLAYER.FANTASY_SEASON_VALUE],
+                                week_points=week[PLAYER.FANTASY_WEEK_POINTS],
+                                transfers_balance=week[PLAYER.FANTASY_TRANSFERS_BALANCE],
+                                selection_count=week[PLAYER.FANTASY_SELECTION_COUNT],
+                                transfers_in=week[PLAYER.FANTASY_WEEK_TRANSFERS_IN],
+                                transfers_out=week[PLAYER.FANTASY_WEEK_TRANSFERS_OUT],
+                            )
+                            week_list.append(week_stats)
+                            week_count += 1
 
+                        if PLAYER.FANTASY_WEEK in full_player:
+                            current_week = full_player[PLAYER.FANTASY_WEEK]
+                            current_week_stats = FantasyWeekStats()
+                            current_week_stats.game_week = current_week
+                            current_week_stats.season_value = full_player[PLAYER.FANTASY_SEASON_VALUE]
+                            current_week_stats.week_points = full_player[PLAYER.FANTASY_WEEK_POINTS]
+                            current_week_stats.fantasy_price = full_player[PLAYER.FANTASY_PRICE]
+                            current_week_stats.selection_percentage = full_player[PLAYER.FANTASY_SELECTION_PERCENTAGE]
+                            current_week_stats.transfers_in = full_player[PLAYER.FANTASY_WEEK_TRANSFERS_IN]
+                            current_week_stats.transfers_out = full_player[PLAYER.FANTASY_WEEK_TRANSFERS_OUT]
+                            current_week_stats.fantasy_overall_price_rise = \
+                                full_player[PLAYER.FANTASY_OVERALL_PRICE_RISE]
+                            current_week_stats.fantasy_overall_price_fall = \
+                                full_player[PLAYER.FANTASY_OVERALL_PRICE_FALL]
+                            current_week_stats.fantasy_week_price_rise = full_player[PLAYER.FANTASY_WEEK_PRICE_RISE]
+                            current_week_stats.fantasy_week_price_fall = full_player[PLAYER.FANTASY_WEEK_PRICE_FALL]
+                            current_week_stats.fantasy_overall_transfers_in = \
+                                full_player[PLAYER.FANTASY_OVERALL_TRANSFERS_IN]
+                            current_week_stats.fantasy_overall_transfers_out = \
+                                full_player[PLAYER.FANTASY_OVERALL_TRANSFERS_OUT]
+                            current_week_stats.fantasy_overall_points = full_player[PLAYER.FANTASY_OVERALL_POINTS]
+                            current_week_stats.fantasy_point_average = full_player[PLAYER.FANTASY_POINT_AVERAGE]
+                            current_week_stats.fantasy_total_bonus = full_player[PLAYER.FANTASY_TOTAL_BONUS]
+                            current_week_stats.week_bonus = full_player[PLAYER.FANTASY_WEEK_BONUS]
+                            current_week_stats.chance_of_playing_this_week = \
+                                full_player[PLAYER.FANTASY_CHANCE_OF_PLAYING_THIS_WEEK]
+                            current_week_stats.chance_of_playing_next_week = \
+                                full_player[PLAYER.FANTASY_CHANCE_OF_PLAYING_NEXT_WEEK]
+                            current_week_stats.fantasy_dream_team_member = full_player[PLAYER.FANTASY_DREAM_TEAM_MEMBER]
+                            current_week_stats.dream_team_count = full_player[PLAYER.FANTASY_DREAM_TEAM_COUNT]
+                            current_week_stats.fantasy_form = full_player[PLAYER.FANTASY_FORM]
+                            current_week_stats.fantasy_special = full_player[PLAYER.FANTASY_SPECIAL]
+                            current_week_stats.total_minutes_played = full_player[PLAYER.MINUTES_PLAYED]
+                            week_list.append(current_week_stats)
+                            db_player.match_stats = week_list
 
-
-            db_pl = Player(
-
-
-            )
-            team.squad.append()
-
-
-
-
-
-
+                    db_team.squad.append(db_player)
+                    db.session.add(db_team)
+                    db.session.commit()
 
 
 if __name__ == "__main__":
     db.create_all()
-    ingest_competitions()
+    competitions = Competition.query.all()
+
+
+    # ingest_competitions()
 
 
 

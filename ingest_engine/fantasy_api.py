@@ -374,7 +374,7 @@ class Fantasy(ApiIntegration):
                             Player.FANTASY_OPPONENT_TEAM_ID: match['opponent_team']
                         })
 
-                    dict_result['season_match_history'] = match_history
+                    dict_result[Player.SEASON_MATCH_HISTORY] = match_history
 
             if fixture_codes:
                 if 'fixtures' in result:
