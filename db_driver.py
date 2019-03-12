@@ -1,7 +1,7 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 import os
-from ingest_engine.ingest_driver import Driver
+from ingest_engine.ingest_driver import Driver, str_comparator
 from ingest_engine.cons import Competition as COMP, \
     Standings as STANDINGS, Team as TEAM, Match as MATCH, Player as PLAYER
 
@@ -233,6 +233,7 @@ class Player(db.Model):
     team_id = db.Column(db.Integer, db.ForeignKey('team.id'), nullable=False)
     match_stats = db.relationship('MatchStats', backref='stats_player')
     week_stats = db.relationship('FantasyWeekStats', backref='week_stats_player', lazy=True)
+    name = db.Column(db.String(200), unique=False, nullable=False)
     first_name = db.Column(db.String(80), unique=False, nullable=False)
     last_name = db.Column(db.String(80), unique=False, nullable=False)
     date_of_birth = db.Column(db.Date, unique=False, nullable=False)
@@ -312,7 +313,10 @@ def ingest_teams(db_id, fls_comp_id, fd_comp_id):
     :return: Team records in DB
     """
     teams = driver.request_teams(fd_comp_id=fd_comp_id, fls_comp_id=fls_comp_id)
+
     for team in teams:
+        team_players = driver.request_player_details(team_name=team[TEAM.NAME],
+                                                     team_fls_id=team[TEAM.FASTEST_LIVE_SCORES_API_ID])
         db_team = Team(fantasy_id=team[TEAM.FANTASY_ID],
                        fd_id=team[TEAM.FOOTBALL_DATA_ID],
                        name=team[TEAM.NAME],
@@ -340,6 +344,44 @@ def ingest_teams(db_id, fls_comp_id, fd_comp_id):
                        defense_away_strength=team[TEAM.FANTASY_DEFENCE_AWAY_STRENGTH]
                        )
         for player in team[TEAM.SQUAD]:
+            for pl in team_players:
+                if str_comparator(player[PLAYER.NAME].split(" ")[0], pl[PLAYER.NAME].split(" ")[0] >= 0.8) and \
+                   str_comparator(player[PLAYER.NAME].split(" ")[1], pl[PLAYER.NAME].split(" ")[1] >= 0.8):
+                    full_player = {**player, **pl}
+                    db_player = Player(
+                        first_name=full_player[PLAYER.FIRST_NAME],
+                        last_name=full_player[PLAYER.LAST_NAME],
+                        name=full_player[PLAYER.NAME],
+                        date_of_birth=full_player[PLAYER.DATE_OF_BIRTH],
+                        date_of_birth_epoch=full_player[PLAYER.DATE_OF_BIRTH_EPOCH],
+                        country_of_birth=full_player[PLAYER.COUNTRY_OF_BIRTH],
+                        nationality=full_player[PLAYER.NATIONALITY],
+                        position=full_player[PLAYER.POSITION],
+                        shirt_number=full_player[PLAYER.SHIRT_NUMBER],
+                        team=full_player[PLAYER.TEAM],
+                        number_of_goals=full_player[PLAYER.NUMBER_OF_GOALS],
+                        weight=full_player[PLAYER.WEIGHT],
+                        gender=full_player[PLAYER.GENDER],
+                        height=full_player[PLAYER.HEIGHT],
+                        team_fls_id=full_player[PLAYER.TEAM_FLS_ID],
+                        fd_api_id=full_player[PLAYER.FOOTBALL_DATA_API_ID],
+                        fls_api_id=full_player[PLAYER.FASTEST_LIVE_SCORES_API_ID],
+                        web_name=full_player[PLAYER.FANTASY_WEB_NAME],
+                        f_team_code=full_player[PLAYER.FANTASY_TEAM_CODE],
+                        f_id=full_player[PLAYER.FANTASY_ID],
+                        fantasy_status=full_player[PLAYER.FANTASY_STATUS],
+                        fantasy_code=full_player[PLAYER.FANTASY_CODE],
+                        fantasy_price=full_player[PLAYER.FANTASY_PRICE],
+                        fantasy_news=full_player[PLAYER.FANTASY_NEWS],
+                        fantasy_news_timestamp=full_player[PLAYER.FANTASY_NEWS_TIMESTAMP],
+                        photo_url=full_player[PLAYER.FANTASY_PHOTO_URL],
+                        fantasy_team_id=full_player[PLAYER.FANTASY_TEAM_ID]
+                    )
+                    
+
+
+
+
             db_pl = Player(
 
 

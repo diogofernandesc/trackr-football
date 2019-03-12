@@ -214,7 +214,7 @@ class Driver(object):
                 csv_file=f'{current_path}/historical_fantasy/{season}/cleaned_players.csv',
                 season="".join(season.split("-"))) + temp_list
 
-    def request_player_details(self, team_name, competition_name):
+    def request_player_details(self, team_name, team_fls_id):
         """
         Join and retrieve player details from different sources
         :return: List of player details from a given team
@@ -258,7 +258,6 @@ class Driver(object):
                     if str_comparator(team_name, team_mapper(f_player[Player.FANTASY_TEAM_ID])) >= 0.8:
                         final_dict = {**player, **f_player}
                         total_players.append(final_dict)
-
 
         return total_players
 
