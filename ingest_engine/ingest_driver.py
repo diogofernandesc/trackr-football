@@ -148,19 +148,19 @@ class Driver(object):
 
         return joint_matches
 
-    def request_teams(self, competition_name, season):
+    def request_teams(self, fd_comp_id, fls_comp_id):
         """
         Retrieve team information from a given competition
-        :param competition_name: name of the competition
-        :param season: 4 digit integer representing the season for which to retrieve info
+        :param fls_comp_id: Competition id from FLS
+        :param fd_comp_id: Competition id from FootballData.org
         :return: list of team info
         :rtype: list
         """
         # In FLS, 2 is id for premier league, 2021 in football-data
         # TODO: Database query based on competition name and retrieve fd_id and fls_id for teams
         # Testing
-        fls_comp_id = 2
-        fd_comp_id = 2021
+        # fls_comp_id = 2
+        # fd_comp_id = 2021
 
         joint_teams = []
         fd_teams = self.fd.request_competition_team(competition_id=fd_comp_id, season=2018)
@@ -175,7 +175,6 @@ class Driver(object):
             temp_dict = {}
             team_name = fd_team[Team.NAME]
             for fls_team in fls_teams:
-                # if team_name in fls_team[Team.NAME] or fls_team[Team.NAME] in team_name:
                 if str_comparator(team_name, fls_team[Team.NAME]) >= 0.9:
                     temp_dict = {**fls_team, **fd_team}
                     break
@@ -268,9 +267,9 @@ if __name__ == "__main__":
     driver = Driver()
     # print(driver.request_standings(competition_id=2002))
     # print(driver.request_player_details(team_name="Liverpool", competition_name="test"))
-    # print(driver.request_teams("banter", 2018))
+    print(driver.request_teams("banter", 2018))
     # print(driver.request_match("banter", game_week=1, season=2018))
-    print(driver.request_competitions())
+    # print(driver.request_competitions())
 
 
     # Ingesting competition data into DB

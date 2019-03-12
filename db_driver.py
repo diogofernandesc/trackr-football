@@ -198,6 +198,7 @@ class Team(db.Model):
                                    backref=db.backref('comp_teams', lazy=True))
     matches = db.relationship('Match', secondary=team_match_table, lazy='subquery',
                               backref=db.backref('match_teams', lazy=True))
+    squad = db.relationship('Player', backref='player_team', lazy=True)
     fantasy_id = db.Column(db.Integer, unique=True, nullable=False)
     fd_id = db.Column(TEAM.FOOTBALL_DATA_ID, db.Integer, unique=False, nullable=False)
     name = db.Column(db.String(80), unique=False, nullable=False)
@@ -229,6 +230,7 @@ class Player(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     matches = db.relationship('Match', secondary=player_match_table, lazy='subquery',
                               backref=db.backref('player_teams', lazy=True))
+    team_id = db.Column(db.Integer, db.ForeignKey('team.id'), nullable=False)
     match_stats = db.relationship('MatchStats', backref='stats_player')
     week_stats = db.relationship('FantasyWeekStats', backref='week_stats_player', lazy=True)
     first_name = db.Column(db.String(80), unique=False, nullable=False)
@@ -261,9 +263,12 @@ class Player(db.Model):
 
 # db.create_all()
 def ingest_competitions():
+    """
+    Ingest ingest_engine competition result into DB
+    :return: Records in DB
+    """
     competitions = driver.request_competitions()
     for comp in competitions:
-        print(comp[COMP.FASTEST_LIVE_SCORES_API_ID])
         db_comp = Competition(name=comp[COMP.NAME],
                               code=comp[COMP.CODE],
                               location=comp[COMP.LOCATION],
@@ -298,10 +303,59 @@ def ingest_competitions():
             db.session.commit()
 
 
-if __name__ == "__main__":
-    # db.create_all()
-    ingest_competitions()
+def ingest_teams(db_id, fls_comp_id, fd_comp_id):
+    """
+    Parsed ingest_engine result into database
+    :param db_id: Postgres ID for the competition for which team belongs
+    :param fls_comp_id: Competition id from FLS
+    :param fd_comp_id: Competition id from FootballData.org
+    :return: Team records in DB
+    """
+    teams = driver.request_teams(fd_comp_id=fd_comp_id, fls_comp_id=fls_comp_id)
+    for team in teams:
+        db_team = Team(fantasy_id=team[TEAM.FANTASY_ID],
+                       fd_id=team[TEAM.FOOTBALL_DATA_ID],
+                       name=team[TEAM.NAME],
+                       country=team[TEAM.COUNTRY],
+                       short_name=team[TEAM.SHORT_NAME],
+                       acronym=team[TEAM.ACRONYM],
+                       crest_url=team[TEAM.CREST_URL],
+                       address=team[TEAM.ADDRESS],
+                       phone=team[TEAM.PHONE],
+                       website=team[TEAM.WEBSITE],
+                       email=team[TEAM.EMAIL],
+                       year_founded=team[TEAM.YEAR_FOUNDED],
+                       club_colours=team[TEAM.CLUB_COLOURS],
+                       stadium=team[TEAM.STADIUM],
+                       stadium_lat=team[TEAM.STADIUM_LAT],
+                       stadium_long=team[TEAM.STADIUM_LONG],
+                       stadium_capacity=team[TEAM.STADIUM_CAPACITY],
+                       fls_api_id=team[TEAM.FASTEST_LIVE_SCORES_API_ID],
+                       fantasy_code=team[TEAM.FANTASY_CODE],
+                       home_strength=team[TEAM.FANTASY_OVERALL_HOME_STRENGTH],
+                       away_strength=team[TEAM.FANTASY_OVERALL_AWAY_STRENGTH],
+                       attack_home_strength=team[TEAM.FANTASY_ATTACK_HOME_STRENGTH],
+                       attack_away_strength=team[TEAM.FANTASY_ATTACK_AWAY_STRENGTH],
+                       defense_home_strength=team[TEAM.FANTASY_DEFENCE_HOME_STRENGTH],
+                       defense_away_strength=team[TEAM.FANTASY_DEFENCE_AWAY_STRENGTH]
+                       )
+        for player in team[TEAM.SQUAD]:
+            db_pl = Player(
 
+
+            )
+            team.squad.append()
+
+
+
+
+
+
+
+
+if __name__ == "__main__":
+    db.create_all()
+    ingest_competitions()
 
 
 
