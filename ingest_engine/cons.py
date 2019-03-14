@@ -417,5 +417,6 @@ FANTASY_STATUS_MAPPER = {
     "i": "injury",
     "n": "ineligible",
     "u": "unavailable",
+    "s": "suspended"
 }
 

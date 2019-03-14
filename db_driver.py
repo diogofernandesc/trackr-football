@@ -1,9 +1,13 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 import os
+from sqlalchemy.exc import IntegrityError
+import logging
 from ingest_engine.ingest_driver import Driver, str_comparator
 from ingest_engine.cons import Competition as COMP, \
     Standings as STANDINGS, Team as TEAM, Match as MATCH, Player as PLAYER
+
+logging.basicConfig(format='%(asctime)s - %(message)s', level=logging.INFO)
 
 driver = Driver()
 app = Flask(__name__)
@@ -127,6 +131,42 @@ class Match(db.Model):
     f_away_team_id = db.Column(MATCH.FANTASY_AWAY_TEAM_ID, db.Integer, unique=False, nullable=False)
 
 
+class Player(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    matches = db.relationship('Match', secondary=player_match_table, lazy='subquery',
+                              backref=db.backref('player_teams', lazy=True))
+    team_id = db.Column(db.Integer, db.ForeignKey('team.id'), nullable=False)
+    match_stats = db.relationship('MatchStats', backref='stats_player')
+    week_stats = db.relationship('FantasyWeekStats', backref='week_stats_player', lazy=True)
+    name = db.Column(db.String(200), unique=False, nullable=False)
+    first_name = db.Column(db.String(80), unique=False, nullable=False)
+    last_name = db.Column(db.String(80), unique=False, nullable=False)
+    date_of_birth = db.Column(db.Date, unique=False, nullable=False)
+    date_of_birth_epoch = db.Column(db.BigInteger, unique=False, nullable=False)
+    country_of_birth = db.Column(db.String(80), unique=False, nullable=False)
+    nationality = db.Column(db.String(80), unique=False, nullable=False)
+    position = db.Column(db.String(80), unique=False, nullable=False)
+    shirt_number = db.Column(db.Integer, unique=False, nullable=False)
+    team = db.Column(db.String(80), unique=False, nullable=False)
+    number_of_goals = db.Column(db.Integer, unique=False, nullable=False)
+    weight = db.Column(db.Float, unique=False, nullable=False)
+    gender = db.Column(db.String(20), unique=False, nullable=False)
+    height = db.Column(db.Float, unique=False, nullable=False)
+    team_fls_id = db.Column(db.Integer, unique=False, nullable=False)
+    fd_api_id = db.Column(PLAYER.FOOTBALL_DATA_API_ID, db.Integer, unique=False, nullable=False)
+    fls_api_id = db.Column(PLAYER.FASTEST_LIVE_SCORES_API_ID, db.Integer, unique=False, nullable=False)
+    web_name = db.Column(PLAYER.FANTASY_WEB_NAME, db.String(80), unique=False, nullable=False)
+    f_team_code = db.Column(PLAYER.FANTASY_TEAM_CODE, db.Integer, unique=False, nullable=False)
+    f_id = db.Column(PLAYER.FANTASY_ID, db.Integer, unique=False, nullable=False)
+    fantasy_status = db.Column(db.String(80), unique=False, nullable=False)
+    fantasy_code = db.Column(db.Integer, unique=False, nullable=False)
+    fantasy_price = db.Column(db.Float, unique=False, nullable=False)
+    fantasy_news = db.Column(db.String(200), unique=False, nullable=False)
+    fantasy_news_timestamp = db.Column(db.TIMESTAMP, unique=False, nullable=False)
+    photo_url = db.Column(db.String(200), unique=False, nullable=False)
+    fantasy_team_id = db.Column(db.Integer, unique=False, nullable=False)
+
+
 class MatchStats(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     match_id = db.Column(db.Integer, db.ForeignKey('match.id'), nullable=False)
@@ -216,7 +256,7 @@ class Team(db.Model):
     acronym = db.Column(db.String(20), unique=False, nullable=False)
     crest_url = db.Column(db.String(120), unique=True, nullable=False)
     address = db.Column(db.String(120), unique=True, nullable=False)
-    phone = db.Column(db.Integer, unique=True, nullable=False)
+    phone = db.Column(db.String, unique=True, nullable=False)
     website = db.Column(db.String(120), unique=True, nullable=False)
     email = db.Column(db.String(80), unique=True, nullable=False)
     year_founded = db.Column(db.Integer, unique=False, nullable=False)
@@ -233,42 +273,6 @@ class Team(db.Model):
     attack_away_strength = db.Column(TEAM.FANTASY_ATTACK_AWAY_STRENGTH, db.Integer, unique=False, nullable=False)
     defense_home_strength = db.Column(TEAM.FANTASY_DEFENCE_HOME_STRENGTH, db.Integer, unique=False, nullable=False)
     defense_away_strength = db.Column(TEAM.FANTASY_DEFENCE_AWAY_STRENGTH, db.Integer, unique=False, nullable=False)
-
-
-class Player(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    matches = db.relationship('Match', secondary=player_match_table, lazy='subquery',
-                              backref=db.backref('player_teams', lazy=True))
-    team_id = db.Column(db.Integer, db.ForeignKey('team.id'), nullable=False)
-    match_stats = db.relationship('MatchStats', backref='stats_player')
-    week_stats = db.relationship('FantasyWeekStats', backref='week_stats_player', lazy=True)
-    name = db.Column(db.String(200), unique=False, nullable=False)
-    first_name = db.Column(db.String(80), unique=False, nullable=False)
-    last_name = db.Column(db.String(80), unique=False, nullable=False)
-    date_of_birth = db.Column(db.Date, unique=False, nullable=False)
-    date_of_birth_epoch = db.Column(db.TIMESTAMP, unique=False, nullable=False)
-    country_of_birth = db.Column(db.String(80), unique=False, nullable=False)
-    nationality = db.Column(db.String(80), unique=False, nullable=False)
-    position = db.Column(db.String(80), unique=False, nullable=False)
-    shirt_number = db.Column(db.Integer, unique=False, nullable=False)
-    team = db.Column(db.String(80), unique=False, nullable=False)
-    number_of_goals = db.Column(db.Integer, unique=False, nullable=False)
-    weight = db.Column(db.Float, unique=False, nullable=False)
-    gender = db.Column(db.String(20), unique=False, nullable=False)
-    height = db.Column(db.Float, unique=False, nullable=False)
-    team_fls_id = db.Column(db.Integer, unique=False, nullable=False)
-    fd_api_id = db.Column(PLAYER.FOOTBALL_DATA_API_ID, db.Integer, unique=False, nullable=False)
-    fls_api_id = db.Column(PLAYER.FASTEST_LIVE_SCORES_API_ID, db.Integer, unique=False, nullable=False)
-    web_name = db.Column(PLAYER.FANTASY_WEB_NAME, db.String(80), unique=False, nullable=False)
-    f_team_code = db.Column(PLAYER.FANTASY_TEAM_CODE, db.Integer, unique=False, nullable=False)
-    f_id = db.Column(PLAYER.FANTASY_ID, db.Integer, unique=False, nullable=False)
-    fantasy_status = db.Column(db.String(80), unique=False, nullable=False)
-    fantasy_code = db.Column(db.Integer, unique=False, nullable=False)
-    fantasy_price = db.Column(db.Float, unique=False, nullable=False)
-    fantasy_news = db.Column(db.String(200), unique=False, nullable=False)
-    fantasy_news_timestamp = db.Column(db.TIMESTAMP, unique=False, nullable=False)
-    photo_url = db.Column(db.String(200), unique=False, nullable=False)
-    fantasy_team_id = db.Column(db.Integer, unique=False, nullable=False)
 
 
 # db.create_all()
@@ -313,12 +317,13 @@ def ingest_competitions():
             db.session.commit()
 
 
-def ingest_teams(db_id, fls_comp_id, fd_comp_id, season):
+def ingest_teams(fls_comp_id, fd_comp_id, season):
     """
     Parsed ingest_engine result into database
     :param db_id: Postgres ID for the competition for which team belongs
     :param fls_comp_id: Competition id from FLS
     :param fd_comp_id: Competition id from FootballData.org
+    :param season: season for which the data belongs
     :return: Team records in DB
     """
     teams = driver.request_teams(fd_comp_id=fd_comp_id, fls_comp_id=fls_comp_id, season=season)
@@ -352,10 +357,10 @@ def ingest_teams(db_id, fls_comp_id, fd_comp_id, season):
                        defense_home_strength=team[TEAM.FANTASY_DEFENCE_HOME_STRENGTH],
                        defense_away_strength=team[TEAM.FANTASY_DEFENCE_AWAY_STRENGTH]
                        )
-        for player in team[TEAM.SQUAD][:1]:
+        for player in team[TEAM.SQUAD]:
             for pl in team_players:
-                if str_comparator(player[PLAYER.NAME].split(" ")[0], pl[PLAYER.NAME].split(" ")[0] >= 0.8) and \
-                   str_comparator(player[PLAYER.NAME].split(" ")[1], pl[PLAYER.NAME].split(" ")[1] >= 0.8):
+                if str_comparator(player[PLAYER.FIRST_NAME], pl[PLAYER.FIRST_NAME]) >= 0.7 and \
+                   str_comparator(player[PLAYER.LAST_NAME], pl[PLAYER.LAST_NAME]) >= 0.7:
                     full_player = {**player, **pl}
                     db_player = Player(
                         first_name=full_player[PLAYER.FIRST_NAME],
@@ -437,19 +442,25 @@ def ingest_teams(db_id, fls_comp_id, fd_comp_id, season):
                             current_week_stats.fantasy_special = full_player[PLAYER.FANTASY_SPECIAL]
                             current_week_stats.total_minutes_played = full_player[PLAYER.MINUTES_PLAYED]
                             week_list.append(current_week_stats)
-                            db_player.match_stats = week_list
+                            db_player.week_stats = week_list
 
                     db_team.squad.append(db_player)
                     db.session.add(db_team)
-                    db.session.commit()
+                    try:
+                        db.session.commit()
+                    except IntegrityError as e:
+                        logging.error(e)
+                        db.session.rollback()
 
 
 if __name__ == "__main__":
     db.create_all()
-    competitions = Competition.query.all()
-
-
+    # db.session.commit()
+    # competitions = Competition.query.all()
     # ingest_competitions()
+    ingest_teams(fls_comp_id=2, fd_comp_id=2021, season=2018)
+
+
 
 
 
