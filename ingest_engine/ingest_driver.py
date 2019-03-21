@@ -215,7 +215,7 @@ class Driver(object):
                 csv_file=f'{current_path}/historical_fantasy/{season}/cleaned_players.csv',
                 season="".join(season.split("-"))) + temp_list
 
-    def request_player_details(self, team_name, team_fls_id):
+    def request_player_details(self, team_fls_id):
         """
         Join and retrieve player details from different sources
         :return: List of player details from a given team
@@ -233,7 +233,6 @@ class Driver(object):
         # fls_players = self.fls.request_player_details(**{flsf.COMPETITION_ID: 2})
         fls_players = self.fls.request_player_details(**{flsf.TEAM_IDS: team_fls_id})
         f_players_base = self.fantasy.request_base_information()['players']
-
         # TODO: This will be done in its own separate function
         # Ingest historical data to match player data with if not already collected
         # if not self.historical_fantasy_gameweek_data or not self.historical_fantasy_base_data:
@@ -256,7 +255,7 @@ class Driver(object):
 
                 elif str_comparator(player[Player.NAME].split(" ")[0], f_player[Player.FIRST_NAME]) >= 0.8 or \
                         str_comparator(player[Player.NAME].split(" ")[0], f_player[Player.FANTASY_WEB_NAME]) >= 0.8:
-                    if str_comparator(team_name, team_mapper(f_player[Player.FANTASY_TEAM_ID])) >= 0.8:
+                    if str_comparator(player[Player.TEAM], team_mapper(f_player[Player.FANTASY_TEAM_ID])) >= 0.8:
                         final_dict = {**player, **f_player}
                         total_players.append(final_dict)
 
