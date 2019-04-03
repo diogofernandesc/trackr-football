@@ -291,7 +291,7 @@ class Player:
     FOULS = 'fouls'
     DRIBBLES = 'dribbles'
     FANTASY_OPPONENT_TEAM_ID = 'fantasy_opponent_team_id'
-
+    SEASON_SUMMARIES = 'season_summaries'
 
 
 

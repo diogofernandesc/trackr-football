@@ -12,7 +12,8 @@ logging.basicConfig(format='%(asctime)s - %(message)s', level=logging.INFO)
 
 driver = Driver()
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('POSTGRES_CONNECTION_STR')
+# app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('POSTGRES_CONNECTION_STR')
+app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('POSTGRES_TEST_CONNECTION_STR')  # For debugging/testing
 db = SQLAlchemy(app)
 
 
@@ -535,12 +536,12 @@ if __name__ == "__main__":
     # teams = db.session\
     #     .query(func.max(StandingsEntry.points),
     #            StandingsEntry.team_name, StandingsEntry.team).filter_by(standings_id=8).group_by(StandingsEntry.team_name).all()
-    teams = driver.request_teams(fd_comp_id=2021, fls_comp_id=2, season=2018)  # PREMIER LEAGUE
-    for team in teams:
-        ingest_players(team_fls_id=team[TEAM.FASTEST_LIVE_SCORES_API_ID])
+    # teams = driver.request_teams(fd_comp_id=2021, fls_comp_id=2, season=2018)  # PREMIER LEAGUE
+    # for team in teams:
+    #     ingest_players(team_fls_id=team[TEAM.FASTEST_LIVE_SCORES_API_ID])
     # db.session.commit()
     # competitions = Competition.query.all()
-    # ingest_competitions()
+    ingest_competitions()
 
     # ingest_teams(fls_comp_id=2, fd_comp_id=2021, season=2018)
 

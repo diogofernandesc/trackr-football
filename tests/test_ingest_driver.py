@@ -2,7 +2,7 @@ import unittest
 import json
 from ingest_engine.football_data import FootballData
 from ingest_engine.ingest_driver import Driver, str_comparator
-from ingest_engine.cons import Competition, Match, Team, Player, FootballDataApiFilters as fdf
+from ingest_engine.cons import Competition, Match, Season, Team, Standings, Player, FootballDataApiFilters as fdf
 from ingest_engine.cons import FLSApiFilters as flsf
 from ingest_engine.fantasy_api import team_mapper
 import os
@@ -136,4 +136,118 @@ class ApiTest(unittest.TestCase):
                                                               Player.SHIRT_NUMBER,
                                                               Team.SQUAD_ROLE]))
 
+    def testStandings(self):
+        standings = self.driver.request_standings(competition_id=2021)
+        self.assertIn(Standings.COMPETITION_NAME, standings)
+        self.assertEqual(type(standings[Standings.COMPETITION_NAME]), str)
+        self.assertGreater(len(standings["standings"]), 0)
+        for standing in standings["standings"]:
+            self.assertTrue(all(k in standing for k in [Standings.STAGE,
+                                                        Standings.TYPE,
+                                                        Standings.SEASON,
+                                                        Standings.GROUP,
+                                                        Standings.MATCH_DAY,
+                                                        Standings.TABLE]))
+            for entry in standing[Standings.TABLE]:
+                self.assertTrue(all(k in entry for k in [Standings.POSITION,
+                                                         Standings.TEAM_NAME,
+                                                         Standings.FOOTBALL_DATA_TEAM_ID,
+                                                         Standings.GAMES_PLAYED,
+                                                         Standings.GAMES_WON,
+                                                         Standings.GAMES_DRAWN,
+                                                         Standings.GAMES_LOST,
+                                                         Standings.POINTS,
+                                                         Standings.GOALS_FOR,
+                                                         Standings.GOALS_AGAINST,
+                                                         Standings.GOAL_DIFFERENCE]))
 
+    def testPlayerDetails(self):
+        players = self.driver.request_player_details(team_fls_id=1)
+        self.assertTrue(len(players) > 0)
+        for player in players:
+            self.assertTrue(all(k in player for k in [Player.NAME,
+                                                      Player.WEIGHT,
+                                                      Player.GENDER,
+                                                      Player.TEAM,
+                                                      Player.TEAM_FLS_ID,
+                                                      Player.SHIRT_NUMBER,
+                                                      Player.HEIGHT,
+                                                      Player.DATE_OF_BIRTH_EPOCH,
+                                                      Player.FASTEST_LIVE_SCORES_API_ID,
+                                                      Player.POSITION,
+                                                      Player.COMPETITION_STATS,
+                                                      Player.FANTASY_ID,
+                                                      Player.SEASON_SUMMARIES,
+                                                      ]))
+
+            for stat in player[Player.COMPETITION_STATS]:
+                self.assertTrue(all(k in stat for k in [Competition.NAME,
+                                                        Competition.FASTEST_LIVE_SCORES_API_ID,
+                                                        Player.ASSISTS,
+                                                        Player.NUMBER_OF_GOALS,
+                                                        Player.RED_CARDS,
+                                                        Player.YELLOW_CARDS]))
+
+            for summary in player[Player.SEASON_SUMMARIES]:
+                self.assertTrue(all(k in summary for k in [Season.NAME,
+                                                           Player.FANTASY_CODE,
+                                                           Player.FANTASY_SEASON_START_PRICE,
+                                                           Player.FANTASY_OVERALL_POINTS,
+                                                           Player.MINUTES_PLAYED,
+                                                           Player.NUMBER_OF_GOALS,
+                                                           Player.ASSISTS,
+                                                           Player.CLEAN_SHEETS,
+                                                           Player.GOALS_CONCEDED,
+                                                           Player.OWN_GOALS,
+                                                           Player.PENALTIES_SAVED,
+                                                           Player.PENALTIES_MISSED,
+                                                           Player.YELLOW_CARDS,
+                                                           Player.RED_CARDS,
+                                                           Player.SAVES,
+                                                           Player.FANTASY_TOTAL_BONUS]))
+
+            for match in player[Player.SEASON_MATCH_HISTORY]:
+                self.assertTrue(all(k in match for k in [Match.START_TIME,
+                                                         Match.FULL_TIME_HOME_SCORE,
+                                                         Match.FULL_TIME_AWAY_SCORE,
+                                                         Player.PLAYED_AT_HOME,
+                                                         Player.FANTASY_WEEK_POINTS,
+                                                         Player.FANTASY_SEASON_VALUE,
+                                                         Player.FANTASY_TRANSFERS_BALANCE,
+                                                         Player.FANTASY_SELECTION_COUNT,
+                                                         Player.FANTASY_WEEK_TRANSFERS_IN,
+                                                         Player.FANTASY_WEEK_TRANSFERS_OUT,
+                                                         Player.MINUTES_PLAYED,
+                                                         Player.NUMBER_OF_GOALS,
+                                                         Player.ASSISTS,
+                                                         Player.CLEAN_SHEETS,
+                                                         Player.GOALS_CONCEDED,
+                                                         Player.OWN_GOALS,
+                                                         Player.PENALTIES_SAVED,
+                                                         Player.PENALTIES_MISSED,
+                                                         Player.YELLOW_CARDS,
+                                                         Player.RED_CARDS,
+                                                         Player.SAVES,
+                                                         Player.FANTASY_WEEK_BONUS,
+                                                         Player.FANTASY_INFLUENCE,
+                                                         Player.FANTASY_CREATIVITY,
+                                                         Player.FANTASY_THREAT,
+                                                         Player.FANTASY_ICT_INDEX,
+                                                         Player.OPEN_PLAY_CROSSES,
+                                                         Player.BIG_CHANCES_CREATED,
+                                                         Player.CLEARANCES_BLOCKS_INTERCEPTIONS,
+                                                         Player.RECOVERIES,
+                                                         Player.KEY_PASSES,
+                                                         Player.WINNING_GOALS,
+                                                         Player.ATTEMPTED_PASSES,
+                                                         Player.COMPLETED_PASSES,
+                                                         Player.PENALTIES_CONCEDED,
+                                                         Player.BIG_CHANCES_MISSED,
+                                                         Player.ERRORS_LEADING_TO_GOAL,
+                                                         Player.ERRORS_LEADING_TO_GOAL_ATTEMPT,
+                                                         Player.TACKLED,
+                                                         Player.OFFSIDE,
+                                                         Player.TARGET_MISSED,
+                                                         Player.FOULS,
+                                                         Player.DRIBBLES,
+                                                         Player.FANTASY_OPPONENT_TEAM_ID]))
