@@ -58,7 +58,7 @@ class ApiTest(unittest.TestCase):
         comp_limit = self.fd.request_competition_scorers(competition_id=2002, limit=5)
         self.assertEqual(self.test_fd.request_competition_scorers(competition_id=2002), [])
         self.assertIsInstance(comp_scorers[0][Player.NUMBER_OF_GOALS], int)
-        self.assertEqual(len(comp_scorers[0]), 10)
+        self.assertEqual(len(comp_scorers[0]), 11)
         self.assertEqual(len(comp_limit), 5)
 
     def testMatchEndPoint(self):
