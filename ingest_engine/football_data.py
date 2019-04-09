@@ -121,7 +121,7 @@ class FootballData(ApiIntegration):
             if 'matches' in result:
                 for match in result['matches']:
                     data = {
-                        Match.SEASON_FOOTBALL_DATA_ID: match[Match.ID],
+                        Match.FOOTBALL_DATA_ID: match[Match.ID],
                         Match.SEASON_START_DATE: match['season']['startDate'],
                         Match.SEASON_END_DATE: match['season']['endDate'],
                         Match.MATCH_UTC_DATE: match['utcDate'],
@@ -222,6 +222,7 @@ class FootballData(ApiIntegration):
                         table.append({
                             Standings.POSITION: entry['position'],
                             Standings.TEAM_NAME: entry['team']['name'],
+                            Standings.FOOTBALL_DATA_TEAM_ID: entry['team']['id'],
                             Standings.GAMES_PLAYED: entry['playedGames'],
                             Standings.GAMES_WON: entry['won'],
                             Standings.GAMES_DRAWN: entry['draw'],
@@ -265,6 +266,7 @@ class FootballData(ApiIntegration):
                     player = scorer['player']
                     data = {
                         Player.NAME: player['name'],
+                        Player.FOOTBALL_DATA_API_ID: player['id'],
                         Player.FIRST_NAME: player['firstName'],
                         Player.LAST_NAME: player['lastName'],
                         Player.DATE_OF_BIRTH: player['dateOfBirth'],
@@ -322,7 +324,7 @@ class FootballData(ApiIntegration):
             if 'matches' in result:
                 for match in result['matches']:
                     data = {
-                        Match.SEASON_FOOTBALL_DATA_ID: match[Match.ID],
+                        Match.FOOTBALL_DATA_ID: match[Match.ID],
                         Match.SEASON_START_DATE: match['season']['startDate'],
                         Match.SEASON_END_DATE: match['season']['endDate'],
                         Match.MATCH_UTC_DATE: match['utcDate'],
@@ -400,6 +402,7 @@ class FootballData(ApiIntegration):
                     for entry in result['squad']:
                         squad.append({
                             Player.NAME: entry['name'],
+                            Player.FOOTBALL_DATA_API_ID: entry['id'],
                             Player.POSITION: entry['position'],
                             Player.DATE_OF_BIRTH: entry['dateOfBirth'],
                             Player.COUNTRY_OF_BIRTH: entry['countryOfBirth'],
@@ -425,6 +428,7 @@ class FootballData(ApiIntegration):
         data = {}
 
         if result:
+            data[Player.FOOTBALL_DATA_API_ID] = result['id'],
             data[Player.FIRST_NAME] = result['firstName']
             data[Player.DATE_OF_BIRTH] = result['dateOfBirth']
             data[Player.COUNTRY_OF_BIRTH] = result['countryOfBirth']
@@ -445,11 +449,13 @@ class FootballData(ApiIntegration):
         return data
 
 
-# if __name__ == "__main__":
-#     fd = FootballData(api_key=os.getenv("FOOTBALL_DATA_API_KEY"))
+if __name__ == "__main__":
+    fd = FootballData(api_key=os.getenv("FOOTBALL_DATA_API_KEY"))
+    # print(fd.request_competition_standings(competition_id=2002))
+    print(fd.request_competition_standings(competition_id=2002))
+    # fd.request_competition_scorers(competition_id=2002)
 
-
-# print(fd.request_player(player_id=1))
+    # print(fd.request_player(player_id=1))
 # print(fd.request_competition_scorers(competition_id=2002))
 # print(fd.request_competition_standings(competition_id=2002))
 # print(fd.request_competition_team(competition_id=2002, season=2017))

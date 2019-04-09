@@ -69,18 +69,19 @@ class FastestLiveScores(ApiIntegration):
             for competition in result:
                 total_results.append({
                     Competition.NAME: competition['name'],
+                    Competition.LOCATION: competition['region']['name'],
                     Competition.FASTEST_LIVE_SCORES_API_ID: competition['dbid'],
                 })
 
         return total_results
 
-    def request_teams(self):
+    def request_teams(self, **kwargs):
         """
         Retrieve all the teams the API supports
         Mainly used for mapping existing teams in DB to the same team in API
         :return: List of teams
         """
-        endpoint = self.build_endpoint(endpoint_name="teams")
+        endpoint = self.build_endpoint(**kwargs, endpoint_name="teams")
         result = self.perform_get(built_uri=endpoint)
         total_results = []
 

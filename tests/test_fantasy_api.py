@@ -117,7 +117,7 @@ class ApiTest(unittest.TestCase):
             Player.FANTASY_SELECTION_PERCENTAGE,
         )
         for player in seasons:
-            self.assertTrue(len(player) == 17)
+            self.assertEqual(len(player), 18)
             for field_name in field_names:
                 self.assertTrue(field_name in player)
             self.assertTrue(Season.NAME in player)

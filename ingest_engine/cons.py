@@ -4,7 +4,7 @@ class FootballDataApiFilters:
     '''
     ID = 'id'
     MATCHDAY = 'matchday'  # Integer 0-49
-    SEASON = 'season'  # Integer for year e.g. 2018
+    SEASON = 'season'  # Integer for starting year e.g. 2018
 
     STATUS = 'status'  # SCHEDULED | LIVE | IN_PLAY | PAUSED | FINISHED | POSTPONED | SUSPENDED | CANCELLED
     STATUS_SCHEDULED = 'SCHEDULED'
@@ -39,9 +39,16 @@ class FootballDataApiFilters:
     STANDING_HOME = 'HOME'
     STANDING_AWAY = 'AWAY'
 
+class FLSApiFilters:
+    FROM_DATETIME = 'from'
+    TO_DATETIME = 'to'
+    COMPETITION_ID = 'competition_id'
+    TEAM_ID = 'team_id'
+    TEAM_IDS = 'team_ids'
 
 class Match:
     ID = 'id'
+    FOOTBALL_DATA_ID = 'match_football_data_id'
     SEASON_FOOTBALL_DATA_ID = 'season_football_data_id'
     SEASON_START_DATE = 'season_start_date'
     SEASON_END_DATE = 'season_end_date'
@@ -109,6 +116,8 @@ class Match:
     MINUTES = 'minutes'
     FANTASY_HOME_TEAM_CODE = 'fantasy_home_team_code'
     FANTASY_AWAY_TEAM_CODE = 'fantasy_away_team_code'
+    FANTASY_HOME_TEAM_ID = 'fantasy_home_team_id'
+    FANTASY_AWAY_TEAM_ID = 'fantasy_away_team_id'
     SIDE = 'side'
     GOAL_AMOUNT = 'amount'
 
@@ -156,6 +165,8 @@ class Team:
     FANTASY_ATTACK_AWAY_STRENGTH = 'fantasy_attack_away_strength'
     FANTASY_DEFENCE_HOME_STRENGTH = 'fantasy_defence_home_strength'
     FANTASY_DEFENCE_AWAY_STRENGTH = 'fantasy_defence_away_strength'
+    FANTASY_ID = 'fantasy_id'
+
 
 class Standings:
     COMPETITION_NAME = 'competition_name'
@@ -167,6 +178,7 @@ class Standings:
     GROUP = 'group'
     POSITION = 'position'
     TEAM_NAME = 'team_name'
+    FOOTBALL_DATA_TEAM_ID = 'football_data_team_id'
     GAMES_PLAYED = 'games_played'
     GAMES_WON = 'games_won'
     GAMES_DRAWN = 'games_drawn'
@@ -197,14 +209,17 @@ class Player:
     RED_CARDS = 'red_cards'
     COMPETITION_FLS_ID = 'competition_fls_id'
     YELLOW_CARDS = 'yellow_cards'
+    FOOTBALL_DATA_API_ID = 'football_data_id'
     FASTEST_LIVE_SCORES_API_ID = 'fls_api_id'
     COMPETITION_STATS = 'competition_stats'
     PLAYED_AT_HOME = 'played_at_home'
     PLAYED = 'played'
     NOT_PLAYED = 'not_played'
     FUTURE_FIXTURES = 'future_fixtures'
+    SEASON_MATCH_HISTORY = 'season_match_history'
 
     # Fantasy fields:
+    FANTASY_WEB_NAME = 'web_name'
     FANTASY_TEAM_CODE = 'fantasy_team_code'
     FANTASY_ID = 'fantasy_player_id'
     FANTASY_STATUS = 'fantasy_status'
@@ -276,7 +291,7 @@ class Player:
     FOULS = 'fouls'
     DRIBBLES = 'dribbles'
     FANTASY_OPPONENT_TEAM_ID = 'fantasy_opponent_team_id'
-
+    SEASON_SUMMARIES = 'season_summaries'
 
 
 
@@ -296,7 +311,7 @@ class Season:
     WINNER = 'winner'
     FOOTBALL_DATA_API_ID = 'football_data_api_id'
     NAME = 'season_name'
-    FANTASY_CODE = 'fantasy_code'
+    FANTASY_CODE = 'season_fantasy_code'
 
 
 class FLS_STATES:
@@ -402,5 +417,6 @@ FANTASY_STATUS_MAPPER = {
     "i": "injury",
     "n": "ineligible",
     "u": "unavailable",
+    "s": "suspended"
 }
 

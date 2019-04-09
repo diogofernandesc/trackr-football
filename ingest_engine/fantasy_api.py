@@ -121,9 +121,41 @@ def ingest_historical_base_csv(csv_file, season):
     season_df = season_df.transpose().to_dict()
     for player in season_df.values():
         player[Season.NAME] = season
+        player[Player.NAME] = f'{player[Player.FIRST_NAME]} {player[Player.LAST_NAME]}'
         player_data.append(player)
 
     return player_data
+
+
+def team_mapper(team_id):
+    """
+    Retrieve team name based on team_code
+    :param team_code: Fantasy code for a given team
+    :return: team name
+    """
+    mapper = {
+        1: "Arsenal",
+        2: "Bournemouth",
+        3: "Brighton & Hove Albion",
+        4: "Burnley",
+        5: "Cardiff City",
+        6: "Chelsea",
+        7: "Crystal Palace",
+        8: "Everton",
+        9: "Fulham",
+        10: "Huddersfield Town",
+        11: "Leicester City",
+        12: "Liverpool",
+        13: "Manchester City",
+        14: "Manchester United",
+        15: "Newcastle United",
+        16: "Southampton",
+        17: "Tottenham Hotspur",
+        18: "Watford",
+        19: "West Ham United",
+        20: "Wolverhampton Wanderers",
+    }
+    return mapper.get(team_id)
 
 
 class Fantasy(ApiIntegration):
@@ -163,6 +195,8 @@ class Fantasy(ApiIntegration):
                     Player.FANTASY_CODE: player['code'],
                     Player.FIRST_NAME: player['first_name'],
                     Player.LAST_NAME: player['second_name'],
+                    Player.FANTASY_WEB_NAME: player['web_name'],
+                    Player.NAME: f"{player['first_name']} {player['second_name']}",
                     Player.SHIRT_NUMBER: player['squad_number'],
                     Player.FANTASY_STATUS: st_mapper.get(player['status']),
                     Player.FANTASY_NEWS: player['news'],
@@ -170,7 +204,7 @@ class Fantasy(ApiIntegration):
                     Player.FANTASY_NEWS_TIMESTAMP: player['news_added'],
                     Player.FANTASY_CHANCE_OF_PLAYING_THIS_WEEK: player['chance_of_playing_this_round'],
                     Player.FANTASY_CHANCE_OF_PLAYING_NEXT_WEEK: player['chance_of_playing_next_round'],
-                    Player.FANTASY_SEASON_VALUE: player['value_season'],
+                    Player.FANTASY_SEASON_VALUE: float(player['value_season']),
                     Player.FANTASY_OVERALL_PRICE_RISE: player['cost_change_start'],
                     Player.FANTASY_WEEK_PRICE_RISE: player['cost_change_event'],
                     Player.FANTASY_OVERALL_PRICE_FALL: player['cost_change_start_fall'],
@@ -178,7 +212,7 @@ class Fantasy(ApiIntegration):
                     Player.FANTASY_DREAM_TEAM_MEMBER: player['in_dreamteam'],
                     Player.FANTASY_DREAM_TEAM_COUNT: player['dreamteam_count'],
                     Player.FANTASY_SELECTION_PERCENTAGE: float(player['selected_by_percent']),
-                    Player.FANTASY_FORM: player['form'],
+                    Player.FANTASY_FORM: float(player['form']),
                     Player.FANTASY_OVERALL_TRANSFERS_IN: player['transfers_in'],
                     Player.FANTASY_OVERALL_TRANSFERS_OUT: player['transfers_out'],
                     Player.FANTASY_WEEK_TRANSFERS_IN: player['transfers_in_event'],
@@ -189,7 +223,7 @@ class Fantasy(ApiIntegration):
                     Player.FANTASY_ESTIMATED_WEEK_POINTS: float(player['ep_this']),
                     Player.FANTASY_ESTIMATED_NEXT_WEEK_POINTS: float(player['ep_next']),
                     Player.FANTASY_SPECIAL: player['special'],
-                    Player.MINUTES_PLAYED: player['minutes'],
+                    Player.MINUTES_PLAYED: round(float(player['minutes'])),
                     Player.NUMBER_OF_GOALS: player['goals_scored'],
                     Player.ASSISTS: player['assists'],
                     Player.CLEAN_SHEETS: player['clean_sheets'],
@@ -213,6 +247,8 @@ class Fantasy(ApiIntegration):
                 for team in result['teams']:
                     teams.append({
                         Team.FANTASY_CODE: team['code'],
+                        Team.FANTASY_ID: team['id'],
+                        Team.NAME: team['name'],
                         Team.FANTASY_WEEK_STRENGTH: team['strength'],
                         Team.FANTASY_OVERALL_HOME_STRENGTH: team['strength_overall_home'],
                         Team.FANTASY_OVERALL_AWAY_STRENGTH: team['strength_overall_away'],
@@ -245,14 +281,6 @@ class Fantasy(ApiIntegration):
 
         return total_result
 
-    def request_player_season_aggregate_data(self, player_id):
-        """
-        Returns summary data for a player's stats
-        :param player_id: The ID of the player for which to retrieve the data
-        :return: parsed season summary results
-        :rtype: dict
-        """
-
     def request_player_data(self, player_id, season_summaries=True, fixture_data=True, fixture_codes=True):
         """
         Returns stats tracked by fantasy football for the footballer given by the player_id param
@@ -278,7 +306,7 @@ class Fantasy(ApiIntegration):
                             Player.FANTASY_SEASON_START_PRICE: entry['start_cost'],
                             Player.FANTASY_SEASON_END_PRICE: entry['end_cost'],
                             Player.FANTASY_OVERALL_POINTS: entry['total_points'],
-                            Player.MINUTES_PLAYED: entry['minutes'],
+                            Player.MINUTES_PLAYED: round(float(entry['minutes'])),
                             Player.NUMBER_OF_GOALS: entry['goals_scored'],
                             Player.ASSISTS: entry['assists'],
                             Player.CLEAN_SHEETS: entry['clean_sheets'],
@@ -309,7 +337,7 @@ class Fantasy(ApiIntegration):
                             Player.FANTASY_SELECTION_COUNT: match['selected'],
                             Player.FANTASY_WEEK_TRANSFERS_IN: match['transfers_in'],
                             Player.FANTASY_WEEK_TRANSFERS_OUT: match['transfers_out'],
-                            Player.MINUTES_PLAYED: match['minutes'],
+                            Player.MINUTES_PLAYED: round(float(match['minutes'])),
                             Player.NUMBER_OF_GOALS: match['goals_scored'],
                             Player.ASSISTS: match['assists'],
                             Player.CLEAN_SHEETS: match['clean_sheets'],
@@ -346,7 +374,7 @@ class Fantasy(ApiIntegration):
                             Player.FANTASY_OPPONENT_TEAM_ID: match['opponent_team']
                         })
 
-                    dict_result['season_match_history'] = match_history
+                    dict_result[Player.SEASON_MATCH_HISTORY] = match_history
 
             if fixture_codes:
                 if 'fixtures' in result:
@@ -379,9 +407,11 @@ class Fantasy(ApiIntegration):
                         Match.FANTASY_MATCH_CODE: match["code"],
                         Match.FULL_TIME_HOME_SCORE: match["team_h_score"],
                         Match.FULL_TIME_AWAY_SCORE: match["team_a_score"],
-                        Match.MINUTES: match["minutes"],
-                        Match.FANTASY_HOME_TEAM_CODE: match["team_h"],
-                        Match.FANTASY_AWAY_TEAM_CODE: match["team_a"]
+                        Match.MINUTES: round(float(match["minutes"])),
+                        Match.FANTASY_HOME_TEAM_ID: match["team_h"],
+                        Match.FANTASY_AWAY_TEAM_ID: match["team_a"]
+                        # Match.FANTASY_HOME_TEAM_CODE: match["team_h"],
+                        # Match.FANTASY_AWAY_TEAM_CODE: match["team_a"]
                     }
 
                     stats = match["stats"]
@@ -406,17 +436,20 @@ class Fantasy(ApiIntegration):
 
 if __name__ == "__main__":
     fantasy = Fantasy()
+    # fantasy.request_base_information()
+    fantasy.request_player_data(player_id=1)
+    # fantasy.request_matches()
     current_path = os.path.dirname(os.path.abspath(__file__))
     current_path = "/".join(current_path.split("/")[:-1])
 
     # Extracting week by week player data
     for week_i in range(1, 38):
         # Season 2016-2017
-        ingest_historical_gameweek_csv(csv_file=f'{current_path}/historical_fantasy/2016-17/gw{week_i}.csv',
+        ingest_historical_gameweek_csv(csv_file=f'{current_path}/historical_fantasy/2016-17/gws/gw{week_i}.csv',
                                        season='201617')
 
         # Season 2017-2018
-        ingest_historical_gameweek_csv(csv_file=f'{current_path}/historical_fantasy/2017-18/gw{week_i}.csv',
+        ingest_historical_gameweek_csv(csv_file=f'{current_path}/historical_fantasy/2017-18/gws/gw{week_i}.csv',
                                        season='201718')
 
     # Extracting historical player information (GIVEN SEASON DETAILED SUMMARY INFORMATION - cleaned_players.csv)
