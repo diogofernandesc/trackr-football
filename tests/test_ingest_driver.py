@@ -89,10 +89,9 @@ class ApiTest(unittest.TestCase):
                                                      Match.AWAY_TEAM]))
 
     def testRequestTeams(self):
-        teams = self.driver.request_teams(competition_name="test", season=2018)
-        # Testing
         fls_comp_id = 2
         fd_comp_id = 2021
+        teams = self.driver.request_teams(fd_comp_id=fd_comp_id, fls_comp_id=fls_comp_id, season=2018)
         fls_teams = self.driver.fls.request_teams(**{flsf.COMPETITION_ID: fls_comp_id})
         f_teams = self.driver.fantasy.request_base_information()['teams']
 
@@ -190,7 +189,7 @@ class ApiTest(unittest.TestCase):
 
             for summary in player[Player.SEASON_SUMMARIES]:
                 self.assertTrue(all(k in summary for k in [Season.NAME,
-                                                           Player.FANTASY_CODE,
+                                                           Season.FANTASY_CODE,
                                                            Player.FANTASY_SEASON_START_PRICE,
                                                            Player.FANTASY_OVERALL_POINTS,
                                                            Player.MINUTES_PLAYED,

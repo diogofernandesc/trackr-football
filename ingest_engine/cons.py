@@ -311,7 +311,7 @@ class Season:
     WINNER = 'winner'
     FOOTBALL_DATA_API_ID = 'football_data_api_id'
     NAME = 'season_name'
-    FANTASY_CODE = 'fantasy_code'
+    FANTASY_CODE = 'season_fantasy_code'
 
 
 class FLS_STATES:

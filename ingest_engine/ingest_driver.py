@@ -109,8 +109,6 @@ class Driver(object):
         # Placeholder
         competition_id = 2002
         # In FLS, 2 is id for premier league, 2021 in football-data
-        # TODO: Database query based on competition name and retrieve fd_id and fls_id
-        # Testing
         fls_comp_id = 2
         fd_comp_id = 2021
 
@@ -217,7 +215,8 @@ class Driver(object):
 
     def request_player_details(self, team_fls_id):
         """
-        Join and retrieve player details from different sources
+        Join and retrieve player details from different sources, parsing and joining same player info
+        :param team_fls_id: fastest-live-scores-api ID for the team the player plays for
         :return: List of player details from a given team
         :rtype: list
         """
@@ -229,24 +228,14 @@ class Driver(object):
         # Testing
         # fls_comp_id = 2
         # fd_comp_id = 2021
-
-        # fls_players = self.fls.request_player_details(**{flsf.COMPETITION_ID: 2})
         fls_players = self.fls.request_player_details(**{flsf.TEAM_IDS: team_fls_id})
         f_players_base = self.fantasy.request_base_information()['players']
-        # TODO: This will be done in its own separate function
-        # Ingest historical data to match player data with if not already collected
-        # if not self.historical_fantasy_gameweek_data or not self.historical_fantasy_base_data:
-        #     self.get_historical_fantasy_data()
-
-        # TODO: match player MATCH info e.g. clean sheets to match stats
-
 
         # Join together data from fantasy football
         for idx, player in enumerate(f_players_base):
             extra_player_data = self.fantasy.request_player_data(player_id=player[Player.FANTASY_ID])
             f_players_base[idx] = {**extra_player_data, **player}
 
-        # print(f_players_base)
         for player in fls_players:
             for f_player in f_players_base:
                 if str_comparator(player[Player.NAME], f_player[Player.NAME]) >= 0.8:
