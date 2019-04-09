@@ -92,28 +92,29 @@ class ApiTest(unittest.TestCase):
         self.assertEqual(self.fd.request_competitions(competition_id=2002), [test_res])
         
     def testMatchParse(self):
-        test_res = {'season_football_data_id': 235686,
-                     'season_start_date': '2018-08-24',
-                     'season_end_date': '2019-05-18',
-                     'utc_date': '2018-08-24T18:30:00Z',
-                     'status': 'FINISHED',
-                     'matchday': 1,
-                     'full_time_home_score': 3,
-                     'full_time_away_score': 1,
-                     'half_time_home_score': 1,
-                     'half_time_away_score': 0,
-                     'extra_time_home_score': None,
-                     'extra_time_away_score': None,
-                     'penalty_home_score': None,
-                     'penalty_away_score': None,
-                     'winner': 'HOME_TEAM',
-                     'home_team': 'FC Bayern München',
-                     'away_team': 'TSG 1899 Hoffenheim',
-                     'referees':
-                         ['Bastian Dankert', 'René Rohde', 'Markus Häcker', 'Thorsten Schiffner', 'Sören Storks']}
+        test_res = {
+            'match_football_data_id': 235686,
+             'season_start_date': '2018-08-24',
+             'season_end_date': '2019-05-18',
+             'utc_date': '2018-08-24T18:30:00Z',
+             'status': 'FINISHED',
+             'matchday': 1,
+             'full_time_home_score': 3,
+             'full_time_away_score': 1,
+             'half_time_home_score': 1,
+             'half_time_away_score': 0,
+             'extra_time_home_score': None,
+             'extra_time_away_score': None,
+             'penalty_home_score': None,
+             'penalty_away_score': None,
+             'winner': 'HOME_TEAM',
+             'home_team': 'FC Bayern München',
+             'away_team': 'TSG 1899 Hoffenheim',
+             'referees':
+                 ['Bastian Dankert', 'René Rohde', 'Markus Häcker', 'Thorsten Schiffner', 'Sören Storks']}
 
         test_res2 = {
-            "season_football_data_id": 204998,
+            "match_football_data_id": 204998,
             "season_start_date": "2018-04-14",
             "season_end_date": "2018-12-02",
             "utc_date": "2018-09-05T22:30:00Z",

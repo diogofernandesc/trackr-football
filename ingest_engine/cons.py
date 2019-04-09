@@ -48,7 +48,7 @@ class FLSApiFilters:
 
 class Match:
     ID = 'id'
-    FOOTBALL_DATA_ID = 'football_data_id'
+    FOOTBALL_DATA_ID = 'match_football_data_id'
     SEASON_FOOTBALL_DATA_ID = 'season_football_data_id'
     SEASON_START_DATE = 'season_start_date'
     SEASON_END_DATE = 'season_end_date'

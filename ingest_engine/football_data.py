@@ -324,7 +324,7 @@ class FootballData(ApiIntegration):
             if 'matches' in result:
                 for match in result['matches']:
                     data = {
-                        Match.SEASON_FOOTBALL_DATA_ID: match[Match.ID],
+                        Match.FOOTBALL_DATA_ID: match[Match.ID],
                         Match.SEASON_START_DATE: match['season']['startDate'],
                         Match.SEASON_END_DATE: match['season']['endDate'],
                         Match.MATCH_UTC_DATE: match['utcDate'],
