@@ -1,10 +1,12 @@
 # from ingest_engine.ingest_driver import Driver, str_comparator
 # from ingest_engine.cons import Player as PLAYER
 # import logging
+from functools import wraps
+
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from ingest_engine.cons import IGNORE
-from db_engine.db_driver import Player, Competition
+from db_engine.db_driver import Player, Competition, Standings
 import os
 import click
 
@@ -17,6 +19,23 @@ app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('POSTGRES_CONNECTION_STR')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
+
+
+def clean_output(query_res):
+    """
+    Ensure only the right fields come out following a DB query
+    :param query_res: the query result to be clean
+    :return:
+    """
+    result = []
+    for res in query_res:
+        final_res = res.__dict__
+        if IGNORE.INSTANCE_STATE in final_res:
+            final_res.pop(IGNORE.INSTANCE_STATE, None)
+
+        result.append(final_res)
+
+    return result
 
 
 @click.group()
@@ -54,7 +73,7 @@ def get_player(id=None, fls_api_id=None, fd_api_id=None, name=None):
         player_query = player_query.filter(Player.name.like(f"%{name}%"))
 
     player_query = player_query.all()
-    return [r.__dict__ for r in player_query]
+    return clean_output(player_query)
 
 
 @click.command()
@@ -95,22 +114,50 @@ def get_competition(id=None, name=None, code=None, location=None, fd_api_id=None
     if fls_api_id:
         comp_query = comp_query.filter_by(fls_api_id=fls_api_id)
 
-    comp_query = comp_query.all()
-    result = []
-    for res in comp_query:
-        final_res = res.__dict__
-        if IGNORE.INSTANCE_STATE in final_res:
-            final_res.pop(IGNORE.INSTANCE_STATE, None)
+    query_result = comp_query.all()
+    clean_output(query_result)
 
-        result.append(final_res)
 
-    print(result)
-    # return [r.__dict__ for r in comp_query]
+@click.command()
+@click.option('--id', default=None, help='DB ID of competition')
+@click.option('--competition_id', default=None, help='Competition id for which to retrieve standings')
+@click.option('--type', default=None, help='The type of standing e.g. TOTAL | HOME | AWAY')
+@click.option('--season', default=None, help='Str season representer for the year of the standings e.g. 2018/19')
+@click.option('--match_day', default=None, help='The match day value the standing belongs to')
+def get_standings(id=None, competition_id=None, type=None, season=None, match_day=None):
+    """
+    Query DB for standings records
+    :param id: DB ID of standings
+    :param competition_id: The ID of the competition for corresponding standings
+    :param type: Type of standing -> TOTAL | HOME | AWAY
+    :param season: Str season for which the standings belong -> e.g. "2018/2019"
+    :param match_day: int value of the matchday for the standings
+    :return: matched (if any) standings records
+    """
+    stan_query = Standings.query
+    if id:
+        stan_query = stan_query.filter_by(id=id)
+
+    if competition_id:
+        stan_query = stan_query.filter_by(competition_id=competition_id)
+
+    if type:
+        stan_query = stan_query.filter_by(type=type)
+
+    if season:
+        stan_query = stan_query.filter_by(season=season)
+
+    if match_day:
+        stan_query = stan_query.filter_by(match_day=match_day)
+
+    stan_query = stan_query.all()
+    clean_output(stan_query)
 
 
 if __name__ == "__main__":
     # qe = QueryEngine()
     # db_cli.add_command(QueryEngine.get_player)
     db_cli.add_command(get_competition)
+    db_cli.add_command(get_standings)
     db_cli()
     # qe.get_player(fls_api_id=18866, name="Aubameyang")
