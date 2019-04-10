@@ -420,3 +420,7 @@ FANTASY_STATUS_MAPPER = {
     "s": "suspended"
 }
 
+
+class IGNORE:
+    INSTANCE_STATE = '_sa_instance_state'
+
