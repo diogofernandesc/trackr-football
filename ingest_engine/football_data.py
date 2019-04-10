@@ -1,7 +1,6 @@
 import requests as re
 import json
 import os
-from ratelimit import limits, sleep_and_retry
 from time import sleep
 from ingest_engine.api_integration import ApiIntegration
 from ingest_engine.cons import Competition, Match, Team, Standings, Player

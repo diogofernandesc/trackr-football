@@ -1,12 +1,10 @@
-from ingest_engine.ingest_driver import Driver, str_comparator
-from ingest_engine.cons import Player as PLAYER
 import logging
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from db_engine.db_driver import Player
 import os
 
-# logging.basicConfig(format='%(asctime)s - %(message)s', level=logging.INFO)
+logging.basicConfig(format='%(asctime)s - %(message)s', level=logging.INFO)
 # driver = Driver()
 # app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('POSTGRES_CONNECTION_STR')
 # db = SQLAlchemy(app)

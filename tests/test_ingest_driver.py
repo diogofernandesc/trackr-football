@@ -1,11 +1,8 @@
 import unittest
-import json
-from ingest_engine.football_data import FootballData
 from ingest_engine.ingest_driver import Driver, str_comparator
 from ingest_engine.cons import Competition, Match, Season, Team, Standings, Player, FootballDataApiFilters as fdf
 from ingest_engine.cons import FLSApiFilters as flsf
 from ingest_engine.fantasy_api import team_mapper
-import os
 
 
 class ApiTest(unittest.TestCase):

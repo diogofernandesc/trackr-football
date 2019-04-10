@@ -1,5 +1,4 @@
 import requests as re
-from ratelimit import sleep_and_retry, limits
 import json
 
 SECOND = 1
