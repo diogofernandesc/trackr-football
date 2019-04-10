@@ -107,7 +107,7 @@ class Driver(object):
         :rtype: list
         """
         # Placeholder
-        competition_id = 2002
+        # competition_id = 2002
         # In FLS, 2 is id for premier league, 2021 in football-data
         fls_comp_id = 2
         fd_comp_id = 2021

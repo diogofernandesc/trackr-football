@@ -1,6 +1,5 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import func
 import os
 from sqlalchemy.exc import IntegrityError
 import logging
@@ -407,8 +406,7 @@ def ingest_teams(fls_comp_id, fd_comp_id, season):
     teams = driver.request_teams(fd_comp_id=fd_comp_id, fls_comp_id=fls_comp_id, season=season)
 
     for team in teams[:1]:
-        team_players = driver.request_player_details(team_name=team[TEAM.NAME],
-                                                     team_fls_id=team[TEAM.FASTEST_LIVE_SCORES_API_ID])
+        team_players = driver.request_player_details(team_fls_id=team[TEAM.FASTEST_LIVE_SCORES_API_ID])
         db_team = Team(fantasy_id=team[TEAM.FANTASY_ID],
                        fd_id=team[TEAM.FOOTBALL_DATA_ID],
                        name=team[TEAM.NAME],

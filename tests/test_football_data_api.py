@@ -139,7 +139,6 @@ class ApiTest(unittest.TestCase):
             'filters': {'dateFrom': '2018-09-05',
                         'dateTo': '2018-09-15',
                         'permission': 'TIER_ONE'},
-            
         }
 
         self.assertEqual(self.fd.request_competition_match(competition_id=2002)[0], test_res)
