@@ -6,11 +6,12 @@ from functools import wraps
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from ingest_engine.cons import IGNORE
-from db_engine.db_driver import Player, Competition, Standings
+from db_engine.db_driver import Player, Competition, Standings, StandingsEntry
 import os
+import logging
 import click
 
-# logging.basicConfig(format='%(asctime)s - %(message)s', level=logging.INFO)
+logging.basicConfig(format='%(asctime)s - %(message)s', level=logging.INFO)
 # driver = Driver()
 # app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('POSTGRES_CONNECTION_STR')
 # db = SQLAlchemy(app)
@@ -19,6 +20,16 @@ app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('POSTGRES_CONNECTION_STR')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
+
+
+def to_json(result_map):
+    dict_result = {}
+    for k, v in result_map.items():
+        dict_result = k.__dict__
+        dict_result.pop(IGNORE.INSTANCE_STATE, None)
+        dict_result['standings_entries'] = clean_output(v)
+        # dict_result['standings_entries'] = [se.__dict__ for se in v]
+    return dict_result
 
 
 def clean_output(query_res):
@@ -124,7 +135,8 @@ def get_competition(id=None, name=None, code=None, location=None, fd_api_id=None
 @click.option('--type', default=None, help='The type of standing e.g. TOTAL | HOME | AWAY')
 @click.option('--season', default=None, help='Str season representer for the year of the standings e.g. 2018/19')
 @click.option('--match_day', default=None, help='The match day value the standing belongs to')
-def get_standings(id=None, competition_id=None, type=None, season=None, match_day=None):
+@click.option('--position', default=None, help='Standing position to retrieve teams for')
+def get_standings(id=None, competition_id=None, type=None, season=None, match_day=None, position=None):
     """
     Query DB for standings records
     :param id: DB ID of standings
@@ -132,27 +144,42 @@ def get_standings(id=None, competition_id=None, type=None, season=None, match_da
     :param type: Type of standing -> TOTAL | HOME | AWAY
     :param season: Str season for which the standings belong -> e.g. "2018/2019"
     :param match_day: int value of the matchday for the standings
+    :param position: Filter by the position of teams in standings e.g. 1 -> get only standings of teams in first place
     :return: matched (if any) standings records
     """
-    stan_query = Standings.query
+    stan_query = db.session.query(Standings, StandingsEntry).filter(Standings.competition_id == competition_id).filter(StandingsEntry.position == position).all()
+    # stan_query = Standings.query.filter_by(competition_id=competition_id).join(StandingsEntry).filter_by(position=position).all()
+
     if id:
-        stan_query = stan_query.filter_by(id=id)
+        stan_query = stan_query.filter(Standings.id == id)
 
     if competition_id:
-        stan_query = stan_query.filter_by(competition_id=competition_id)
+       stan_query = stan_query.filter(Standings.competition_id == competition_id)
 
     if type:
-        stan_query = stan_query.filter_by(type=type)
+        stan_query = stan_query.filter(Standings.type == type)
 
     if season:
-        stan_query = stan_query.filter_by(season=season)
+        stan_query = stan_query.filter(Standings.season == season)
 
     if match_day:
-        stan_query = stan_query.filter_by(match_day=match_day)
+        stan_query = stan_query.filter(Standings.match_day == match_day)
 
+    if position:
+        stan_query = stan_query.filter(StandingsEntry.position == position)
+        # stan_query = stan_query.join(StandingsEntry, Standings.id == StandingsEntry.standings_id)
+        # stan_query = stan_query.join(StandingsEntry).filter_by(position=position)
     stan_query = stan_query.all()
-    clean_output(stan_query)
+    standings_map = {}
+    for tpl in stan_query:
+        if tpl[0] not in standings_map:
+            standings_map[tpl[0]] = [tpl[1]]
 
+        else:
+            standings_map[tpl[0]].append(tpl[1])
+
+    return to_json(standings_map)
+    
 
 if __name__ == "__main__":
     # qe = QueryEngine()
@@ -160,4 +187,5 @@ if __name__ == "__main__":
     db_cli.add_command(get_competition)
     db_cli.add_command(get_standings)
     db_cli()
+    # get_standings(competition_id=1, position=1)
     # qe.get_player(fls_api_id=18866, name="Aubameyang")
