@@ -147,14 +147,13 @@ def get_standings(id=None, competition_id=None, type=None, season=None, match_da
     :param position: Filter by the position of teams in standings e.g. 1 -> get only standings of teams in first place
     :return: matched (if any) standings records
     """
-    stan_query = db.session.query(Standings, StandingsEntry).filter(Standings.competition_id == competition_id).filter(StandingsEntry.position == position).all()
-    # stan_query = Standings.query.filter_by(competition_id=competition_id).join(StandingsEntry).filter_by(position=position).all()
+    stan_query = db.session.query(Standings, StandingsEntry)
 
     if id:
         stan_query = stan_query.filter(Standings.id == id)
 
     if competition_id:
-       stan_query = stan_query.filter(Standings.competition_id == competition_id)
+        stan_query = stan_query.filter(Standings.competition_id == competition_id)
 
     if type:
         stan_query = stan_query.filter(Standings.type == type)
@@ -167,10 +166,11 @@ def get_standings(id=None, competition_id=None, type=None, season=None, match_da
 
     if position:
         stan_query = stan_query.filter(StandingsEntry.position == position)
-        # stan_query = stan_query.join(StandingsEntry, Standings.id == StandingsEntry.standings_id)
-        # stan_query = stan_query.join(StandingsEntry).filter_by(position=position)
+
     stan_query = stan_query.all()
     standings_map = {}
+
+    # Reformatting dict to get standings in list per comp as "standing_entries" field
     for tpl in stan_query:
         if tpl[0] not in standings_map:
             standings_map[tpl[0]] = [tpl[1]]
@@ -179,7 +179,7 @@ def get_standings(id=None, competition_id=None, type=None, season=None, match_da
             standings_map[tpl[0]].append(tpl[1])
 
     return to_json(standings_map)
-    
+    # print(to_json(standings_map))
 
 if __name__ == "__main__":
     # qe = QueryEngine()
