@@ -6,8 +6,8 @@ app.config['DEBUG'] = True
 # Logging using app.logger.debug/warning/error
 
 
-@app.route('/')
-def index():
+@app.route('/v1')
+def base():
     api_endpoints = []
     for cons, endpoint in vars(API_ENDPOINTS).items():
         if not cons.startswith('__'):
@@ -19,6 +19,11 @@ def index():
     return flask.jsonify({
         API.ENDPOINTS: api_endpoints
     })
+
+
+
+
+
 
 
 if __name__ == '__main__':
