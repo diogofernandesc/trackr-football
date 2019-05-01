@@ -1,7 +1,6 @@
 import unittest
 from api_engine import api_interface
 from api_engine.api_cons import API_ENDPOINTS, API
-import os
 
 
 class ApiInterfaceTest(unittest.TestCase):
