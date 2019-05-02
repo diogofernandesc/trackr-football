@@ -31,19 +31,45 @@ def base():
     })
 
 
-# @app.route('/v1/competitions?id=<int:id>&name=<string:name>&code=<string:code>&location=<string:location>&fd_api_id=<int:fd_api_id>&fls_api_id=<int:fls_api_id')
-
-# def competitions(id=None, name=None, code=None, location=None, fd_api_id=None, fls_api_id=None):
+@app.route('/v1/competition', methods=['GET'])
 @app.route('/v1/competitions', methods=['GET'])
-def competitions():
-    id = request.args.get(COMPETITION.ID, None, int)
-    name = request.args.get(COMPETITION.NAME, None, str)
-    code = request.args.get(COMPETITION.CODE, None, str)
-    location = request.args.get(COMPETITION.LOCATION, None, str)
-    fd_api_id = request.args.get(COMPETITION.FOOTBALL_DATA_API_ID, None, int)
-    fls_api_id = request.args.get(COMPETITION.FASTEST_LIVE_SCORES_API_ID, None, int)
-    return jsonify(db_interface.get_competition(id=id, name=name, code=code, location=location,
-                                                fd_api_id=fd_api_id, fls_api_id=fls_api_id))
+def competition():
+    """
+    /v1/competitions will be used to allow OR type querying across all the available competitions
+    /v1/competition is AND querying on competitions but still allows multiple values to be chosen per field
+    :return:
+    """
+    multi = 'competitions' in request.url_rule.rule
+
+    def get_vals(v, type_):
+        """
+        Extract multiple values comma separated if they exist
+        :param v: url parameter
+        :param type_: type of url parameter e.g. int, str
+        :return: multiple (typed) values or single
+        """
+        if v:
+            if ',' in v:
+                return [type_(v) for v in v.split(",")]
+
+            else:
+                return [type_(v)]
+
+        return None
+
+    id_ = get_vals(request.args.get(COMPETITION.ID, None), int)
+    name = get_vals(request.args.get(COMPETITION.NAME, None), str)
+    code = get_vals(request.args.get(COMPETITION.CODE, None), str)
+    location = get_vals(request.args.get(COMPETITION.LOCATION, None), str)
+    fd_api_id = get_vals(request.args.get(COMPETITION.FOOTBALL_DATA_API_ID, None), int)
+    fls_api_id = get_vals(request.args.get(COMPETITION.FASTEST_LIVE_SCORES_API_ID, None), int)
+    return jsonify(db_interface.get_competition(multi=multi,
+                                                id_=id_,
+                                                name=name,
+                                                code=code,
+                                                location=location,
+                                                fd_api_id=fd_api_id,
+                                                fls_api_id=fls_api_id))
 
 
 if __name__ == '__main__':

@@ -17,7 +17,6 @@ class QueryEngine(object):
     def __init__(self):
         self.app = Flask(__name__)
         self.app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('POSTGRES_CONNECTION_STR')
-        print(os.getenv('POSTGRES_CONNECTION_STR'))
         self.db = SQLAlchemy(self.app)
 
     def get_player(self, fls_api_id=None, fd_api_id=None, name=None):

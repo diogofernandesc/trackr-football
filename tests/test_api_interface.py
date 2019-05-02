@@ -30,8 +30,30 @@ class ApiInterfaceTest(unittest.TestCase):
                                                       COMPETITION.FASTEST_LIVE_SCORES_API_ID,
                                                       COMPETITION.FOOTBALL_DATA_API_ID)))
 
-        filter_result = self.api.get('/v1/competitions?id=1').get_json()
+        filter_result = self.api.get('/v1/competition?id=1').get_json()
         self.assertEqual(filter_result[COMPETITION.ID], 1)
+        filter_result = self.api.get('/v1/competitions?id=1,11').get_json()
+        for result in filter_result:
+            self.assertTrue(result[COMPETITION.ID] in [1, 11])
 
-        # TODO: Test ?filter= (AND FILTER)
+        # AND query - no one competition with id 1 AND also id 2
+        filter_result = self.api.get('/v1/competition?id=1,2').get_json()
+        self.assertEqual(filter_result, [])
+
+        filter_result = self.api.get('/v1/competition?name=La Liga').get_json()
+        self.assertEqual(filter_result[COMPETITION.LOCATION], "Spain")
+
+        filter_result = self.api.get('/v1/competition?code=PL').get_json()
+        self.assertEqual(filter_result[COMPETITION.ID], 3)
+
+        filter_result = self.api.get('/v1/competition?location=spain').get_json()
+        self.assertEqual(filter_result[COMPETITION.ID], 11)
+
+        filter_result = self.api.get('/v1/competition?fd_api_id=2002').get_json()
+        self.assertEqual(filter_result[COMPETITION.FOOTBALL_DATA_API_ID], 2002)
+
+        filter_result = self.api.get('/v1/competition?fls_api_id=81').get_json()
+        self.assertEqual(filter_result[COMPETITION.FASTEST_LIVE_SCORES_API_ID], 81)
+
+
 

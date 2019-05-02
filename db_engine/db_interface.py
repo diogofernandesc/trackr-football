@@ -1,13 +1,7 @@
-from db_engine.db_driver import Player, Team, Competition, Standings, StandingsEntry
-from flask_sqlalchemy import SQLAlchemy
-from flask import Flask
-from ingest_engine.cons import IGNORE
-import os
+from sqlalchemy import union, or_
 
-# app = Flask(__name__)
-# app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('POSTGRES_CONNECTION_STR')
-# app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-# db = SQLAlchemy(app)
+from db_engine.db_driver import Competition
+from ingest_engine.cons import IGNORE
 
 
 def to_json(result_map):
@@ -44,10 +38,11 @@ class DBInterface(object):
     def __init__(self, db):
         self.db = db
 
-    def get_competition(self, id=None, name=None, code=None, location=None, fd_api_id=None, fls_api_id=None):
+    def get_competition(self, multi=False, id_=None, name=None, code=None, location=None, fd_api_id=None, fls_api_id=None):
         """
         Query DB for competition record
-        :param id: DB ID of competition
+        :param multi: Perform OR query on filters, SQL OR otherwise SQL AND
+        :param id_: DB ID of competition
         :param name: The name of the competition, LIKE match performed
         :param code: The code of the competition
         :param location: Country/Location of the competition
@@ -55,25 +50,37 @@ class DBInterface(object):
         :param fls_api_id: FastestLiveScores API id for competition
         :return:  matched (if any) competition records
         """
+
+        applied_filters = []
         comp_query = self.db.session.query(Competition)
 
-        if id:
-            comp_query = comp_query.filter(Competition.id == id)
+        if id_:
+            for id_val in id_:
+                applied_filters.append(Competition.id == id_val)
 
         if name:
-            comp_query = comp_query.filter(Competition.name.ilike(f"%{name}%"))
+            for name_val in name:
+                applied_filters.append(Competition.name.ilike(f"%{name_val}%"))
 
         if code:
-            comp_query = comp_query.filter(Competition.code == code)
+            for code_val in code:
+                applied_filters.append(Competition.code == code_val)
 
         if location:
-            comp_query = comp_query.filter(Competition.location == location)
+            for loc_val in location:
+                applied_filters.append(Competition.location.ilike(f"%{loc_val}%"))
 
         if fd_api_id:
-            comp_query = comp_query.filter(Competition.fd_api_id == fd_api_id)
+            for fd_val in fd_api_id:
+                applied_filters.append(Competition.fd_api_id == fd_val)
 
         if fls_api_id:
-            comp_query = comp_query.filter(Competition.fls_api_id == fls_api_id)
+            for fls_val in fls_api_id:
+                applied_filters.append(Competition.fls_api_id == fls_val)
 
-        query_result = comp_query.all()
+        if multi:
+            query_result = comp_query.filter(or_(*applied_filters))
+        else:
+            query_result = comp_query.filter(*applied_filters)
+
         return clean_output(query_result)
