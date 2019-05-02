@@ -5,6 +5,9 @@ class API:
     URL_DESCRIPTION = 'description'
 
 
+class API_ERROR:
+    COMPETITION_404 = 'There is no competition with those filters'
+
 class API_ENDPOINTS:
     TEAMS = 'teams'
     COMPETITIONS = 'competitions'

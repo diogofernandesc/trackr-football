@@ -2,7 +2,7 @@ import flask
 from flask import request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from ingest_engine.cons import Competition as COMPETITION
-from api_engine.api_cons import API_ENDPOINTS, API, ENDPOINT_DESCRIPTION
+from api_engine.api_cons import API_ENDPOINTS, API, ENDPOINT_DESCRIPTION, API_ERROR
 from db_engine.db_interface import DBInterface
 import os
 
@@ -93,7 +93,7 @@ def competition():
                                                   location=location,
                                                   fd_api_id=fd_api_id,
                                                   fls_api_id=fls_api_id))
-    print(result.json)
+    
     if result.json:
         return result
 

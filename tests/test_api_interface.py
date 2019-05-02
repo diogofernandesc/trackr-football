@@ -1,7 +1,7 @@
 import unittest
 from api_engine import api_interface
 from ingest_engine.cons import Competition as COMPETITION
-from api_engine.api_cons import API_ENDPOINTS, API
+from api_engine.api_cons import API_ENDPOINTS, API, API_ERROR
 
 
 class ApiInterfaceTest(unittest.TestCase):
@@ -38,7 +38,10 @@ class ApiInterfaceTest(unittest.TestCase):
 
         # AND query - no one competition with id 1 AND also id 2
         filter_result = self.api.get('/v1/competition?id=1,2').get_json()
-        self.assertEqual(filter_result, [])
+        self.assertEqual(filter_result, {
+            'message': API_ERROR.COMPETITION_404,
+            'status_code': 404
+        })
 
         filter_result = self.api.get('/v1/competition?name=La Liga').get_json()
         self.assertEqual(filter_result[COMPETITION.LOCATION], "Spain")
