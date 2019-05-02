@@ -16,6 +16,21 @@ db_interface = DBInterface(db=db)
 # Logging using app.logger.debug/warning/error
 
 
+class InvalidUsage(Exception):
+    status_code = 400
+
+    def __init__(self, message, status_code=None, payload=None):
+        Exception.__init__(self)
+        self.message = message
+        if status_code is not None:
+            self.status_code = status_code
+        self.payload = payload
+
+    def to_dict(self):
+        rv = dict(self.payload or ())
+        rv['message'] = self.message
+        return rv
+
 @app.route('/v1')
 def base():
     api_endpoints = []
@@ -29,6 +44,13 @@ def base():
     return jsonify({
         API.ENDPOINTS: api_endpoints
     })
+
+
+@app.errorhandler(InvalidUsage)
+def handle_invalid_usage(error):
+    response = jsonify(**error.to_dict(), **{"status_code": error.status_code})
+    response.status_code = error.status_code
+    return response
 
 
 @app.route('/v1/competition', methods=['GET'])
@@ -63,13 +85,20 @@ def competition():
     location = get_vals(request.args.get(COMPETITION.LOCATION, None), str)
     fd_api_id = get_vals(request.args.get(COMPETITION.FOOTBALL_DATA_API_ID, None), int)
     fls_api_id = get_vals(request.args.get(COMPETITION.FASTEST_LIVE_SCORES_API_ID, None), int)
-    return jsonify(db_interface.get_competition(multi=multi,
-                                                id_=id_,
-                                                name=name,
-                                                code=code,
-                                                location=location,
-                                                fd_api_id=fd_api_id,
-                                                fls_api_id=fls_api_id))
+
+    result = jsonify(db_interface.get_competition(multi=multi,
+                                                  id_=id_,
+                                                  name=name,
+                                                  code=code,
+                                                  location=location,
+                                                  fd_api_id=fd_api_id,
+                                                  fls_api_id=fls_api_id))
+    print(result.json)
+    if result.json:
+        return result
+
+    else:
+        raise InvalidUsage('There is no competition with those filters', status_code=404)
 
 
 if __name__ == '__main__':
