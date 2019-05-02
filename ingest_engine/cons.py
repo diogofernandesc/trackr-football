@@ -296,10 +296,11 @@ class Player:
 
 
 class Competition:
+    ID = 'id'
     NAME = 'name'
     CODE = 'code'
     LOCATION = 'location'
-    FOOTBALL_DATA_API_ID = 'football_data_api_id'
+    FOOTBALL_DATA_API_ID = 'fd_api_id'
     FASTEST_LIVE_SCORES_API_ID = 'fls_api_id'
 
 
@@ -420,3 +421,5 @@ FANTASY_STATUS_MAPPER = {
     "s": "suspended"
 }
 
+class IGNORE:
+    INSTANCE_STATE = '_sa_instance_state'
