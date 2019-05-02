@@ -16,6 +16,7 @@ db_interface = DBInterface(db=db)
 # Logging using app.logger.debug/warning/error
 
 
+
 class InvalidUsage(Exception):
     status_code = 400
 
@@ -30,6 +31,7 @@ class InvalidUsage(Exception):
         rv = dict(self.payload or ())
         rv['message'] = self.message
         return rv
+
 
 @app.route('/v1')
 def base():
