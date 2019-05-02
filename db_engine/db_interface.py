@@ -50,7 +50,6 @@ class DBInterface(object):
         :param fls_api_id: FastestLiveScores API id for competition
         :return:  matched (if any) competition records
         """
-
         applied_filters = []
         comp_query = self.db.session.query(Competition)
 
