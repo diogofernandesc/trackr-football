@@ -95,7 +95,7 @@ def competition():
                                                   location=location,
                                                   fd_api_id=fd_api_id,
                                                   fls_api_id=fls_api_id))
-    
+
     if result.json:
         return result
 
