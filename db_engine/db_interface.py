@@ -1,7 +1,7 @@
-from sqlalchemy import union, or_
+from sqlalchemy import or_
 
-from db_engine.db_driver import Competition
-from ingest_engine.cons import IGNORE
+from db_engine.db_driver import Competition, Team
+from ingest_engine.cons import IGNORE, Team as TEAM
 
 
 def to_json(result_map):
@@ -83,3 +83,39 @@ class DBInterface(object):
             query_result = comp_query.filter(*applied_filters)
 
         return clean_output(query_result)
+
+    def get_team(self, multi=False, filters=None):
+        """
+        Query DB for team record
+        :param multi: Perform OR query on filters, SQL OR otherwise SQL AND
+        :param filters: namedtuple with all available filter fields
+        :return: matched (if any) team records
+        """
+
+        db_filters = []
+        team_query = self.db.session.query(Team)
+        active_filters = [(f, v) for f, v in filters._asdict().items() if v]
+
+        for filter_ in active_filters:
+            for filter_val in filter_[1]:
+
+                # Applied different filtering method when it's a team name e.g. SQL LIKE search
+                if filter_[0] == TEAM.NAME:
+                    db_filters.append(Team.name.ilike(f"%{filter_val}%"))
+
+                else:
+                    db_filters.append(Team.__table__.c[filter_[0]] == filter_val)
+
+        if multi:
+            query_result = team_query.filter(or_(*db_filters))
+        else:
+            query_result = team_query.filter(*db_filters)
+
+        return clean_output(query_result)
+
+
+
+
+
+
+

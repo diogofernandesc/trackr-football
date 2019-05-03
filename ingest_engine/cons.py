@@ -137,6 +137,7 @@ class MatchEvent:
 
 
 class Team:
+    ID = 'id'
     FOOTBALL_DATA_ID = 'football_data_id'
     COUNTRY = 'country'
     NAME = 'name'
