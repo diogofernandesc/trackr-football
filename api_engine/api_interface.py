@@ -1,9 +1,10 @@
 import flask
 from flask import request, jsonify
 from flask_sqlalchemy import SQLAlchemy
-from ingest_engine.cons import Competition as COMPETITION
+from ingest_engine.cons import Competition as COMPETITION, Team as TEAM
 from api_engine.api_cons import API_ENDPOINTS, API, ENDPOINT_DESCRIPTION, API_ERROR
 from db_engine.db_interface import DBInterface
+from db_engine.db_filters import TeamFilters
 import os
 
 app = flask.Flask(__name__)
@@ -15,6 +16,67 @@ db = SQLAlchemy(app)
 db_interface = DBInterface(db=db)
 # Logging using app.logger.debug/warning/error
 
+
+def get_vals(v, type_):
+    """
+    Extract multiple values comma separated if they exist
+    :param v: url parameter
+    :param type_: type of url parameter e.g. int, str
+    :return: multiple (typed) values or single
+    """
+    if v:
+        if ',' in v:
+            return [type_(v) for v in v.split(",")]
+
+        else:
+            return [type_(v)]
+
+    return None
+
+
+def get_vals_(v):
+    """
+    Extract multiple values comma separated if they exist
+    :param v: url parameter
+    :param type_: type of url parameter e.g. int, str
+    :return: multiple (typed) values or single
+    """
+    def isfloat(x):
+        try:
+            a = float(x)
+        except ValueError:
+            return False
+        else:
+            return True
+
+    def isint(x):
+        try:
+            a = float(x)
+            b = int(a)
+        except ValueError:
+            return False
+        else:
+            return a == b
+
+    if v:
+        # Perform type inference from the query string
+        def type_eval(x):
+            if isint(x):
+                return int(x)
+            elif isfloat(x):
+                return float(x)
+            else:
+                return x
+
+        if isinstance(v, list):
+            v = v[0]
+
+        if ',' in v:
+            return [type_eval(val) for val in v.split(",")]
+
+        return [type_eval(v)]
+
+    return None
 
 
 class InvalidUsage(Exception):
@@ -61,25 +123,9 @@ def competition():
     """
     /v1/competitions will be used to allow OR type querying across all the available competitions
     /v1/competition is AND querying on competitions but still allows multiple values to be chosen per field
-    :return:
+    :return: API request json format
     """
     multi = 'competitions' in request.url_rule.rule
-
-    def get_vals(v, type_):
-        """
-        Extract multiple values comma separated if they exist
-        :param v: url parameter
-        :param type_: type of url parameter e.g. int, str
-        :return: multiple (typed) values or single
-        """
-        if v:
-            if ',' in v:
-                return [type_(v) for v in v.split(",")]
-
-            else:
-                return [type_(v)]
-
-        return None
 
     id_ = get_vals(request.args.get(COMPETITION.ID, None), int)
     name = get_vals(request.args.get(COMPETITION.NAME, None), str)
@@ -101,6 +147,28 @@ def competition():
 
     else:
         raise InvalidUsage('There is no competition with those filters', status_code=404)
+
+
+@app.route('/v1/team', methods=['GET'])
+@app.route('/v1/teams', methods=['GET'])
+def team():
+    """
+    /v1/teams will be used to allow OR type querying across all the available teams
+    /v1/team is AND querying on competitions but still allows multiple values to be chosen per field
+    :return: API request json format
+    """
+    multi = 'teams' in request.url_rule.rule
+    ra = request.args
+    team_filters = TeamFilters(**{k: get_vals_(v) for k, v in ra.items()})
+    return jsonify(db_interface.get_team(multi=multi, filters=team_filters))
+    # team_filters1 = {**team_filters._asdict()}
+    # db_interface.get_team(multi=multi, filters=**team_filters)
+    # result = jsonify()
+    # print(ra)
+
+
+
+
 
 
 if __name__ == '__main__':
