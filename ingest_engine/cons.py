@@ -170,6 +170,8 @@ class Team:
 
 
 class Standings:
+    ID = 'id'
+    STANDINGS_ID = 'standings_id'
     COMPETITION_NAME = 'competition_name'
     STAGE = 'stage'
     TYPE = 'type'

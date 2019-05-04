@@ -4,7 +4,7 @@ from flask_sqlalchemy import SQLAlchemy
 from ingest_engine.cons import Competition as COMPETITION, Team as TEAM
 from api_engine.api_cons import API_ENDPOINTS, API, ENDPOINT_DESCRIPTION, API_ERROR
 from db_engine.db_interface import DBInterface
-from db_engine.db_filters import TeamFilters
+from db_engine.db_filters import TeamFilters, StandingsFilters
 import os
 
 app = flask.Flask(__name__)
@@ -165,6 +165,26 @@ def team():
     # db_interface.get_team(multi=multi, filters=**team_filters)
     # result = jsonify()
     # print(ra)
+
+
+@app.route('/v1/ip/<string:ip>', methods=['GET'])
+def ip_lol(ip):
+    return jsonify({"ip": ip})
+
+
+@app.route('/v1/standings/all', methods=['GET'])
+@app.route('/v1/standings', methods=['GET'])
+def standings():
+    """
+    /v1/standings/all OR type querying across ALL available standings
+    /v1/standings AND querying on standings, multiple values allowed per field
+    :return: API request JSON format
+    """
+    rule_ = request.url_rule.rule
+    multi = 'standings/all' in request.url_rule.rule
+    ra = request.args
+    standings_filters = StandingsFilters(**{k: get_vals_(v) for k, v in ra.items()})
+    return jsonify(db_interface.get_standings(multi=multi, filters=standings_filters))
 
 
 

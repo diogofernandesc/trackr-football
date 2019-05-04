@@ -1,5 +1,5 @@
 from collections import namedtuple
-from ingest_engine.cons import Team as TEAM
+from ingest_engine.cons import Team as TEAM, Standings as STANDINGS
 
 
 """
@@ -24,3 +24,25 @@ team_filter_fields = [TEAM.ID,
                       TEAM.FANTASY_DEFENCE_AWAY_STRENGTH,
                       ]
 TeamFilters = namedtuple('team_filters', team_filter_fields, defaults=(None,) * len(team_filter_fields))
+
+
+standings_filter_field = [STANDINGS.ID,
+                          STANDINGS.STANDINGS_ID,
+                          STANDINGS.POSITION,
+                          STANDINGS.TEAM_NAME,
+                          STANDINGS.TYPE,
+                          STANDINGS.SEASON,
+                          STANDINGS.MATCH_DAY,
+                          STANDINGS.GAMES_PLAYED,
+                          STANDINGS.GAMES_WON,
+                          STANDINGS.GAMES_DRAWN,
+                          STANDINGS.GAMES_LOST,
+                          STANDINGS.POINTS,
+                          STANDINGS.GOALS_FOR,
+                          STANDINGS.GOALS_AGAINST,
+                          STANDINGS.GOAL_DIFFERENCE]
+
+StandingsFilters = namedtuple('standings_filters',
+                              standings_filter_field, defaults=(None,) * len(standings_filter_field))
+
+
