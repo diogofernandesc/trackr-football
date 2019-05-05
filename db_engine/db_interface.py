@@ -54,14 +54,14 @@ def filter_parse(query_str, table, column):
 
 
 
-def to_json(result_map):
+def to_json(result_map, limit=10):
     list_dict_result = []
     for k, v in result_map.items():
         dict_result = k.__dict__
         dict_result.pop(IGNORE.INSTANCE_STATE, None)
         dict_result['standings_entries'] = clean_output(v)
         list_dict_result.append(dict_result)
-    return list_dict_result
+    return list_dict_result[:limit]
 
 
 def clean_output(query_res):
@@ -202,9 +202,10 @@ class DBInterface(object):
         # do some stuff
 
         if multi:
-            stan_query = stan_query.filter(or_(*db_filters)).limit(limit).all()
+            stan_query = stan_query.filter(or_(*db_filters)).limit(100).all()
         else:
-            stan_query = stan_query.filter(*db_filters).limit(limit).all()
+            stan_query = stan_query.filter(*db_filters).limit(100).all() # no standings will have more than 100 entries
+            # stan_query = stan_query.filter(*db_filters).all()
         standings_map = {}
 
         # Reformatting dict to get standings in list per comp as "standing_entries" field
@@ -215,7 +216,7 @@ class DBInterface(object):
             else:
                 standings_map[tpl[0]].append(tpl[1])
 
-        result = to_json(standings_map)
+        result = to_json(standings_map, limit=limit)
         elapsed_time = time.process_time() - t
         print(f"time: {elapsed_time}")
         return result
