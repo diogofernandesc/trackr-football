@@ -40,7 +40,8 @@ standings_filter_field = [STANDINGS.ID,
                           STANDINGS.POINTS,
                           STANDINGS.GOALS_FOR,
                           STANDINGS.GOALS_AGAINST,
-                          STANDINGS.GOAL_DIFFERENCE]
+                          STANDINGS.GOAL_DIFFERENCE,
+                          STANDINGS.LIMIT]
 
 StandingsFilters = namedtuple('standings_filters',
                               standings_filter_field, defaults=(None,) * len(standings_filter_field))

@@ -190,7 +190,7 @@ class Standings:
     GOALS_FOR = 'goals_for'
     GOALS_AGAINST = 'goals_against'
     GOAL_DIFFERENCE = 'goal_difference'
-
+    LIMIT = 'limit'
 
 class Player:
     NAME = 'name'

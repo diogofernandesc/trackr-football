@@ -23,6 +23,37 @@ def col_exists(table, col):
     return False
 
 
+def filter_parse(query_str, table, column):
+    """
+    Parse individual filter into an SQLAlchemy query statement
+    :param query_str: API URL query string
+    :param table: SQL Table to query from
+    :param column: SQL table column to query from
+    :param val: filtering value
+    :return: SQLAlchemy filter
+    """
+
+    if isinstance(query_str, str):
+        if any(x in query_str for x in ["$lt","$gt","$lte", "$gte"]):
+        # if ["$lt","$gt","$lte", "$gte"] in query_str:
+            val = query_str.split(":")[1]
+            if "$lt" in query_str:
+                return table.c[column] < val
+
+            elif "$gt" in query_str:
+                return table.c[column] > val
+
+            elif "$lte" in query_str:
+                return table.c[column] <= val
+
+            elif "$gte" in query_str:
+                return table.c[column] >= val
+
+
+    return table.c[column] == query_str
+
+
+
 def to_json(result_map):
     list_dict_result = []
     for k, v in result_map.items():
@@ -133,9 +164,10 @@ class DBInterface(object):
 
         return clean_output(query_result)
 
-    def get_standings(self, multi=False, filters=None):
+    def get_standings(self, limit=10, multi=False, filters=None):
         """
         Query DB for standings records
+        :param limit: Due to how heavy standings are, default amount of standings to 10, unless otherwise changed
         :param multi: Perform OR query on filters, SQL OR otherwise SQL AND
         :param filters: namedtuple with all available filter fields
         :return: matched (if any) standings records
@@ -160,13 +192,19 @@ class DBInterface(object):
                     elif col_exists(table=StandingsEntry, col=filter_[0]):
                         active_table = StandingsEntry.__table__
 
-                    db_filters.append(active_table.c[filter_[0]] == filter_val)
+                    db_filters.append(filter_parse(query_str=filter_val, table=active_table, column=filter_[0]))
 
-        # or_filter = [True for f in active_filters if f[0] == STANDINGS.ID]
+                    # db_filters.append(active_table.c[filter_[0]] == filter_val)
+
+        import time
+
+        t = time.process_time()
+        # do some stuff
+
         if multi:
-            stan_query = stan_query.filter(or_(*db_filters)).all()
+            stan_query = stan_query.filter(or_(*db_filters)).limit(limit).all()
         else:
-            stan_query = stan_query.filter(*db_filters).all()
+            stan_query = stan_query.filter(*db_filters).limit(limit).all()
         standings_map = {}
 
         # Reformatting dict to get standings in list per comp as "standing_entries" field
@@ -178,6 +216,8 @@ class DBInterface(object):
                 standings_map[tpl[0]].append(tpl[1])
 
         result = to_json(standings_map)
+        elapsed_time = time.process_time() - t
+        print(f"time: {elapsed_time}")
         return result
 
 

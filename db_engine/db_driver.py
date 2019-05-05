@@ -48,7 +48,7 @@ class Competition(db.Model):
 class Standings(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     # standings_entries = db.relationship('StandingsEntry', backpopulates="standings")
-    standings_entries = db.relationship('StandingsEntry', backref='standings', lazy=True)
+    standings_entries = db.relationship('StandingsEntry', backref='standings', lazy='dynamic')
                                         # primaryjoin="standings.id==standings_entry.standings_id")
     competition_id = db.Column(db.Integer, db.ForeignKey('competition.id'), nullable=False)
     type = db.Column(db.String(20), unique=False, nullable=False)
@@ -531,6 +531,7 @@ def ingest_teams(fls_comp_id, fd_comp_id, season):
 
 if __name__ == "__main__":
     db.create_all()
+    ingest_competitions()
     # teams = db.session\
     #     .query(func.max(StandingsEntry.points),
     #            StandingsEntry.team_name, StandingsEntry.team).filter_by(standings_id=8).group_by(StandingsEntry.team_name).all()

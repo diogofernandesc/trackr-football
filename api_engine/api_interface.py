@@ -161,15 +161,6 @@ def team():
     ra = request.args
     team_filters = TeamFilters(**{k: get_vals_(v) for k, v in ra.items()})
     return jsonify(db_interface.get_team(multi=multi, filters=team_filters))
-    # team_filters1 = {**team_filters._asdict()}
-    # db_interface.get_team(multi=multi, filters=**team_filters)
-    # result = jsonify()
-    # print(ra)
-
-
-@app.route('/v1/ip/<string:ip>', methods=['GET'])
-def ip_lol(ip):
-    return jsonify({"ip": ip})
 
 
 @app.route('/v1/standings/all', methods=['GET'])
@@ -180,15 +171,16 @@ def standings():
     /v1/standings AND querying on standings, multiple values allowed per field
     :return: API request JSON format
     """
-    rule_ = request.url_rule.rule
     multi = 'standings/all' in request.url_rule.rule
     ra = request.args
-    standings_filters = StandingsFilters(**{k: get_vals_(v) for k, v in ra.items()})
-    return jsonify(db_interface.get_standings(multi=multi, filters=standings_filters))
+    limit = ra.get("limit", 10)
+    try:
+        limit = int(limit)
+    except ValueError:
+        raise InvalidUsage('Limit must be an integer', status_code=400)
 
-
-
-
+    standings_filters = StandingsFilters(**{k: get_vals_(v) for k, v in ra.items() if k != "limit"})
+    return jsonify(db_interface.get_standings(limit=limit, multi=multi, filters=standings_filters))
 
 
 if __name__ == '__main__':
