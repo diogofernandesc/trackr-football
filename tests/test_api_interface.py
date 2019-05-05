@@ -1,6 +1,6 @@
 import unittest
 from api_engine import api_interface
-from ingest_engine.cons import Competition as COMPETITION
+from ingest_engine.cons import Competition as COMPETITION, Standings as STANDINGS
 from api_engine.api_cons import API_ENDPOINTS, API, API_ERROR
 
 
@@ -47,16 +47,153 @@ class ApiInterfaceTest(unittest.TestCase):
         self.assertEqual(filter_result[COMPETITION.LOCATION], "Spain")
 
         filter_result = self.api.get('/v1/competition?code=PL').get_json()
-        self.assertEqual(filter_result[COMPETITION.ID], 3)
+        self.assertEqual(filter_result[COMPETITION.CODE], 'PL')
 
         filter_result = self.api.get('/v1/competition?location=spain').get_json()
-        self.assertEqual(filter_result[COMPETITION.ID], 11)
+        self.assertEqual(filter_result[COMPETITION.LOCATION], "Spain")
 
         filter_result = self.api.get('/v1/competition?fd_api_id=2002').get_json()
         self.assertEqual(filter_result[COMPETITION.FOOTBALL_DATA_API_ID], 2002)
 
         filter_result = self.api.get('/v1/competition?fls_api_id=81').get_json()
         self.assertEqual(filter_result[COMPETITION.FASTEST_LIVE_SCORES_API_ID], 81)
+
+    def testStandingsUrl(self):
+
+        def filter_test(filter_str, filter_val):
+            filter_result = self.api.get(f'/v1/standings?{filter_str}={filter_val}').get_json()
+            if isinstance(filter_result, list):
+                for result in filter_result:
+                    if isinstance(result[STANDINGS.TABLE], list):
+                        for entry in result[STANDINGS.TABLE]:
+                            self.assertTrue(entry[filter_str], filter_val)
+                    else:
+                        self.assertTrue(result[STANDINGS.TABLE][filter_str], filter_val)
+
+            else:
+                if isinstance(filter_result[STANDINGS.TABLE], list):
+                    for entry in filter_result[STANDINGS.TABLE]:
+                        self.assertTrue(entry[filter_str], filter_val)
+                else:
+                    self.assertTrue(filter_result[STANDINGS.TABLE][filter_str], filter_val)
+
+        def filter_test_adv(filter_str, filter_val, op):
+            url = f'/v1/standings/all?{filter_str}=${op}:{filter_val}'
+            filter_result = self.api.get(f'/v1/standings/all?{filter_str}=${op}:{filter_val}').get_json()
+            if isinstance(filter_result, list):
+                for result in filter_result:
+                    if isinstance(result[STANDINGS.TABLE], list):
+                        for entry in result[STANDINGS.TABLE]:
+                            if op == "lt":
+                                self.assertLess(entry[filter_str], filter_val)
+
+                            elif op == "lte":
+                                self.assertLessEqual(entry[filter_str], filter_val)
+
+                            elif op == "gt":
+                                self.assertGreater(entry[filter_str], filter_val)
+
+                            elif op == "gte":
+                                self.assertGreaterEqual(entry[filter_str], filter_val)
+
+                    else:
+                        if op == "lt":
+                            self.assertLess(result[STANDINGS.TABLE][filter_str], filter_val)
+
+                        elif op == "lte":
+                            self.assertLessEqual(result[STANDINGS.TABLE][filter_str], filter_val)
+
+                        elif op == "gt":
+                            self.assertGreater(result[STANDINGS.TABLE][filter_str], filter_val)
+
+                        elif op == "gte":
+                            self.assertGreaterEqual(result[STANDINGS.TABLE][filter_str], filter_val)
+
+
+            else:
+                for entry in filter_result[STANDINGS.TABLE]:
+                    if op == "lt":
+                        self.assertLess(entry[filter_str], filter_val)
+
+                    elif op == "lte":
+                        self.assertLessEqual(entry[filter_str], filter_val)
+
+                    elif op == "gt":
+                        self.assertGreater(entry[filter_str], filter_val)
+
+                    elif op == "gte":
+                        self.assertGreaterEqual(entry[filter_str], filter_val)
+
+        all_result = self.api.get('/v1/standings/all').get_json()
+        self.assertTrue(len(all_result), 10)
+        for result in all_result:
+            self.assertTrue(all(k in result for k in (STANDINGS.ID,
+                                                      STANDINGS.COMPETITION_ID,
+                                                      STANDINGS.TYPE,
+                                                      STANDINGS.SEASON,
+                                                      STANDINGS.MATCH_DAY)))
+
+            if isinstance(result[STANDINGS.TABLE], list):
+                for entry in result[STANDINGS.TABLE]:
+                    self.assertTrue(STANDINGS.ID in entry)
+                    self.assertTrue(STANDINGS.STANDINGS_ID in entry)
+                    self.assertTrue(STANDINGS.POSITION in entry)
+                    self.assertTrue(STANDINGS.TEAM_NAME in entry)
+                    self.assertTrue(STANDINGS.FOOTBALL_DATA_TEAM_ID in entry)
+                    self.assertTrue(STANDINGS.GAMES_PLAYED in entry)
+                    self.assertTrue(STANDINGS.GAMES_WON in entry)
+                    self.assertTrue(STANDINGS.GAMES_DRAWN in entry)
+                    self.assertTrue(STANDINGS.GAMES_LOST in entry)
+                    self.assertTrue(STANDINGS.POINTS in entry)
+                    self.assertTrue(STANDINGS.GOALS_FOR in entry)
+                    self.assertTrue(STANDINGS.GOALS_AGAINST in entry)
+                    self.assertTrue(STANDINGS.GOAL_DIFFERENCE in entry)
+
+            else:
+                self.assertTrue(STANDINGS.ID in result[STANDINGS.TABLE])
+                self.assertTrue(STANDINGS.STANDINGS_ID in result[STANDINGS.TABLE])
+                self.assertTrue(STANDINGS.POSITION in result[STANDINGS.TABLE])
+                self.assertTrue(STANDINGS.TEAM_NAME in result[STANDINGS.TABLE])
+                self.assertTrue(STANDINGS.FOOTBALL_DATA_TEAM_ID in result[STANDINGS.TABLE])
+                self.assertTrue(STANDINGS.GAMES_PLAYED in result[STANDINGS.TABLE])
+                self.assertTrue(STANDINGS.GAMES_WON in result[STANDINGS.TABLE])
+                self.assertTrue(STANDINGS.GAMES_DRAWN in result[STANDINGS.TABLE])
+                self.assertTrue(STANDINGS.GAMES_LOST in result[STANDINGS.TABLE])
+                self.assertTrue(STANDINGS.POINTS in result[STANDINGS.TABLE])
+                self.assertTrue(STANDINGS.GOALS_FOR in result[STANDINGS.TABLE])
+                self.assertTrue(STANDINGS.GOALS_AGAINST in result[STANDINGS.TABLE])
+                self.assertTrue(STANDINGS.GOAL_DIFFERENCE in result[STANDINGS.TABLE])
+
+        all_result = self.api.get('/v1/standings').get_json()
+        self.assertTrue(len(all_result), 10)
+
+        filter_result = self.api.get('/v1/standings?id=1').get_json()
+        self.assertFalse(isinstance(filter_result, list))
+        self.assertEqual(filter_result[STANDINGS.ID], 1)
+
+        filter_result = self.api.get('/v1/standings/all?id=1,2').get_json()
+        self.assertTrue(isinstance(filter_result, list))
+        for result in filter_result:
+            self.assertTrue(result[STANDINGS.ID] in [1, 2])
+
+        self.assertTrue(filter_result[0][STANDINGS.ID] != filter_result[1][STANDINGS.ID])
+
+        filter_test(filter_str=STANDINGS.POSITION, filter_val=5)
+        filter_test(filter_str=STANDINGS.TEAM_NAME, filter_val="chapecoense")
+        filter_test(filter_str=STANDINGS.GAMES_PLAYED, filter_val=3)
+        filter_test(filter_str=STANDINGS.GAMES_WON, filter_val=1)
+        filter_test(filter_str=STANDINGS.GAMES_DRAWN, filter_val=2)
+        filter_test(filter_str=STANDINGS.GAMES_LOST, filter_val=5)
+        filter_test(filter_str=STANDINGS.POINTS, filter_val=20)
+        filter_test(filter_str=STANDINGS.GOALS_FOR, filter_val=15)
+        filter_test(filter_str=STANDINGS.GOALS_AGAINST, filter_val=5)
+        filter_test(filter_str=STANDINGS.GOAL_DIFFERENCE, filter_val=5)
+
+        filter_test_adv(filter_str=STANDINGS.POSITION, filter_val=10, op="lt")
+        filter_test_adv(filter_str=STANDINGS.GAMES_PLAYED, filter_val=3, op="lte")
+        filter_test_adv(filter_str=STANDINGS.GAMES_WON, filter_val=10, op="gte")
+
+
 
 
 

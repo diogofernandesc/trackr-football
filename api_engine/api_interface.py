@@ -180,7 +180,13 @@ def standings():
         raise InvalidUsage('Limit must be an integer', status_code=400)
 
     standings_filters = StandingsFilters(**{k: get_vals_(v) for k, v in ra.items() if k != "limit"})
-    return jsonify(db_interface.get_standings(limit=limit, multi=multi, filters=standings_filters))
+    result = jsonify(db_interface.get_standings(limit=limit, multi=multi, filters=standings_filters))
+
+    if result.json:
+        return result
+
+    else:
+        raise InvalidUsage('There is no standings with those filters', status_code=404)
 
 
 if __name__ == '__main__':

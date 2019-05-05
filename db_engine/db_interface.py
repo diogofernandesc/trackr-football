@@ -49,9 +49,7 @@ def filter_parse(query_str, table, column):
             elif "$gte" in query_str:
                 return table.c[column] >= val
 
-
     return table.c[column] == query_str
-
 
 
 def to_json(result_map, limit=10):
@@ -59,9 +57,15 @@ def to_json(result_map, limit=10):
     for k, v in result_map.items():
         dict_result = k.__dict__
         dict_result.pop(IGNORE.INSTANCE_STATE, None)
-        dict_result['standings_entries'] = clean_output(v)
+        dict_result['table'] = clean_output(v)
         list_dict_result.append(dict_result)
-    return list_dict_result[:limit]
+
+    if len(list_dict_result) == 1:
+        return list_dict_result[0]
+
+    else:
+
+        return list_dict_result[:limit]
 
 
 def clean_output(query_res):
@@ -129,9 +133,9 @@ class DBInterface(object):
                 applied_filters.append(Competition.fls_api_id == fls_val)
 
         if multi:
-            query_result = comp_query.filter(or_(*applied_filters))
+            query_result = comp_query.filter(or_(*applied_filters)).all()
         else:
-            query_result = comp_query.filter(*applied_filters)
+            query_result = comp_query.filter(*applied_filters).all()
 
         return clean_output(query_result)
 
@@ -194,31 +198,21 @@ class DBInterface(object):
 
                     db_filters.append(filter_parse(query_str=filter_val, table=active_table, column=filter_[0]))
 
-                    # db_filters.append(active_table.c[filter_[0]] == filter_val)
-
-        import time
-
-        t = time.process_time()
-        # do some stuff
-
         if multi:
             stan_query = stan_query.filter(or_(*db_filters)).limit(100).all()
         else:
-            stan_query = stan_query.filter(*db_filters).limit(100).all() # no standings will have more than 100 entries
-            # stan_query = stan_query.filter(*db_filters).all()
+            stan_query = stan_query.filter(*db_filters).limit(100).all()  # no standings will have more than 100 entries
         standings_map = {}
 
         # Reformatting dict to get standings in list per comp as "standing_entries" field
         for tpl in stan_query:
             if tpl[0] not in standings_map:
                 standings_map[tpl[0]] = [tpl[1]]
-        #
+
             else:
                 standings_map[tpl[0]].append(tpl[1])
 
         result = to_json(standings_map, limit=limit)
-        elapsed_time = time.process_time() - t
-        print(f"time: {elapsed_time}")
         return result
 
 
