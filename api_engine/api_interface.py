@@ -4,7 +4,7 @@ from flask_sqlalchemy import SQLAlchemy
 from ingest_engine.cons import Competition as COMPETITION, Team as TEAM
 from api_engine.api_cons import API_ENDPOINTS, API, ENDPOINT_DESCRIPTION, API_ERROR
 from db_engine.db_interface import DBInterface
-from db_engine.db_filters import TeamFilters
+from db_engine.db_filters import TeamFilters, StandingsFilters, CompFilters
 import os
 
 app = flask.Flask(__name__)
@@ -126,27 +126,15 @@ def competition():
     :return: API request json format
     """
     multi = 'competitions' in request.url_rule.rule
-
-    id_ = get_vals(request.args.get(COMPETITION.ID, None), int)
-    name = get_vals(request.args.get(COMPETITION.NAME, None), str)
-    code = get_vals(request.args.get(COMPETITION.CODE, None), str)
-    location = get_vals(request.args.get(COMPETITION.LOCATION, None), str)
-    fd_api_id = get_vals(request.args.get(COMPETITION.FOOTBALL_DATA_API_ID, None), int)
-    fls_api_id = get_vals(request.args.get(COMPETITION.FASTEST_LIVE_SCORES_API_ID, None), int)
-
-    result = jsonify(db_interface.get_competition(multi=multi,
-                                                  id_=id_,
-                                                  name=name,
-                                                  code=code,
-                                                  location=location,
-                                                  fd_api_id=fd_api_id,
-                                                  fls_api_id=fls_api_id))
+    ra = request.args
+    comp_filters = CompFilters(**{k: get_vals_(v) for k, v in ra.items()})
+    result = jsonify(db_interface.get_competition(multi=multi, filters=comp_filters))
 
     if result.json:
         return result
-
+    #
     else:
-        raise InvalidUsage('There is no competition with those filters', status_code=404)
+        raise InvalidUsage(API_ERROR.COMPETITION_404, status_code=404)
 
 
 @app.route('/v1/team', methods=['GET'])
@@ -160,15 +148,39 @@ def team():
     multi = 'teams' in request.url_rule.rule
     ra = request.args
     team_filters = TeamFilters(**{k: get_vals_(v) for k, v in ra.items()})
-    return jsonify(db_interface.get_team(multi=multi, filters=team_filters))
-    # team_filters1 = {**team_filters._asdict()}
-    # db_interface.get_team(multi=multi, filters=**team_filters)
-    # result = jsonify()
-    # print(ra)
+    result = jsonify(db_interface.get_team(multi=multi, filters=team_filters))
+
+    if result.json:
+        return result
+
+    else:
+        raise InvalidUsage(API_ERROR.TEAM_404, status_code=404)
 
 
+@app.route('/v1/standings/all', methods=['GET'])
+@app.route('/v1/standings', methods=['GET'])
+def standings():
+    """
+    /v1/standings/all OR type querying across ALL available standings
+    /v1/standings AND querying on standings, multiple values allowed per field
+    :return: API request JSON format
+    """
+    multi = 'standings/all' in request.url_rule.rule
+    ra = request.args
+    limit = ra.get("limit", 10)
+    try:
+        limit = int(limit)
+    except ValueError:
+        raise InvalidUsage(API_ERROR.INTEGER_LIMIT_400, status_code=400)
 
+    standings_filters = StandingsFilters(**{k: get_vals_(v) for k, v in ra.items() if k != "limit"})
+    result = jsonify(db_interface.get_standings(limit=limit, multi=multi, filters=standings_filters))
 
+    if result.json:
+        return result
+
+    else:
+        raise InvalidUsage(API_ERROR.STANDINGS_404, status_code=404)
 
 
 if __name__ == '__main__':

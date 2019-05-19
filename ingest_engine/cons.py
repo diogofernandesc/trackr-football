@@ -170,6 +170,9 @@ class Team:
 
 
 class Standings:
+    ID = 'id'
+    COMPETITION_ID = 'competition_id'
+    STANDINGS_ID = 'standings_id'
     COMPETITION_NAME = 'competition_name'
     STAGE = 'stage'
     TYPE = 'type'
@@ -179,7 +182,7 @@ class Standings:
     GROUP = 'group'
     POSITION = 'position'
     TEAM_NAME = 'team_name'
-    FOOTBALL_DATA_TEAM_ID = 'football_data_team_id'
+    FOOTBALL_DATA_TEAM_ID = 'fd_team_id'
     GAMES_PLAYED = 'games_played'
     GAMES_WON = 'games_won'
     GAMES_DRAWN = 'games_drawn'
@@ -187,8 +190,8 @@ class Standings:
     POINTS = 'points'
     GOALS_FOR = 'goals_for'
     GOALS_AGAINST = 'goals_against'
-    GOAL_DIFFERENCE = 'goal_difference'
-
+    GOAL_DIFFERENCE = 'goals_difference'
+    LIMIT = 'limit'
 
 class Player:
     NAME = 'name'

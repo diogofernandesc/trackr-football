@@ -3,10 +3,16 @@ class API:
     ENDPOINT_URL = 'url'
     ENDPOINT_FILTERS = 'filters'
     URL_DESCRIPTION = 'description'
+    MESSAGE = 'message'
+    STATUS_CODE = 'status_code'
 
 
 class API_ERROR:
     COMPETITION_404 = 'There is no competition with those filters'
+    TEAM_404 = 'There is no team with those filters'
+    STANDINGS_404 = 'There is no standings with those filters'
+    INTEGER_LIMIT_400 = 'Limit must be an integer'
+
 
 class API_ENDPOINTS:
     TEAMS = 'teams'
