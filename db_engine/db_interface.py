@@ -34,8 +34,7 @@ def filter_parse(query_str, table, column):
     """
 
     if isinstance(query_str, str):
-        if any(x in query_str for x in ["$lt","$gt","$lte", "$gte"]):
-        # if ["$lt","$gt","$lte", "$gte"] in query_str:
+        if any(x in query_str for x in ["$lt", "$gt", "$lte", "$gte"]):
             val = query_str.split(":")[1]
             if "$lt" in query_str:
                 return table.c[column] < val
@@ -57,7 +56,7 @@ def to_json(result_map, limit=10):
     for k, v in result_map.items():
         dict_result = k.__dict__
         dict_result.pop(IGNORE.INSTANCE_STATE, None)
-        dict_result['table'] = clean_output(v)
+        dict_result['table'] = clean_output(v, as_list=True)
         list_dict_result.append(dict_result)
 
     if len(list_dict_result) == 1:
@@ -68,10 +67,11 @@ def to_json(result_map, limit=10):
         return list_dict_result[:limit]
 
 
-def clean_output(query_res):
+def clean_output(query_res, as_list=False):
     """
     Ensure only the right fields come out following a DB query
     :param query_res: the query result to be clean
+    :param as_list: format output to output as list even when result is solely one entity e.g. for a standings table
     :return:
     """
     result = []
@@ -82,7 +82,7 @@ def clean_output(query_res):
 
         result.append(final_res)
 
-    if len(result) == 1:
+    if not as_list and len(result) == 1:
         return result[0]
 
     return result
@@ -214,38 +214,6 @@ class DBInterface(object):
 
         result = to_json(standings_map, limit=limit)
         return result
-
-
-        # if id_:
-        #     stan_query = stan_query.filter(Standings.id == id_)
-        #
-        # if competition_id:
-        #     stan_query = stan_query.filter(Standings.competition_id == competition_id)
-        #
-        # if type_:
-        #     stan_query = stan_query.filter(Standings.type == type_)
-        #
-        # if season:
-        #     stan_query = stan_query.filter(Standings.season == season)
-        #
-        # if match_day:
-        #     stan_query = stan_query.filter(Standings.match_day == match_day)
-        #
-        # if position:
-        #     stan_query = stan_query.filter(StandingsEntry.position == position)
-        #
-        # stan_query = stan_query.all()
-        # standings_map = {}
-        #
-        # # Reformatting dict to get standings in list per comp as "standing_entries" field
-        # for tpl in stan_query:
-        #     if tpl[0] not in standings_map:
-        #         standings_map[tpl[0]] = [tpl[1]]
-        #
-        #     else:
-        #         standings_map[tpl[0]].append(tpl[1])
-        #
-        # return to_json(standings_map)
 
 
 

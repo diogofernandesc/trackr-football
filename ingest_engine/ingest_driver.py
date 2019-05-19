@@ -156,7 +156,7 @@ class Driver(object):
         :rtype: list
         """
         # In FLS, 2 is id for premier league, 2021 in football-data
-        # TODO: Database query based on competition name and retrieve fd_id and fls_id for teams
+        #   TODO: Database query based on competition name and retrieve fd_id and fls_id for teams
         # Testing
         # fls_comp_id = 2
         # fd_comp_id = 2021

@@ -44,7 +44,7 @@ class ApiInterfaceTest(unittest.TestCase):
         })
 
         filter_result = self.api.get('/v1/competition?name=La Liga').get_json()
-        self.assertEqual(filter_result[COMPETITION.LOCATION], "Spain")
+        self.assertEqual(filter_result[COMPETITION.NAME], "La Liga")
 
         filter_result = self.api.get('/v1/competition?code=PL').get_json()
         self.assertEqual(filter_result[COMPETITION.CODE], 'PL')
@@ -62,56 +62,20 @@ class ApiInterfaceTest(unittest.TestCase):
 
         def filter_test(filter_str, filter_val):
             filter_result = self.api.get(f'/v1/standings?{filter_str}={filter_val}').get_json()
-            if isinstance(filter_result, list):
-                for result in filter_result:
-                    if isinstance(result[STANDINGS.TABLE], list):
-                        for entry in result[STANDINGS.TABLE]:
-                            self.assertTrue(entry[filter_str], filter_val)
-                    else:
-                        self.assertTrue(result[STANDINGS.TABLE][filter_str], filter_val)
+            if not isinstance(filter_result, list):
+                filter_result = [filter_result]
 
-            else:
-                if isinstance(filter_result[STANDINGS.TABLE], list):
-                    for entry in filter_result[STANDINGS.TABLE]:
-                        self.assertTrue(entry[filter_str], filter_val)
-                else:
-                    self.assertTrue(filter_result[STANDINGS.TABLE][filter_str], filter_val)
+            for result in filter_result:
+                for entry in result[STANDINGS.TABLE]:
+                    self.assertTrue(entry[filter_str], filter_val)
 
         def filter_test_adv(filter_str, filter_val, op):
-            url = f'/v1/standings/all?{filter_str}=${op}:{filter_val}'
             filter_result = self.api.get(f'/v1/standings/all?{filter_str}=${op}:{filter_val}').get_json()
-            if isinstance(filter_result, list):
-                for result in filter_result:
-                    if isinstance(result[STANDINGS.TABLE], list):
-                        for entry in result[STANDINGS.TABLE]:
-                            if op == "lt":
-                                self.assertLess(entry[filter_str], filter_val)
+            if not isinstance(filter_result, list):
+                filter_result = [filter_result]  # Handle returns as dict or list
 
-                            elif op == "lte":
-                                self.assertLessEqual(entry[filter_str], filter_val)
-
-                            elif op == "gt":
-                                self.assertGreater(entry[filter_str], filter_val)
-
-                            elif op == "gte":
-                                self.assertGreaterEqual(entry[filter_str], filter_val)
-
-                    else:
-                        if op == "lt":
-                            self.assertLess(result[STANDINGS.TABLE][filter_str], filter_val)
-
-                        elif op == "lte":
-                            self.assertLessEqual(result[STANDINGS.TABLE][filter_str], filter_val)
-
-                        elif op == "gt":
-                            self.assertGreater(result[STANDINGS.TABLE][filter_str], filter_val)
-
-                        elif op == "gte":
-                            self.assertGreaterEqual(result[STANDINGS.TABLE][filter_str], filter_val)
-
-
-            else:
-                for entry in filter_result[STANDINGS.TABLE]:
+            for result in filter_result:
+                for entry in result[STANDINGS.TABLE]:
                     if op == "lt":
                         self.assertLess(entry[filter_str], filter_val)
 
@@ -133,36 +97,20 @@ class ApiInterfaceTest(unittest.TestCase):
                                                       STANDINGS.SEASON,
                                                       STANDINGS.MATCH_DAY)))
 
-            if isinstance(result[STANDINGS.TABLE], list):
-                for entry in result[STANDINGS.TABLE]:
-                    self.assertTrue(STANDINGS.ID in entry)
-                    self.assertTrue(STANDINGS.STANDINGS_ID in entry)
-                    self.assertTrue(STANDINGS.POSITION in entry)
-                    self.assertTrue(STANDINGS.TEAM_NAME in entry)
-                    self.assertTrue(STANDINGS.FOOTBALL_DATA_TEAM_ID in entry)
-                    self.assertTrue(STANDINGS.GAMES_PLAYED in entry)
-                    self.assertTrue(STANDINGS.GAMES_WON in entry)
-                    self.assertTrue(STANDINGS.GAMES_DRAWN in entry)
-                    self.assertTrue(STANDINGS.GAMES_LOST in entry)
-                    self.assertTrue(STANDINGS.POINTS in entry)
-                    self.assertTrue(STANDINGS.GOALS_FOR in entry)
-                    self.assertTrue(STANDINGS.GOALS_AGAINST in entry)
-                    self.assertTrue(STANDINGS.GOAL_DIFFERENCE in entry)
-
-            else:
-                self.assertTrue(STANDINGS.ID in result[STANDINGS.TABLE])
-                self.assertTrue(STANDINGS.STANDINGS_ID in result[STANDINGS.TABLE])
-                self.assertTrue(STANDINGS.POSITION in result[STANDINGS.TABLE])
-                self.assertTrue(STANDINGS.TEAM_NAME in result[STANDINGS.TABLE])
-                self.assertTrue(STANDINGS.FOOTBALL_DATA_TEAM_ID in result[STANDINGS.TABLE])
-                self.assertTrue(STANDINGS.GAMES_PLAYED in result[STANDINGS.TABLE])
-                self.assertTrue(STANDINGS.GAMES_WON in result[STANDINGS.TABLE])
-                self.assertTrue(STANDINGS.GAMES_DRAWN in result[STANDINGS.TABLE])
-                self.assertTrue(STANDINGS.GAMES_LOST in result[STANDINGS.TABLE])
-                self.assertTrue(STANDINGS.POINTS in result[STANDINGS.TABLE])
-                self.assertTrue(STANDINGS.GOALS_FOR in result[STANDINGS.TABLE])
-                self.assertTrue(STANDINGS.GOALS_AGAINST in result[STANDINGS.TABLE])
-                self.assertTrue(STANDINGS.GOAL_DIFFERENCE in result[STANDINGS.TABLE])
+            for entry in result[STANDINGS.TABLE]:
+                self.assertTrue(STANDINGS.ID in entry)
+                self.assertTrue(STANDINGS.STANDINGS_ID in entry)
+                self.assertTrue(STANDINGS.POSITION in entry)
+                self.assertTrue(STANDINGS.TEAM_NAME in entry)
+                self.assertTrue(STANDINGS.FOOTBALL_DATA_TEAM_ID in entry)
+                self.assertTrue(STANDINGS.GAMES_PLAYED in entry)
+                self.assertTrue(STANDINGS.GAMES_WON in entry)
+                self.assertTrue(STANDINGS.GAMES_DRAWN in entry)
+                self.assertTrue(STANDINGS.GAMES_LOST in entry)
+                self.assertTrue(STANDINGS.POINTS in entry)
+                self.assertTrue(STANDINGS.GOALS_FOR in entry)
+                self.assertTrue(STANDINGS.GOALS_AGAINST in entry)
+                self.assertTrue(STANDINGS.GOAL_DIFFERENCE in entry)
 
         all_result = self.api.get('/v1/standings').get_json()
         self.assertTrue(len(all_result), 10)
@@ -192,6 +140,7 @@ class ApiInterfaceTest(unittest.TestCase):
         filter_test_adv(filter_str=STANDINGS.POSITION, filter_val=10, op="lt")
         filter_test_adv(filter_str=STANDINGS.GAMES_PLAYED, filter_val=3, op="lte")
         filter_test_adv(filter_str=STANDINGS.GAMES_WON, filter_val=10, op="gte")
+        filter_test_adv(filter_str=STANDINGS.GAMES_DRAWN, filter_val=5, op="gt")
 
 
 
