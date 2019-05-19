@@ -146,7 +146,7 @@ def competition():
         return result
 
     else:
-        raise InvalidUsage('There is no competition with those filters', status_code=404)
+        raise InvalidUsage(API_ERROR.COMPETITION_404, status_code=404)
 
 
 @app.route('/v1/team', methods=['GET'])
@@ -177,7 +177,7 @@ def standings():
     try:
         limit = int(limit)
     except ValueError:
-        raise InvalidUsage('Limit must be an integer', status_code=400)
+        raise InvalidUsage(API_ERROR.INTEGER_LIMIT_400, status_code=400)
 
     standings_filters = StandingsFilters(**{k: get_vals_(v) for k, v in ra.items() if k != "limit"})
     result = jsonify(db_interface.get_standings(limit=limit, multi=multi, filters=standings_filters))
@@ -186,7 +186,7 @@ def standings():
         return result
 
     else:
-        raise InvalidUsage('There is no standings with those filters', status_code=404)
+        raise InvalidUsage(API_ERROR.STANDINGS_404, status_code=404)
 
 
 if __name__ == '__main__':

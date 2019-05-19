@@ -142,6 +142,16 @@ class ApiInterfaceTest(unittest.TestCase):
         filter_test_adv(filter_str=STANDINGS.GAMES_WON, filter_val=10, op="gte")
         filter_test_adv(filter_str=STANDINGS.GAMES_DRAWN, filter_val=5, op="gt")
 
+        filter_result = self.api.get('/v1/standings?points=$lt:0').get_json()
+        self.assertEqual(filter_result[API.MESSAGE], API_ERROR.STANDINGS_404)
+        self.assertEqual(filter_result[API.STATUS_CODE], 404)
+
+        filter_result = self.api.get('/v1/standings?id=1&limit=astring').get_json()
+        self.assertEqual(filter_result[API.MESSAGE], API_ERROR.INTEGER_LIMIT_400)
+        self.assertEqual(filter_result[API.STATUS_CODE], 400)
+
+
+
 
 
 

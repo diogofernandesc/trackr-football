@@ -6,7 +6,7 @@ from ingest_engine.cons import Team as TEAM, Standings as STANDINGS
 To add a new table filter:
  - Add a list of filters, preferably a list of string constants representing the column names that can be filtered on
  - Create a named tuple with default none fields, passing your newly defined list of filterable columns
- """
+"""
 
 team_filter_fields = [TEAM.ID,
                       TEAM.FANTASY_ID,
