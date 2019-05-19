@@ -9,8 +9,10 @@ class API:
 
 class API_ERROR:
     COMPETITION_404 = 'There is no competition with those filters'
+    TEAM_404 = 'There is no team with those filters'
     STANDINGS_404 = 'There is no standings with those filters'
     INTEGER_LIMIT_400 = 'Limit must be an integer'
+
 
 class API_ENDPOINTS:
     TEAMS = 'teams'

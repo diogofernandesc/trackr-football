@@ -4,7 +4,7 @@ from flask_sqlalchemy import SQLAlchemy
 from ingest_engine.cons import Competition as COMPETITION, Team as TEAM
 from api_engine.api_cons import API_ENDPOINTS, API, ENDPOINT_DESCRIPTION, API_ERROR
 from db_engine.db_interface import DBInterface
-from db_engine.db_filters import TeamFilters, StandingsFilters
+from db_engine.db_filters import TeamFilters, StandingsFilters, CompFilters
 import os
 
 app = flask.Flask(__name__)
@@ -126,25 +126,13 @@ def competition():
     :return: API request json format
     """
     multi = 'competitions' in request.url_rule.rule
-
-    id_ = get_vals(request.args.get(COMPETITION.ID, None), int)
-    name = get_vals(request.args.get(COMPETITION.NAME, None), str)
-    code = get_vals(request.args.get(COMPETITION.CODE, None), str)
-    location = get_vals(request.args.get(COMPETITION.LOCATION, None), str)
-    fd_api_id = get_vals(request.args.get(COMPETITION.FOOTBALL_DATA_API_ID, None), int)
-    fls_api_id = get_vals(request.args.get(COMPETITION.FASTEST_LIVE_SCORES_API_ID, None), int)
-
-    result = jsonify(db_interface.get_competition(multi=multi,
-                                                  id_=id_,
-                                                  name=name,
-                                                  code=code,
-                                                  location=location,
-                                                  fd_api_id=fd_api_id,
-                                                  fls_api_id=fls_api_id))
+    ra = request.args
+    comp_filters = CompFilters(**{k: get_vals_(v) for k, v in ra.items()})
+    result = jsonify(db_interface.get_competition(multi=multi, filters=comp_filters))
 
     if result.json:
         return result
-
+    #
     else:
         raise InvalidUsage(API_ERROR.COMPETITION_404, status_code=404)
 
@@ -160,7 +148,13 @@ def team():
     multi = 'teams' in request.url_rule.rule
     ra = request.args
     team_filters = TeamFilters(**{k: get_vals_(v) for k, v in ra.items()})
-    return jsonify(db_interface.get_team(multi=multi, filters=team_filters))
+    result = jsonify(db_interface.get_team(multi=multi, filters=team_filters))
+
+    if result.json:
+        return result
+
+    else:
+        raise InvalidUsage(API_ERROR.TEAM_404, status_code=404)
 
 
 @app.route('/v1/standings/all', methods=['GET'])

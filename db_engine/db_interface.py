@@ -1,7 +1,7 @@
 from sqlalchemy import or_
 
 from db_engine.db_driver import Competition, Team, Standings, StandingsEntry
-from ingest_engine.cons import IGNORE, Team as TEAM, Standings as STANDINGS
+from ingest_engine.cons import IGNORE, Team as TEAM, Standings as STANDINGS, Competition as COMPETITION
 
 
 def col_exists(table, col):
@@ -93,49 +93,31 @@ class DBInterface(object):
     def __init__(self, db):
         self.db = db
 
-    def get_competition(self, multi=False, id_=None, name=None, code=None, location=None, fd_api_id=None, fls_api_id=None):
+    def get_competition(self, multi=False, filters=None):
         """
         Query DB for competition record
         :param multi: Perform OR query on filters, SQL OR otherwise SQL AND
-        :param id_: DB ID of competition
-        :param name: The name of the competition, LIKE match performed
-        :param code: The code of the competition
-        :param location: Country/Location of the competition
-        :param fd_api_id: Football data API id for competition
-        :param fls_api_id: FastestLiveScores API id for competition
+        :param filters: namedtuple with all available filter fields
         :return:  matched (if any) competition records
         """
-        applied_filters = []
+        db_filters = []
         comp_query = self.db.session.query(Competition)
+        active_filters = [(f, v) for f, v in filters._asdict().items() if v]
 
-        if id_:
-            for id_val in id_:
-                applied_filters.append(Competition.id == id_val)
+        for filter_ in active_filters:
+            for filter_val in filter_[1]:
 
-        if name:
-            for name_val in name:
-                applied_filters.append(Competition.name.ilike(f"%{name_val}%"))
+                # Applied different filtering method when it's a team name e.g. SQL LIKE search
+                if filter_[0] in [COMPETITION.NAME, COMPETITION.LOCATION]:
+                    db_filters.append(Competition.__table__.c[filter_[0]].ilike(f"%{filter_val}%"))
 
-        if code:
-            for code_val in code:
-                applied_filters.append(Competition.code == code_val)
-
-        if location:
-            for loc_val in location:
-                applied_filters.append(Competition.location.ilike(f"%{loc_val}%"))
-
-        if fd_api_id:
-            for fd_val in fd_api_id:
-                applied_filters.append(Competition.fd_api_id == fd_val)
-
-        if fls_api_id:
-            for fls_val in fls_api_id:
-                applied_filters.append(Competition.fls_api_id == fls_val)
+                else:
+                    db_filters.append(Competition.__table__.c[filter_[0]] == filter_val)
 
         if multi:
-            query_result = comp_query.filter(or_(*applied_filters)).all()
+            query_result = comp_query.filter(or_(*db_filters))
         else:
-            query_result = comp_query.filter(*applied_filters).all()
+            query_result = comp_query.filter(*db_filters)
 
         return clean_output(query_result)
 

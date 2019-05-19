@@ -187,7 +187,7 @@ class Fantasy(ApiIntegration):
             teams = []
             game_weeks = []
             for player in result['elements']:
-                players.append({
+                player_dict = {
                     Player.FANTASY_ID: player['id'],
                     Player.FANTASY_PHOTO_URL: player['photo'],
                     Player.FANTASY_TEAM_CODE: player['team_code'],
@@ -220,8 +220,6 @@ class Fantasy(ApiIntegration):
                     Player.FANTASY_OVERALL_POINTS: player['total_points'],
                     Player.FANTASY_WEEK_POINTS: player['event_points'],
                     Player.FANTASY_POINT_AVERAGE: float(player['points_per_game']),
-                    Player.FANTASY_ESTIMATED_WEEK_POINTS: float(player['ep_this']),
-                    Player.FANTASY_ESTIMATED_NEXT_WEEK_POINTS: float(player['ep_next']),
                     Player.FANTASY_SPECIAL: player['special'],
                     Player.MINUTES_PLAYED: round(float(player['minutes'])),
                     Player.NUMBER_OF_GOALS: player['goals_scored'],
@@ -241,7 +239,12 @@ class Fantasy(ApiIntegration):
                     Player.FANTASY_THREAT: float(player['threat']),
                     Player.FANTASY_ICT_INDEX: float(player['ict_index']),
                     Player.FANTASY_WEEK: result['current-event']
-                })
+                }
+
+                if 'ep_this' in player:  # Is there a value for estimated points for next week
+                    player_dict[Player.FANTASY_ESTIMATED_WEEK_POINTS] = float(player['ep_this'])
+
+                players.append(player_dict)
 
             if 'teams' in result:
                 for team in result['teams']:
