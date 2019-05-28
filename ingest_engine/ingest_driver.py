@@ -97,10 +97,11 @@ class Driver(object):
         """
         return self.fd.request_competition_standings(competition_id=competition_id, standing_type=standing_type)
 
-    def request_match(self, competition_name, game_week, season):
+    def request_match(self, fls_comp_id, fd_comp_id, game_week, season):
         """
         Retrieve the match details
-        :param competition_name: Name of the competition for which to retrieve matches
+        :param fls_comp_id: FLS comp id
+        :param fd_comp_id: footballdata comp id
         :param game_week: 1, 2, 3....n
         :param season: Identifier for the season e.g. 2018-2019 (for football-data API)
         :return: Matches over a given gameweek for a given competition and season
@@ -109,8 +110,8 @@ class Driver(object):
         # Placeholder
         # competition_id = 2002
         # In FLS, 2 is id for premier league, 2021 in football-data
-        fls_comp_id = 2
-        fd_comp_id = 2021
+        # fls_comp_id = 2
+        # fd_comp_id = 2021
 
         joint_matches = []
         fantasy_matches = self.fantasy.request_matches()
@@ -132,8 +133,8 @@ class Driver(object):
                         home_score == fls_match[Match.FULL_TIME_HOME_SCORE] and \
                         away_score == fls_match[Match.FULL_TIME_AWAY_SCORE]:
                     temp_dict = {**match, **fls_match}
-                    adv_match_details = self.fls.request_match_details(match_id=fls_match[Match.FLS_MATCH_ID])
-                    temp_dict2 = {**temp_dict, **adv_match_details}
+                    # adv_match_details = self.fls.request_match_details(match_id=fls_match[Match.FLS_MATCH_ID])
+                    # temp_dict2 = {**temp_dict, **adv_match_details}
                     for f_match in fantasy_matches:
                         f_home_team = team_mapper(f_match[Match.FANTASY_HOME_TEAM_ID])
                         f_away_team = team_mapper(f_match[Match.FANTASY_AWAY_TEAM_ID])
@@ -141,7 +142,8 @@ class Driver(object):
                             if f_home_team in home_team and f_away_team in away_team and \
                                     home_score == f_match[Match.FULL_TIME_HOME_SCORE] and \
                                     away_score == f_match[Match.FULL_TIME_AWAY_SCORE]:
-                                final_dict = {**f_match, **temp_dict2}
+                                # final_dict = {**f_match, **temp_dict2}
+                                final_dict = {**f_match, **temp_dict}
                                 joint_matches.append(final_dict)
 
         return joint_matches

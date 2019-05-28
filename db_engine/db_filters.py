@@ -34,6 +34,15 @@ team_filter_fields = [TEAM.ID,
 TeamFilters = namedtuple('team_filters', team_filter_fields, defaults=(None,) * len(team_filter_fields))
 
 
+standings_base_filter_field = [STANDINGS.ID,
+                               STANDINGS.COMPETITION_ID,
+                               STANDINGS.TYPE,
+                               STANDINGS.SEASON,
+                               STANDINGS.MATCH_DAY]
+
+StandingsBaseFilters = namedtuple('standings_base_filters',
+                                  standings_base_filter_field, defaults=(None,) * len(standings_base_filter_field))
+
 standings_filter_field = [STANDINGS.ID,
                           STANDINGS.STANDINGS_ID,
                           STANDINGS.POSITION,

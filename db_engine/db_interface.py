@@ -1,5 +1,5 @@
-from sqlalchemy import or_
-
+from sqlalchemy import or_, func
+from collections import namedtuple
 from db_engine.db_driver import Competition, Team, Standings, StandingsEntry
 from ingest_engine.cons import IGNORE, Team as TEAM, Standings as STANDINGS, Competition as COMPETITION
 
@@ -92,6 +92,25 @@ class DBInterface(object):
 
     def __init__(self, db):
         self.db = db
+
+    def get_last_game_week(self, filters) -> int:
+        """
+        Get the latest game week
+        :return: int indicator
+        """
+        base_standings_filters = []
+        bs_query = self.db.session.query(func.max(Standings.match_day))
+
+        if type(filters) == list:
+            active_filters = filters
+        else:
+            active_filters = [(f, v) for f, v in filters._asdict().items() if v]
+
+        for filter_ in active_filters:
+            for filter_val in filter_[1]:
+                base_standings_filters.append(Standings.__table__.c[filter_[0]] == filter_val)
+
+        return bs_query.filter(*base_standings_filters).scalar()
 
     def get_competition(self, multi=False, filters=None):
         """

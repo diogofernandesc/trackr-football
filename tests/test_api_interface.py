@@ -1,12 +1,12 @@
 import unittest
-from api_engine import api_interface
+from api_engine import api_service
 from ingest_engine.cons import Competition as COMPETITION, Standings as STANDINGS
 from api_engine.api_cons import API_ENDPOINTS, API, API_ERROR
 
 
 class ApiInterfaceTest(unittest.TestCase):
     def setUp(self):
-        self.api = api_interface.app.test_client()
+        self.api = api_service.app.test_client()
         self.api.testing = True
 
     def tearDown(self):
