@@ -113,6 +113,9 @@ class Driver(object):
         # fls_comp_id = 2
         # fd_comp_id = 2021
 
+        if type(season) == str:
+            season = int(season.split("-")[0])
+
         joint_matches = []
         fantasy_matches = self.fantasy.request_matches()
         fd_matches = self.fd.request_competition_match(competition_id=fd_comp_id,
@@ -133,8 +136,8 @@ class Driver(object):
                         home_score == fls_match[Match.FULL_TIME_HOME_SCORE] and \
                         away_score == fls_match[Match.FULL_TIME_AWAY_SCORE]:
                     temp_dict = {**match, **fls_match}
-                    # adv_match_details = self.fls.request_match_details(match_id=fls_match[Match.FLS_MATCH_ID])
-                    # temp_dict2 = {**temp_dict, **adv_match_details}
+                    adv_match_details = self.fls.request_match_details(match_id=fls_match[Match.FLS_MATCH_ID])
+                    temp_dict2 = {**temp_dict, **adv_match_details}
                     for f_match in fantasy_matches:
                         f_home_team = team_mapper(f_match[Match.FANTASY_HOME_TEAM_ID])
                         f_away_team = team_mapper(f_match[Match.FANTASY_AWAY_TEAM_ID])
@@ -142,8 +145,8 @@ class Driver(object):
                             if f_home_team in home_team and f_away_team in away_team and \
                                     home_score == f_match[Match.FULL_TIME_HOME_SCORE] and \
                                     away_score == f_match[Match.FULL_TIME_AWAY_SCORE]:
-                                # final_dict = {**f_match, **temp_dict2}
-                                final_dict = {**f_match, **temp_dict}
+                                final_dict = {**f_match, **temp_dict2}
+                                # final_dict = {**f_match, **temp_dict}
                                 joint_matches.append(final_dict)
 
         return joint_matches

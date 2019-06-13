@@ -1,6 +1,6 @@
 from sqlalchemy import or_, func
 from collections import namedtuple
-from db_engine.db_driver import Competition, Team, Standings, StandingsEntry
+from db_engine.db_driver import Competition, Team, Standings, StandingsEntry, Match
 from ingest_engine.cons import IGNORE, Team as TEAM, Standings as STANDINGS, Competition as COMPETITION
 
 
@@ -216,7 +216,19 @@ class DBInterface(object):
         result = to_json(standings_map, limit=limit)
         return result
 
+    def get_match(self, multi:bool = False, filters=None) -> dict:
+        """
+        Query DB for match record
+        :param multi: Perform OR query on filters, SQL OR otherwise SQL AND
+        :param filters: namedtuple with all available filter fields
+        :return: matched (if any) match records
+        """
+        db_filters = []
+        match_query = self.db.session.query(Match)
+        active_filters = [(f, v) for f, v in filters._asdict().items() if v]
 
+        for filter_ in active_filters:
+            for filter_val in filter_[1]:
 
 
 

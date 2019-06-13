@@ -111,8 +111,10 @@ class FootballData(ApiIntegration):
         # Check for any applied filters
         if kwargs:
             built_uri += '?'
-            for name_filter, value in kwargs.items():
-                built_uri += f'{name_filter}={value}&'
+            for i, (name_filter, value) in enumerate(kwargs.items()):
+                built_uri += f'{name_filter}={value}'
+                if i != len(kwargs.items()) - 1:
+                    built_uri += "&"
 
         result = self.perform_get(built_uri=built_uri)
         total_results = []

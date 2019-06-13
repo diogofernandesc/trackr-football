@@ -45,12 +45,14 @@ def get_match() -> dict:
 
     comp_filters = CompFilters(**{k: get_vals(v) for k, v in ra.items()})
     comp = db_interface.get_competition(multi=False, filters=comp_filters)
-
     matches = api_ingest.request_match(fls_comp_id=comp[COMPETITION.FASTEST_LIVE_SCORES_API_ID],
                                        fd_comp_id=comp[COMPETITION.FOOTBALL_DATA_API_ID],
                                        game_week=match_day,
                                        season=season
                                        )
+
+    # Does it exist in database:
+    # def db_insert(matches, db)
 
     if matches:
         return jsonify(matches)

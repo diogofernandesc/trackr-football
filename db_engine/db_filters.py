@@ -1,6 +1,5 @@
 from collections import namedtuple
-from ingest_engine.cons import Team as TEAM, Standings as STANDINGS, Competition as COMPETITION
-
+from ingest_engine.cons import Team as TEAM, Standings as STANDINGS, Competition as COMPETITION, Match as MATCH
 
 """
 To add a new table filter:
@@ -64,3 +63,5 @@ StandingsFilters = namedtuple('standings_filters',
                               standings_filter_field, defaults=(None,) * len(standings_filter_field))
 
 
+match_filter_field = [MATCH.ID,
+                      MATCH.]
