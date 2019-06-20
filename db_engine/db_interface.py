@@ -1,8 +1,9 @@
+from typing import Union
+
 from sqlalchemy import or_, func
 from collections import namedtuple
-from db_engine.db_driver import Competition, Team, Standings, StandingsEntry, Match
-from ingest_engine.cons import IGNORE, Team as TEAM, Standings as STANDINGS, Competition as COMPETITION
-
+from db_engine.db_driver import Competition, Team, Standings, StandingsEntry, Match, db
+from ingest_engine.cons import IGNORE, Team as TEAM, Standings as STANDINGS, Competition as COMPETITION, Match as MATCH
 
 def col_exists(table, col):
     """
@@ -216,7 +217,7 @@ class DBInterface(object):
         result = to_json(standings_map, limit=limit)
         return result
 
-    def get_match(self, multi:bool = False, filters=None) -> dict:
+    def get_match(self, multi: bool = False, filters=None) -> dict:
         """
         Query DB for match record
         :param multi: Perform OR query on filters, SQL OR otherwise SQL AND
@@ -229,6 +230,59 @@ class DBInterface(object):
 
         for filter_ in active_filters:
             for filter_val in filter_[1]:
+
+                if any(filter_name in filter_[0] for filter_name in [MATCH.HOME_TEAM,
+                                                                     MATCH.AWAY_TEAM,
+                                                                     MATCH.COMPETITION,
+                                                                     ]):
+                    db_filters.append(Match.__table__.c[filter_[0]].ilike(f"%{filter_val}%"))
+
+                else:
+                    db_filters.append(Match.__table__.c[filter_[0]] == filter_val)
+
+        if multi:
+            query_result = match_query.filter(or_(*db_filters))
+
+        else:
+            query_result = match_query.filter(*db_filters)
+
+        return clean_output(query_result)
+
+    def insert_match(self, record: Union[list,dict]):
+        """
+        Insert record into DB
+        :return:
+        """
+        if type(record) == dict:
+            record = [record]
+
+        for match in record:
+            db_player = Match(
+                fd_id=match[MATCH.FOOTBALL_DATA_ID],
+                season_start_date=match[MATCH.SEASON_START_DATE],
+                season_end_date=match[MATCH.SEASON_END_DATE],
+                season_year=match[MATCH.SEASON_YEAR],
+                utc_date=match[MATCH.MATCH_UTC_DATE],
+                start_time_epoch=match[MATCH.START_TIME_EPOCH],
+                start_time=match[MATCH.START_TIME],
+                status=match[MATCH.STATUS],
+                match_day=match[MATCH.MATCHDAY],
+                ...
+            )
+                (
+                name=player[PLAYER.NAME],
+                position=player[PLAYER.POSITION],
+                shirt_number=player[PLAYER.SHIRT_NUMBER],
+                team=player[PLAYER.TEAM],
+                number_of_goals=player[PLAYER.NUMBER_OF_GOALS],
+                weight=player[PLAYER.WEIGHT],
+                gender=player[PLAYER.GENDER],
+                height=player[PLAYER.HEIGHT],
+                team_fls_id=player[PLAYER.TEAM_FLS_ID],
+                fls_api_id=player[PLAYER.FASTEST_LIVE_SCORES_API_ID]
+            )
+
+
 
 
 
