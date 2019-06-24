@@ -248,7 +248,7 @@ class DBInterface(object):
 
         return clean_output(query_result)
 
-    def insert_match(self, record: Union[list,dict]):
+    def insert_match(self, record: Union[list, dict]):
         """
         Insert record into DB
         :return:
@@ -257,7 +257,7 @@ class DBInterface(object):
             record = [record]
 
         for match in record:
-            db_player = Match(
+            db_match = Match(
                 fd_id=match[MATCH.FOOTBALL_DATA_ID],
                 season_start_date=match[MATCH.SEASON_START_DATE],
                 season_end_date=match[MATCH.SEASON_END_DATE],
@@ -267,20 +267,56 @@ class DBInterface(object):
                 start_time=match[MATCH.START_TIME],
                 status=match[MATCH.STATUS],
                 match_day=match[MATCH.MATCHDAY],
-                ...
+                ft_home_score=match[MATCH.FULL_TIME_HOME_SCORE],
+                ft_away_score=match[MATCH.FULL_TIME_AWAY_SCORE],
+                ht_home_score=match[MATCH.HALF_TIME_HOME_SCORE],
+                ht_away_score=match[MATCH.HALF_TIME_AWAY_SCORE],
+                et_home_score=match[MATCH.EXTRA_TIME_HOME_SCORE],
+                et_away_score=match[MATCH.EXTRA_TIME_AWAY_SCORE],
+                p_home_score=match[MATCH.PENALTY_HOME_SCORE],
+                p_away_score=match[MATCH.PENALTY_AWAY_SCORE],
+                winner=match[MATCH.WINNER],
+                home_team=match[MATCH.HOME_TEAM],
+                away_team=match[MATCH.AWAY_TEAM],
+                referees=match[MATCH.REFEREES],
+                fls_match_id=match[MATCH.FLS_MATCH_ID],
+                fls_competition_id=match[MATCH.FLS_API_COMPETITION_ID],
+                competition=match[MATCH.COMPETITION],
+                home_score_probability=match[MATCH.HOME_SCORE_PROBABILITY],
+                away_score_probability=match[MATCH.AWAY_SCORE_PROBABILITY],
+                home_concede_probability=match[MATCH.HOME_CONCEDE_PROBABILITY],
+                away_concede_probability=match[MATCH.AWAY_CONCEDE_PROBABILITY],
+                home_o15_prob=match[MATCH.HOME_SCORE_PROBABILITY_OVER_1_5],
+                home_o25_prob=match[MATCH.HOME_SCORE_PROBABILITY_OVER_2_5],
+                home_o35_prob=match[MATCH.HOME_SCORE_PROBABILITY_OVER_3_5],
+                home_u15_prob=match[MATCH.HOME_SCORE_PROBABILITY_UNDER_1_5],
+                home_u25_prob=match[MATCH.HOME_SCORE_PROBABILITY_UNDER_2_5],
+                home_u35_prob=match[MATCH.HOME_SCORE_PROBABILITY_UNDER_3_5],
+                away_o15_prob=match[MATCH.AWAY_SCORE_PROBABILITY_OVER_1_5],
+                away_o25_prob=match[MATCH.AWAY_SCORE_PROBABILITY_OVER_2_5],
+                away_o35_prob=match[MATCH.AWAY_SCORE_PROBABILITY_OVER_3_5],
+                away_u15_prob=match[MATCH.AWAY_SCORE_PROBABILITY_UNDER_1_5],
+                away_u25_prob=match[MATCH.AWAY_SCORE_PROBABILITY_UNDER_2_5],
+                away_u35_prob=match[MATCH.AWAY_SCORE_PROBABILITY_UNDER_3_5],
+                home_form=match[MATCH.HOME_FORM],
+                away_form=match[MATCH.AWAY_FORM],
+                h_fls_id=match[MATCH.HOME_TEAM_FLS_ID],
+                a_fls_id=match[MATCH.AWAY_TEAM_FLS_ID],
+                psc=match[MATCH.PENALTY_SHOOTOUT_SCORE],
+                finished=match[MATCH.FINISHED],
+                fantasy_game_week=match[MATCH.FANTASY_GAME_WEEK],
+                home_team_difficulty=match[MATCH.FANTASY_HOME_TEAM_DIFFICULTY],
+                away_team_difficulty=match[MATCH.FANTASY_AWAY_TEAM_DIFFICULTY],
+                fantasy_match_code=match[MATCH.FANTASY_MATCH_CODE],
+                f_home_team_code=match[MATCH.FANTASY_HOME_TEAM_CODE],
+                f_away_team_code=match[MATCH.FANTASY_AWAY_TEAM_CODE],
+                minutes=match[MATCH.MINUTES],
+                f_home_team_id=match[MATCH.FANTASY_HOME_TEAM_ID],
+                f_away_team_id=match[MATCH.FANTASY_AWAY_TEAM_ID]
             )
-                (
-                name=player[PLAYER.NAME],
-                position=player[PLAYER.POSITION],
-                shirt_number=player[PLAYER.SHIRT_NUMBER],
-                team=player[PLAYER.TEAM],
-                number_of_goals=player[PLAYER.NUMBER_OF_GOALS],
-                weight=player[PLAYER.WEIGHT],
-                gender=player[PLAYER.GENDER],
-                height=player[PLAYER.HEIGHT],
-                team_fls_id=player[PLAYER.TEAM_FLS_ID],
-                fls_api_id=player[PLAYER.FASTEST_LIVE_SCORES_API_ID]
-            )
+            self.db.session.add(db_match)
+
+        self.db.session.commit()
 
 
 

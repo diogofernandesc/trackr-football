@@ -1,5 +1,7 @@
+from threading import Thread
+
 from flask import Blueprint, request, jsonify, current_app
-from db_engine.db_filters import TeamFilters, StandingsBaseFilters, CompFilters
+from db_engine.db_filters import TeamFilters, StandingsBaseFilters, CompFilters, MatchFilters
 from api_engine.api_service import get_vals, InvalidUsage
 from api_engine.api_cons import API_ENDPOINTS, API, ENDPOINT_DESCRIPTION, API_ERROR
 from ingest_engine.cons import IGNORE, Team as TEAM, Standings as STANDINGS, Competition as COMPETITION, Match as MATCH
@@ -23,19 +25,24 @@ def get_match() -> dict:
 
     ra = request.args
     season = '2018-2019'
+    comp_fd_id = 2021
+    comp_fls_id = 2
+    db_id = 2
     match_day = None
     temp_filters = {}
-    try:
-        assert COMPETITION.ID in ra
 
-    except AssertionError:
-        raise InvalidUsage(API_ERROR.NO_COMPETITION_400, status_code=400)
+    # To be used when API compatible with multiple leagues
+    # try:
+    #     assert COMPETITION.ID in ra
+    #
+    # except AssertionError:
+    #     raise InvalidUsage(API_ERROR.NO_COMPETITION_400, status_code=400)
 
     if STANDINGS.SEASON in ra:
         season = ra[STANDINGS.SEASON]
 
     # temp_filters[STANDINGS.SEASON] = season
-    temp_filters[STANDINGS.COMPETITION_ID] = ra[COMPETITION.ID]
+    temp_filters[STANDINGS.COMPETITION_ID] = db_id
     if MATCH.MATCHDAY not in ra:
         standings_filters = StandingsBaseFilters(**{k: get_vals(v) for k, v in temp_filters.items()})
         match_day = db_interface.get_last_game_week(filters=standings_filters)
@@ -43,16 +50,24 @@ def get_match() -> dict:
     else:
         match_day = ra[MATCH.MATCHDAY]
 
-    comp_filters = CompFilters(**{k: get_vals(v) for k, v in ra.items()})
-    comp = db_interface.get_competition(multi=False, filters=comp_filters)
-    matches = api_ingest.request_match(fls_comp_id=comp[COMPETITION.FASTEST_LIVE_SCORES_API_ID],
-                                       fd_comp_id=comp[COMPETITION.FOOTBALL_DATA_API_ID],
-                                       game_week=match_day,
-                                       season=season
-                                       )
+    # To be used when API compatible with multiple leagues
+    # comp_filters = CompFilters(**{k: get_vals(v) for k, v in ra.items()})
+    # comp = db_interface.get_competition(multi=False, filters=comp_filters)
+    match_filters = MatchFilters(**{k: get_vals(v) for k, v in ra.items()})
+    db_matches = db_interface.get_match(multi=False, filters=match_filters)
+    if db_matches:
+        matches = db_matches
 
-    # Does it exist in database:
-    # def db_insert(matches, db)
+    else:
+        matches = api_ingest.request_match(fls_comp_id=comp_fls_id,
+                                           fd_comp_id=comp_fd_id,
+                                           game_week=match_day,
+                                           season=season
+                                           )
+
+        # Inserts record into the database in parallel
+        thread = Thread(target=lambda record: db_interface.insert_match(record), kwargs={'record': matches})
+        thread.start()
 
     if matches:
         return jsonify(matches)

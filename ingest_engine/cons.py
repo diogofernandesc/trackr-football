@@ -39,12 +39,14 @@ class FootballDataApiFilters:
     STANDING_HOME = 'HOME'
     STANDING_AWAY = 'AWAY'
 
+
 class FLSApiFilters:
     FROM_DATETIME = 'from'
     TO_DATETIME = 'to'
     COMPETITION_ID = 'competition_id'
     TEAM_ID = 'team_id'
     TEAM_IDS = 'team_ids'
+
 
 class Match:
     ID = 'id'

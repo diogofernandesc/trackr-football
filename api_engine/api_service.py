@@ -46,7 +46,7 @@ def get_vals(v):
         if isinstance(v, list):
             v = v[0]
 
-        if ',' in v:
+        if ',' in str(v):
             return [type_eval(val) for val in v.split(",")]
 
         return [type_eval(v)]

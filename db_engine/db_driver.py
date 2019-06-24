@@ -531,7 +531,7 @@ def ingest_teams(fls_comp_id, fd_comp_id, season):
 
 if __name__ == "__main__":
     db.create_all()
-    ingest_competitions()
+    # ingest_competitions()
     # teams = db.session\
     #     .query(func.max(StandingsEntry.points),
     #            StandingsEntry.team_name, StandingsEntry.team).filter_by(standings_id=8).group_by(StandingsEntry.team_name).all()
