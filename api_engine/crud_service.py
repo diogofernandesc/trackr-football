@@ -7,7 +7,7 @@ from api_engine.api_cons import API_ENDPOINTS, API, ENDPOINT_DESCRIPTION, API_ER
 from ingest_engine.cons import IGNORE, Team as TEAM, Standings as STANDINGS, Competition as COMPETITION, Match as MATCH
 from ingest_engine.ingest_driver import Driver
 
-crud_service = Blueprint('crud_service', __name__, template_folder='templates')
+crud_service = Blueprint('crud_service', __name__, template_folder='templates', url_prefix='/db')
 
 
 api_ingest = Driver()

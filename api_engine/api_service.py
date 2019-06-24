@@ -2,7 +2,7 @@ from flask import request, jsonify, Blueprint, current_app
 from api_engine.api_cons import API_ENDPOINTS, API, ENDPOINT_DESCRIPTION, API_ERROR
 from db_engine.db_filters import TeamFilters, StandingsFilters, CompFilters
 
-api_service = Blueprint('api_service', __name__, template_folder='templates')
+api_service = Blueprint('api_service', __name__, template_folder='templates', url_prefix='/v1')
 
 # db = SQLAlchemy(app)
 # db_interface = DBInterface(db=db)
@@ -70,7 +70,7 @@ class InvalidUsage(Exception):
         return rv
 
 
-@api_service.route('/v1')
+@api_service.route('/')
 def base():
     api_endpoints = []
     for cons, endpoint in vars(API_ENDPOINTS).items():
@@ -92,8 +92,8 @@ def handle_invalid_usage(error):
     return response
 
 
-@api_service.route('/v1/competition', methods=['GET'])
-@api_service.route('/v1/competitions', methods=['GET'])
+@api_service.route('/competition', methods=['GET'])
+@api_service.route('/competitions', methods=['GET'])
 def competition():
     """
     /v1/competitions will be used to allow OR type querying across all the available competitions
@@ -114,8 +114,8 @@ def competition():
         raise InvalidUsage(API_ERROR.COMPETITION_404, status_code=404)
 
 
-@api_service.route('/v1/team', methods=['GET'])
-@api_service.route('/v1/teams', methods=['GET'])
+@api_service.route('/team', methods=['GET'])
+@api_service.route('/teams', methods=['GET'])
 def team():
     """
     /v1/teams will be used to allow OR type querying across all the available teams
@@ -136,8 +136,8 @@ def team():
         raise InvalidUsage(API_ERROR.TEAM_404, status_code=404)
 
 
-@api_service.route('/v1/standings/all', methods=['GET'])
-@api_service.route('/v1/standings', methods=['GET'])
+@api_service.route('/standings/all', methods=['GET'])
+@api_service.route('/standings', methods=['GET'])
 def standings():
     """
     /v1/standings/all OR type querying across ALL available standings
