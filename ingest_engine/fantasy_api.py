@@ -160,11 +160,11 @@ def team_mapper(team_id):
 
 class Fantasy(ApiIntegration):
     """
-    Wrapper for API available at -> https://fantasy.premierleague.com/drf/
+    Wrapper for API available at -> https://fantasy.premierleague.com/api/
     """
     def __init__(self):
         super().__init__()
-        self.uri = 'https://fantasy.premierleague.com/drf/'
+        self.uri = 'https://fantasy.premierleague.com/api/'
 
     def request_base_information(self, full=False):
         """
@@ -391,7 +391,7 @@ class Fantasy(ApiIntegration):
 
     def request_matches(self):
         """
-        Returns fixture (match) information from https://fantasy.premierleague.com/drf/fixtures/
+        Returns fixture (match) information from https://fantasy.premierleague.com/api/fixtures/
         :return: Parsed list of fixtures from API endpoint
         :rtype: list
         """

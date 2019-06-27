@@ -1,3 +1,6 @@
+from datetime import datetime, timedelta
+from itertools import filterfalse
+
 from ingest_engine.football_data import FootballData
 from ingest_engine.fastest_live_scores_api import FastestLiveScores
 from ingest_engine.fantasy_api import Fantasy, team_mapper, ingest_historical_base_csv, ingest_historical_gameweek_csv
@@ -117,13 +120,16 @@ class Driver(object):
             season = int(season.split("-")[0])
 
         joint_matches = []
-        fantasy_matches = self.fantasy.request_matches()
+        # fantasy_matches = self.fantasy.request_matches()
         fd_matches = self.fd.request_competition_match(competition_id=fd_comp_id,
                                                        **{fdf.MATCHDAY: game_week, fdf.SEASON: season})
 
-        game_week_start = f'{fd_matches[0][Match.MATCH_UTC_DATE].split("T")[0]}T00:00:00+00:00'
-        fls_matches = self.fls.request_matches(**{flsf.COMPETITION_ID: fls_comp_id,
-                                                  flsf.FROM_DATETIME: game_week_start})
+        game_week_start = datetime.strptime(fd_matches[0][Match.MATCH_UTC_DATE], '%Y-%m-%dT%H:%M:%SZ')
+        game_week_end = game_week_start + timedelta(days=4)  # 4 days per game week
+        fls_matches = self.fls.request_matches(**{flsf.FROM_DATETIME: game_week_start,
+                                                  flsf.TO_DATETIME: game_week_end})
+
+        fls_matches = list(filterfalse(lambda x: x[Match.FLS_API_COMPETITION_ID] != fls_comp_id, fls_matches))
 
         for match in fd_matches:
             match_start_datetime = match[Match.MATCH_UTC_DATE]
@@ -137,17 +143,18 @@ class Driver(object):
                         away_score == fls_match[Match.FULL_TIME_AWAY_SCORE]:
                     temp_dict = {**match, **fls_match}
                     adv_match_details = self.fls.request_match_details(match_id=fls_match[Match.FLS_MATCH_ID])
-                    temp_dict2 = {**temp_dict, **adv_match_details}
-                    for f_match in fantasy_matches:
-                        f_home_team = team_mapper(f_match[Match.FANTASY_HOME_TEAM_ID])
-                        f_away_team = team_mapper(f_match[Match.FANTASY_AWAY_TEAM_ID])
-                        if f_match[Match.START_TIME] == match_start_datetime:
-                            if f_home_team in home_team and f_away_team in away_team and \
-                                    home_score == f_match[Match.FULL_TIME_HOME_SCORE] and \
-                                    away_score == f_match[Match.FULL_TIME_AWAY_SCORE]:
-                                final_dict = {**f_match, **temp_dict2}
-                                # final_dict = {**f_match, **temp_dict}
-                                joint_matches.append(final_dict)
+                    final_dict = {**temp_dict, **adv_match_details}
+                    joint_matches.append(final_dict)
+                    # for f_match in fantasy_matches:
+                    #     f_home_team = team_mapper(f_match[Match.FANTASY_HOME_TEAM_ID])
+                    #     f_away_team = team_mapper(f_match[Match.FANTASY_AWAY_TEAM_ID])
+                    #     if f_match[Match.START_TIME] == match_start_datetime:
+                    #         if f_home_team in home_team and f_away_team in away_team and \
+                    #                 home_score == f_match[Match.FULL_TIME_HOME_SCORE] and \
+                    #                 away_score == f_match[Match.FULL_TIME_AWAY_SCORE]:
+                    #             final_dict = {**f_match, **temp_dict2}
+                    #             # final_dict = {**f_match, **temp_dict}
+                    #             joint_matches.append(final_dict)
 
         return joint_matches
 

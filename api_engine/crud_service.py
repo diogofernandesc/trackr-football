@@ -7,18 +7,18 @@ from api_engine.api_cons import API_ENDPOINTS, API, ENDPOINT_DESCRIPTION, API_ER
 from ingest_engine.cons import IGNORE, Team as TEAM, Standings as STANDINGS, Competition as COMPETITION, Match as MATCH
 from ingest_engine.ingest_driver import Driver
 
-crud_service = Blueprint('crud_service', __name__, template_folder='templates', url_prefix='/db')
+crud_service = Blueprint('crud_service', __name__, template_folder='templates', url_prefix='/v1/db')
 
 
 api_ingest = Driver()
 
 
-@crud_service.route('/v1/db/insert/match')
+@crud_service.route('/insert/match')
 def insert_match():
     pass
 
 
-@crud_service.route('/v1/db/match', methods=['GET'])
+@crud_service.route('/match', methods=['GET'])
 def get_match() -> dict:
     with current_app.app_context():
         db_interface = current_app.config['db_interface']
@@ -64,10 +64,12 @@ def get_match() -> dict:
                                            game_week=match_day,
                                            season=season
                                            )
+        print(matches)
 
         # Inserts record into the database in parallel
         thread = Thread(target=lambda record: db_interface.insert_match(record), kwargs={'record': matches})
         thread.start()
+        thread.join()
 
     if matches:
         return jsonify(matches)
