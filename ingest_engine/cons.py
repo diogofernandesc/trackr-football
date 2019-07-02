@@ -59,7 +59,7 @@ class Match:
     START_TIME_EPOCH = 'start_time_epoch'
     START_TIME = 'start_time'
     STATUS = 'status'
-    MATCHDAY = 'matchday'
+    MATCHDAY = 'match_day'
     FULL_TIME_HOME_SCORE = 'full_time_home_score'
     FULL_TIME_AWAY_SCORE = 'full_time_away_score'
     HALF_TIME_HOME_SCORE = 'half_time_home_score'

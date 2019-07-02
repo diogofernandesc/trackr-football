@@ -100,13 +100,14 @@ class Driver(object):
         """
         return self.fd.request_competition_standings(competition_id=competition_id, standing_type=standing_type)
 
-    def request_match(self, fls_comp_id, fd_comp_id, game_week, season):
+    def request_match(self, fls_comp_id, fd_comp_id, game_week, season, limit=None):
         """
         Retrieve the match details
         :param fls_comp_id: FLS comp id
         :param fd_comp_id: footballdata comp id
         :param game_week: 1, 2, 3....n
         :param season: Identifier for the season e.g. 2018-2019 (for football-data API)
+        :param limit: result set limiter
         :return: Matches over a given gameweek for a given competition and season
         :rtype: list
         """
@@ -155,6 +156,9 @@ class Driver(object):
                     #             final_dict = {**f_match, **temp_dict2}
                     #             # final_dict = {**f_match, **temp_dict}
                     #             joint_matches.append(final_dict)
+
+        if limit:
+            return joint_matches[:limit]
 
         return joint_matches
 

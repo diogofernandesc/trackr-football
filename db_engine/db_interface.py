@@ -68,11 +68,12 @@ def to_json(result_map, limit=10):
         return list_dict_result[:limit]
 
 
-def clean_output(query_res, as_list=False):
+def clean_output(query_res, as_list=False, limit=10):
     """
     Ensure only the right fields come out following a DB query
     :param query_res: the query result to be clean
     :param as_list: format output to output as list even when result is solely one entity e.g. for a standings table
+    :param limit:
     :return:
     """
     result = []
@@ -86,7 +87,7 @@ def clean_output(query_res, as_list=False):
     if not as_list and len(result) == 1:
         return result[0]
 
-    return result
+    return result[:limit]
 
 
 class DBInterface(object):
@@ -217,11 +218,12 @@ class DBInterface(object):
         result = to_json(standings_map, limit=limit)
         return result
 
-    def get_match(self, multi: bool = False, filters=None) -> dict:
+    def get_match(self, limit: int = 10, multi: bool = False, filters=None) -> dict:
         """
         Query DB for match record
         :param multi: Perform OR query on filters, SQL OR otherwise SQL AND
         :param filters: namedtuple with all available filter fields
+        :param limit: Result set size
         :return: matched (if any) match records
         """
         db_filters = []
@@ -246,7 +248,7 @@ class DBInterface(object):
         else:
             query_result = match_query.filter(*db_filters)
 
-        return clean_output(query_result)
+        return clean_output(query_result, limit=limit)
 
     def insert_match(self, record: Union[list, dict]):
         """

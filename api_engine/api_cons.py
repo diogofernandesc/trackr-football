@@ -10,10 +10,11 @@ class API:
 class API_ERROR:
     COMPETITION_404 = 'There is no competition with those filters'
     TEAM_404 = 'There is no team with those filters'
-    MATCH_404 = 'There is no match(es) with those filters'
+    MATCH_404 = 'There is no matches with those filters'
     STANDINGS_404 = 'There is no standings with those filters'
     INTEGER_LIMIT_400 = 'Limit must be an integer'
     NO_COMPETITION_400 = 'You need to provide a competition id to query this endpoint'
+    MISSING_COMPETITION_404 = 'No competition could be found'
 
 
 class API_ENDPOINTS:

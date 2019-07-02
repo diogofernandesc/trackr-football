@@ -1,8 +1,13 @@
+from threading import Thread
+
 from flask import request, jsonify, Blueprint, current_app
 from api_engine.api_cons import API_ENDPOINTS, API, ENDPOINT_DESCRIPTION, API_ERROR
-from db_engine.db_filters import TeamFilters, StandingsFilters, CompFilters
+from db_engine.db_filters import TeamFilters, StandingsFilters, CompFilters, MatchFilters, StandingsBaseFilters
+from ingest_engine.ingest_driver import Driver
+from ingest_engine.cons import Standings as STANDINGS, Match as MATCH
 
 api_service = Blueprint('api_service', __name__, template_folder='templates', url_prefix='/v1')
+api_ingest = Driver()
 
 # db = SQLAlchemy(app)
 # db_interface = DBInterface(db=db)
@@ -64,7 +69,7 @@ class InvalidUsage(Exception):
             self.status_code = status_code
         self.payload = payload
 
-    def to_dict(self):
+    def to_dict(self) -> dict:
         rv = dict(self.payload or ())
         rv['message'] = self.message
         return rv
@@ -87,6 +92,11 @@ def base():
 
 @api_service.errorhandler(InvalidUsage)
 def handle_invalid_usage(error):
+    """
+    Handler methods for when API calls do not work
+    :param error:
+    :return:
+    """
     response = jsonify(**error.to_dict(), **{"status_code": error.status_code})
     response.status_code = error.status_code
     return response
@@ -162,6 +172,9 @@ def standings():
 
     else:
         raise InvalidUsage(API_ERROR.STANDINGS_404, status_code=404)
+
+
+
 
 
 
