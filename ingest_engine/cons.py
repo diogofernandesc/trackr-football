@@ -103,6 +103,7 @@ class Match:
     FANTASY_GAME_WEEK = 'fantasy_game_week'
     FANTASY_GAME_WEEK_ID = 'fantasy_game_week_id'
     GOALS_SCORED = 'goals_scored'
+    GOALS_CONCEDED = 'goals_concended'
     ASSISTS = 'assists'
     OWN_GOALS = 'own_goals'
     PENALTIES_SAVED = 'penalties_saved'
@@ -124,6 +125,7 @@ class Match:
     GOAL_AMOUNT = 'amount'
 
 
+
 class MatchEvent:
     OCCURED_AT = 'occured_at'
     STATE = 'state'
@@ -136,6 +138,8 @@ class MatchEvent:
     SCORER_FLS_ID = 'scorer_fls_id'
     ASSIST_FLS_ID = 'assist_fls_id'
     TYPE = 'type'
+    SUBSTITUTION = 'substitution'
+    CLEAN_SHEET = 'clean_sheet'
 
 
 class Team:
@@ -338,6 +342,7 @@ class FLS_STATES:
 
 class FantasyGameWeek:
     ID = 'id'
+    WEEK = 'week'
     NAME = 'name'
     FANTASY_ID = 'fantasy_id'
     DEADLINE_TIME = 'deadline_time'
