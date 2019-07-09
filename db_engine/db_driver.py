@@ -42,7 +42,7 @@ class Competition(db.Model):
     name = db.Column(COMP.NAME, db.String(80), unique=False, nullable=False)
     code = db.Column(COMP.CODE, db.String(20), unique=False, nullable=True)
     location = db.Column(COMP.LOCATION, db.String(80), unique=False, nullable=False)
-    fd_api_id = db.Column(COMP.FOOTBALL_DATA_API_ID, COMP.FOOTBALL_DATA_API_ID, db.Integer, unique=True, nullable=False)
+    fd_api_id = db.Column(COMP.FOOTBALL_DATA_API_ID, db.Integer, unique=True, nullable=False)
     fls_api_id = db.Column(COMP.FASTEST_LIVE_SCORES_API_ID, db.Integer, unique=True, nullable=False)
 
 
@@ -155,7 +155,7 @@ class Player(db.Model):
     gender = db.Column(PLAYER.GENDER, db.String(20), unique=False, nullable=True)
     height = db.Column(PLAYER.HEIGHT, db.Float, unique=False, nullable=True)
     team_fls_id = db.Column(PLAYER.TEAM_FLS_ID, db.Integer, unique=False, nullable=False)
-    fd_api_id = db.Column(PLAYER.FOOTBALL_DATA_API_ID, PLAYER.FOOTBALL_DATA_API_ID, db.Integer, unique=False, nullable=True)
+    fd_api_id = db.Column(PLAYER.FOOTBALL_DATA_API_ID, db.Integer, unique=False, nullable=True)
     fls_api_id = db.Column(PLAYER.FASTEST_LIVE_SCORES_API_ID, db.Integer, unique=False, nullable=False)
     web_name = db.Column(PLAYER.FANTASY_WEB_NAME, db.String(80), unique=False, nullable=True)
     f_team_code = db.Column(PLAYER.FANTASY_TEAM_CODE, db.Integer, unique=False, nullable=True)
@@ -251,7 +251,7 @@ class Team(db.Model):
                               backref=db.backref('match_teams', lazy=True))
     squad = db.relationship('Player', backref='player_team', lazy=True)
     fantasy_id = db.Column(TEAM.FANTASY_ID, db.Integer, unique=True, nullable=False)
-    fd_id = db.Column(TEAM.FOOTBALL_DATA_ID, TEAM.FOOTBALL_DATA_ID, db.Integer, unique=False, nullable=False)
+    fd_id = db.Column(TEAM.FOOTBALL_DATA_ID, db.Integer, unique=False, nullable=False)
     name = db.Column(TEAM.NAME, db.String(80), unique=False, nullable=False)
     country = db.Column(TEAM.COUNTRY, db.String(80), unique=False, nullable=False)
     short_name = db.Column(TEAM.SHORT_NAME, db.String(80), unique=False, nullable=False)
