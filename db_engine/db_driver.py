@@ -52,9 +52,10 @@ class Standings(db.Model):
     standings_entries = db.relationship('StandingsEntry', backref='standings', lazy='dynamic')
                                         # primaryjoin="standings.id==standings_entry.standings_id")
     competition_id = db.Column(STANDINGS.COMPETITION_ID, db.Integer, db.ForeignKey('competition.id'), nullable=False)
-    type = db.Column(STANDINGS.TYPE, db.String(20), unique=False, nullable=False)
-    season = db.Column(STANDINGS.SEASON, db.String(20), unique=False, nullable=False)
-    match_day = db.Column(STANDINGS.MATCH_DAY, db.Integer, unique=False, nullable=False)
+    type = db.Column(STANDINGS.TYPE, db.String(20), unique=False, nullable=True)
+    season = db.Column(STANDINGS.SEASON, db.String(20), unique=False, nullable=True)
+    match_day = db.Column(STANDINGS.MATCH_DAY, db.Integer, unique=False, nullable=True)
+    group = db.Column(STANDINGS.GROUP, db.String, unique=False, nullable=True)
 
 
 class StandingsEntry(db.Model):
@@ -285,32 +286,21 @@ def ingest_competitions():
     """
     competitions = driver.request_competitions()
     for comp in competitions:
-        db_comp = Competition(name=comp[COMP.NAME],
-                              code=comp[COMP.CODE],
-                              location=comp[COMP.LOCATION],
-                              fd_api_id=comp[COMP.FOOTBALL_DATA_API_ID],
-                              fls_api_id=comp[COMP.FASTEST_LIVE_SCORES_API_ID]
-                              )
+        db_comp = Competition(**comp)
+        # db_comp = Competition(name=comp[COMP.NAME],
+        #                       code=comp[COMP.CODE],
+        #                       location=comp[COMP.LOCATION],
+        #                       fd_api_id=comp[COMP.FOOTBALL_DATA_API_ID],
+        #                       fls_api_id=comp[COMP.FASTEST_LIVE_SCORES_API_ID]
+        #                       )
         standings = driver.request_standings(competition_id=comp[COMP.FOOTBALL_DATA_API_ID])
         if standings:
             for stan in standings['standings']:
-                db_standing = Standings(type=stan[STANDINGS.TYPE],
-                                        season=stan[STANDINGS.SEASON],
-                                        match_day=stan[STANDINGS.MATCH_DAY])
-                for entry in stan[STANDINGS.TABLE]:
-                    se = StandingsEntry(
-                        position=entry[STANDINGS.POSITION],
-                        team_name=entry[STANDINGS.TEAM_NAME],
-                        fd_team_id=entry[STANDINGS.FOOTBALL_DATA_TEAM_ID],
-                        games_played=entry[STANDINGS.GAMES_PLAYED],
-                        games_won=entry[STANDINGS.GAMES_WON],
-                        games_drawn=entry[STANDINGS.GAMES_DRAWN],
-                        games_lost=entry[STANDINGS.GAMES_LOST],
-                        points=entry[STANDINGS.POINTS],
-                        goals_for=entry[STANDINGS.GOALS_FOR],
-                        goals_against=entry[STANDINGS.GOALS_AGAINST],
-                        goals_difference=entry[STANDINGS.GOAL_DIFFERENCE]
-                    )
+                table = stan.pop(STANDINGS.TABLE, [])
+                db_standing = Standings(**stan)
+
+                for entry in table:
+                    se = StandingsEntry(**entry)
                     db_standing.standings_entries.append(se)
 
                 db_comp.standings.append(db_standing)
@@ -532,7 +522,8 @@ def ingest_teams(fls_comp_id, fd_comp_id, season):
 
 if __name__ == "__main__":
     db.create_all()
-    # ingest_competitions()
+    ingest_competitions()
+
     # teams = db.session\
     #     .query(func.max(StandingsEntry.points),
     #            StandingsEntry.team_name, StandingsEntry.team).filter_by(standings_id=8).group_by(StandingsEntry.team_name).all()

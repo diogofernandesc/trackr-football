@@ -138,8 +138,7 @@ class ApiTest(unittest.TestCase):
         self.assertEqual(type(standings[Standings.COMPETITION_NAME]), str)
         self.assertGreater(len(standings["standings"]), 0)
         for standing in standings["standings"]:
-            self.assertTrue(all(k in standing for k in [Standings.STAGE,
-                                                        Standings.TYPE,
+            self.assertTrue(all(k in standing for k in [Standings.TYPE,
                                                         Standings.SEASON,
                                                         Standings.GROUP,
                                                         Standings.MATCH_DAY,

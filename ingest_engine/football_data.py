@@ -211,7 +211,6 @@ class FootballData(ApiIntegration):
 
                 for standings in result['standings']:
                     data = {
-                        Standings.STAGE: standings['stage'],
                         Standings.TYPE: standings['type'],
                         Standings.SEASON: season,
                         Standings.GROUP: standings['group'],
