@@ -1,9 +1,9 @@
 from typing import Union
 
 from sqlalchemy import or_, func
-from collections import namedtuple
 from db_engine.db_driver import Competition, Team, Standings, StandingsEntry, Match, db
 from ingest_engine.cons import IGNORE, Team as TEAM, Standings as STANDINGS, Competition as COMPETITION, Match as MATCH
+
 
 def col_exists(table, col):
     """
@@ -48,7 +48,6 @@ def filter_parse(query_str, table, column):
 
             elif "$gte" in query_str:
                 return table.c[column] >= val
-
     return table.c[column] == query_str
 
 
@@ -193,13 +192,17 @@ class DBInterface(object):
 
                 else:
                     active_table = Standings.__table__
-                    if col_exists(table=Standings, col=filter_[0]):
+                    if col_exists(table=Standings, col=filter_[0]) and filter_[0] != STANDINGS.ID:
                         active_table = Standings.__table__
 
                     elif col_exists(table=StandingsEntry, col=filter_[0]):
                         active_table = StandingsEntry.__table__
 
-                    db_filters.append(filter_parse(query_str=filter_val, table=active_table, column=filter_[0]))
+                    column = filter_[0]
+                    if filter_[0] == STANDINGS.ID:  # Ensure that standings_id column is used when querying DB
+                        column = STANDINGS.STANDINGS_ID
+
+                    db_filters.append(filter_parse(query_str=filter_val, table=active_table, column=column))
 
         if multi:
             stan_query = stan_query.filter(or_(*db_filters)).limit(100).all()
