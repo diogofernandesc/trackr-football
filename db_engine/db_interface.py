@@ -63,7 +63,6 @@ def to_json(result_map, limit=10):
         return list_dict_result[0]
 
     else:
-
         return list_dict_result[:limit]
 
 
@@ -179,7 +178,7 @@ class DBInterface(object):
         :return: matched (if any) standings records
         """
         db_filters = []
-        stan_query = self.db.session.query(Standings, StandingsEntry)
+        stan_query = self.db.session.query(Standings, StandingsEntry).join(StandingsEntry)
 
         active_filters = [(f, v) for f, v in filters._asdict().items() if v]
 
