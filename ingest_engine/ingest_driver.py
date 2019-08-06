@@ -145,6 +145,8 @@ class Driver(object):
                     temp_dict = {**match, **fls_match}
                     adv_match_details = self.fls.request_match_details(match_id=fls_match[Match.FLS_MATCH_ID])
                     final_dict = {**temp_dict, **adv_match_details}
+                    final_dict.pop(Match.PREVIOUS_ENCOUNTERS)  # for now ignore previous encounters data
+                    final_dict.pop(Match.EVENTS)  # for now ignore events data
                     joint_matches.append(final_dict)
                     # for f_match in fantasy_matches:
                     #     f_home_team = team_mapper(f_match[Match.FANTASY_HOME_TEAM_ID])
