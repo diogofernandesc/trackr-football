@@ -1,6 +1,6 @@
 import unittest
 from flask_run import app
-from ingest_engine.cons import Competition as COMPETITION, Standings as STANDINGS
+from ingest_engine.cons import Competition as COMPETITION, Standings as STANDINGS, Match as MATCH
 from api_engine.api_cons import API_ENDPOINTS, API, API_ERROR
 
 
@@ -151,37 +151,84 @@ class ApiInterfaceTest(unittest.TestCase):
         self.assertEqual(filter_result[API.MESSAGE], API_ERROR.INTEGER_LIMIT_400)
         self.assertEqual(filter_result[API.STATUS_CODE], 400)
 
-    # def testDBMatchUrl(self):
+    def testDBMatchUrl(self):
         # Whilst API is PL only
         # comp_fd_id = 2021
         # comp_fls_id = 2
 
-        # all_result = self.api.get('/v1/matches&limit=5').get_json()
-        # for result in all_result:
-        #     self.assertTrue(all(k in result for k in (MATCH.ID,
-        #                                               MATCH.FOOTBALL_DATA_ID,
-        #                                               MATCH.FLS_MATCH_ID,
-        #                                               MATCH.FLS_API_COMPETITION_ID,
-        #                                               MATCH.HOME_TEAM_FLS_ID,
-        #                                               MATCH.AWAY_TEAM_FLS_ID,
-        #                                               )))
-        # self.assertIsInstance(all_result, list)
-        # self.assertEqual(len(all_result), 5)
-        #
-        # single_result = self.api.get('/v1/match?match_day=1').get_json()
-        # self.assertTrue(all(k in single_result for k in (MATCH.ID,
-        #                                                  MATCH.FOOTBALL_DATA_ID,
-        #                                                  MATCH.FLS_MATCH_ID,
-        #                                                  MATCH.FLS_API_COMPETITION_ID,
-        #                                                  MATCH.HOME_TEAM_FLS_ID,
-        #                                                  MATCH.AWAY_TEAM_FLS_ID
-        #                                                  )))
-        # self.assertEqual(single_result[MATCH.MATCHDAY], 1)
-        # self.assertIsInstance(single_result, dict)
-        #
-        # filter_result = self.api.get('/v1/match?id=-1').get_json()
-        # self.assertEqual(filter_result[API.MESSAGE], API_ERROR.MATCH_404)
-        # self.assertEqual(filter_result[API.STATUS_CODE], 404)
+        def filter_test(filter_str, filter_val):
+            filter_result = self.api.get(f'/v1/match?{filter_str}={filter_val}').get_json()
+            if not isinstance(filter_result, list):
+                filter_result = [filter_result]
+
+            for result in filter_result:
+                self.assertTrue(result[filter_str], filter_val)
+
+        def filter_test_adv(filter_str, filter_val, op):
+            filter_result = self.api.get(f'/v1/match/all?{filter_str}=${op}:{filter_val}').get_json()
+            if not isinstance(filter_result, list):
+                filter_result = [filter_result]  # Handle returns as dict or list
+
+            for result in filter_result:
+                if op == "lt":
+                    self.assertLess(result[filter_str], filter_val)
+
+                elif op == "lte":
+                    self.assertLessEqual(result[filter_str], filter_val)
+
+                elif op == "gt":
+                    self.assertGreater(result[filter_str], filter_val)
+
+                elif op == "gte":
+                    self.assertGreaterEqual(result[filter_str], filter_val)
+
+        all_result = self.api.get('/v1/match/all?limit=5').get_json()
+        for result in all_result:
+            self.assertTrue(all(k in result for k in (MATCH.ID,
+                                                      MATCH.FOOTBALL_DATA_ID,
+                                                      MATCH.FLS_MATCH_ID,
+                                                      MATCH.FLS_API_COMPETITION_ID,
+                                                      MATCH.HOME_TEAM_FLS_ID,
+                                                      MATCH.AWAY_TEAM_FLS_ID,
+                                                      )))
+        self.assertIsInstance(all_result, list)
+        self.assertEqual(len(all_result), 5)
+
+        match_day_result = self.api.get('/v1/match?match_day=1').get_json()
+        for match in match_day_result:
+            self.assertTrue(all(k in match for k in (MATCH.ID,
+                                                     MATCH.FOOTBALL_DATA_ID,
+                                                     MATCH.FLS_MATCH_ID,
+                                                     MATCH.FLS_API_COMPETITION_ID,
+                                                     MATCH.HOME_TEAM_FLS_ID,
+                                                     MATCH.AWAY_TEAM_FLS_ID
+                                                     )))
+            self.assertEqual(match[MATCH.MATCHDAY], 1)
+
+        single_result = self.api.get('/v1/match?id=1').get_json()
+        self.assertIsInstance(single_result, dict)
+
+        filter_test(MATCH.ID, 1)
+        filter_test(MATCH.MATCHDAY, 2)
+        filter_test(MATCH.HOME_TEAM, "fulham")
+
+        filter_test_adv(filter_str=MATCH.HOME_SCORE_PROBABILITY, filter_val=60, op="lt")
+        filter_test_adv(filter_str=MATCH.AWAY_SCORE_PROBABILITY, filter_val=20, op="gt")
+        filter_test_adv(filter_str=MATCH.HOME_SCORE_PROBABILITY_OVER_1_5, filter_val=10, op="gte")
+        filter_test_adv(filter_str=MATCH.AWAY_SCORE_PROBABILITY_UNDER_3_5, filter_val=90, op="lte")
+        filter_test_adv(filter_str=MATCH.FULL_TIME_AWAY_SCORE, filter_val=2, op="gte")
+
+        filter_result = self.api.get('/v1/match?id=-1').get_json()
+        self.assertEqual(filter_result[API.MESSAGE], API_ERROR.MATCH_404)
+        self.assertEqual(filter_result[API.STATUS_CODE], 404)
+
+        error_result = self.api.get('/v1/match?match_day=$ltr:3').get_json()
+        self.assertEqual(error_result[API.MESSAGE], API_ERROR.FILTER_PROBLEM_400)
+        self.assertEqual(error_result[API.STATUS_CODE], 400)
+
+        error_result = self.api.get('v1/match/all?hdas=1').get_json()
+        self.assertEqual(error_result[API.MESSAGE], API_ERROR.RESOURCE_NOT_FOUND_404)
+        self.assertEqual(error_result[API.STATUS_CODE], 404)
 #
 
 

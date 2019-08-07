@@ -244,7 +244,7 @@ class DBInterface(object):
                     db_filters.append(Match.__table__.c[filter_[0]].ilike(f"%{filter_val}%"))
 
                 else:
-                    db_filters.append(Match.__table__.c[filter_[0]] == filter_val)
+                    db_filters.append(filter_parse(query_str=filter_val, table=Match.__table__, column=filter_[0]))
 
         if multi:
             query_result = match_query.filter(or_(*db_filters))
