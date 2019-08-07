@@ -36,17 +36,17 @@ def filter_parse(query_str, table, column):
 
     if isinstance(query_str, str):
         if any(x in query_str for x in ["$lt", "$gt", "$lte", "$gte"]):
-            val = query_str.split(":")[1]
-            if "$lt" in query_str:
+            [op, val] = query_str.split(":")
+            if op == "$lt":
                 return table.c[column] < val
 
-            elif "$gt" in query_str:
+            elif op == "$gt":
                 return table.c[column] > val
 
-            elif "$lte" in query_str:
+            elif op == "$lte":
                 return table.c[column] <= val
 
-            elif "$gte" in query_str:
+            elif op == "$gte":
                 return table.c[column] >= val
     return table.c[column] == query_str
 
@@ -178,7 +178,9 @@ class DBInterface(object):
         :return: matched (if any) standings records
         """
         db_filters = []
-        stan_query = self.db.session.query(Standings, StandingsEntry).join(StandingsEntry)
+        stan_query = self.db.session\
+            .query(Standings, StandingsEntry)\
+            .join(StandingsEntry, Standings.id == StandingsEntry.standings_id)
 
         active_filters = [(f, v) for f, v in filters._asdict().items() if v]
 
