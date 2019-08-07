@@ -1,10 +1,7 @@
-from threading import Thread
-
 from flask import request, jsonify, Blueprint, current_app
 from api_engine.api_cons import API_ENDPOINTS, API, ENDPOINT_DESCRIPTION, API_ERROR
-from db_engine.db_filters import TeamFilters, StandingsFilters, CompFilters, MatchFilters, StandingsBaseFilters
+from db_engine.db_filters import TeamFilters, StandingsFilters, CompFilters
 from ingest_engine.ingest_driver import Driver
-from ingest_engine.cons import Standings as STANDINGS, Match as MATCH
 
 api_service = Blueprint('api_service', __name__, template_folder='templates', url_prefix='/v1')
 api_ingest = Driver()

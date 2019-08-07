@@ -1,7 +1,7 @@
 from typing import Union
 
 from sqlalchemy import or_, func
-from db_engine.db_driver import Competition, Team, Standings, StandingsEntry, Match, db
+from db_engine.db_driver import Competition, Team, Standings, StandingsEntry, Match
 from ingest_engine.cons import IGNORE, Team as TEAM, Standings as STANDINGS, Competition as COMPETITION, Match as MATCH
 
 
@@ -101,7 +101,7 @@ class DBInterface(object):
         base_standings_filters = []
         bs_query = self.db.session.query(func.max(Standings.match_day))
 
-        if type(filters) == list:
+        if isinstance(filters, list):
             active_filters = filters
         else:
             active_filters = [(f, v) for f, v in filters._asdict().items() if v]

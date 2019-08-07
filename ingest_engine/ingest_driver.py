@@ -117,7 +117,7 @@ class Driver(object):
         # fls_comp_id = 2
         # fd_comp_id = 2021
 
-        if type(season) == str:
+        if isinstance(season, str):
             season = int(season.split("-")[0])
 
         joint_matches = []

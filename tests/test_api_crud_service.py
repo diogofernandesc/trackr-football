@@ -1,7 +1,7 @@
 import unittest
 from flask_run import app
-from ingest_engine.cons import Competition as COMPETITION, Standings as STANDINGS, Match as MATCH
-from api_engine.api_cons import API_ENDPOINTS, API, API_ERROR
+from ingest_engine.cons import Match as MATCH
+from api_engine.api_cons import API, API_ERROR
 
 
 class ApiInterfaceTest(unittest.TestCase):
