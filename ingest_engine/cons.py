@@ -39,6 +39,7 @@ class FootballDataApiFilters:
     STANDING_HOME = 'HOME'
     STANDING_AWAY = 'AWAY'
 
+
 class FLSApiFilters:
     FROM_DATETIME = 'from'
     TO_DATETIME = 'to'
@@ -46,9 +47,10 @@ class FLSApiFilters:
     TEAM_ID = 'team_id'
     TEAM_IDS = 'team_ids'
 
+
 class Match:
     ID = 'id'
-    FOOTBALL_DATA_ID = 'match_football_data_id'
+    FOOTBALL_DATA_ID = 'match_fd_id'
     SEASON_FOOTBALL_DATA_ID = 'season_football_data_id'
     SEASON_START_DATE = 'season_start_date'
     SEASON_END_DATE = 'season_end_date'
@@ -57,15 +59,15 @@ class Match:
     START_TIME_EPOCH = 'start_time_epoch'
     START_TIME = 'start_time'
     STATUS = 'status'
-    MATCHDAY = 'matchday'
-    FULL_TIME_HOME_SCORE = 'full_time_home_score'
-    FULL_TIME_AWAY_SCORE = 'full_time_away_score'
-    HALF_TIME_HOME_SCORE = 'half_time_home_score'
-    HALF_TIME_AWAY_SCORE = 'half_time_away_score'
-    EXTRA_TIME_HOME_SCORE = 'extra_time_home_score'
-    EXTRA_TIME_AWAY_SCORE = 'extra_time_away_score'
-    PENALTY_HOME_SCORE = 'penalty_home_score'
-    PENALTY_AWAY_SCORE = 'penalty_away_score'
+    MATCHDAY = 'match_day'
+    FULL_TIME_HOME_SCORE = 'ft_home_score'
+    FULL_TIME_AWAY_SCORE = 'ft_away_score'
+    HALF_TIME_HOME_SCORE = 'ht_home_score'
+    HALF_TIME_AWAY_SCORE = 'ht_away_score'
+    EXTRA_TIME_HOME_SCORE = 'et_home_score'
+    EXTRA_TIME_AWAY_SCORE = 'et_away_score'
+    PENALTY_HOME_SCORE = 'p_home_score'
+    PENALTY_AWAY_SCORE = 'p_away_score'
     WINNER = 'winner'
     HOME_TEAM = 'home_team'
     AWAY_TEAM = 'away_team'
@@ -79,18 +81,18 @@ class Match:
     HOME_CONCEDE_PROBABILITY = 'home_concede_probability'
     AWAY_SCORE_PROBABILITY = 'away_score_probability'
     AWAY_CONCEDE_PROBABILITY = 'away_concede_probability'
-    HOME_SCORE_PROBABILITY_OVER_1_5 = 'home_score_probability_over_1_5'  # THESE STATS ARE BASED ON THE LAST 5 GAMES
-    HOME_SCORE_PROBABILITY_OVER_2_5 = 'home_score_probability_over_2_5'
-    HOME_SCORE_PROBABILITY_OVER_3_5 = 'home_score_probability_over_3_5'
-    HOME_SCORE_PROBABILITY_UNDER_1_5 = 'home_score_probability_under_1_5'
-    HOME_SCORE_PROBABILITY_UNDER_2_5 = 'home_score_probability_under_2_5'
-    HOME_SCORE_PROBABILITY_UNDER_3_5 = 'home_score_probability_under_3_5'
-    AWAY_SCORE_PROBABILITY_OVER_1_5 = 'away_score_probability_over_1_5'
-    AWAY_SCORE_PROBABILITY_OVER_2_5 = 'away_score_probability_over_2_5'
-    AWAY_SCORE_PROBABILITY_OVER_3_5 = 'away_score_probability_over_3_5'
-    AWAY_SCORE_PROBABILITY_UNDER_1_5 = 'away_score_probability_under_1_5'
-    AWAY_SCORE_PROBABILITY_UNDER_2_5 = 'away_score_probability_under_2_5'
-    AWAY_SCORE_PROBABILITY_UNDER_3_5 = 'away_score_probability_under_3_5'
+    HOME_SCORE_PROBABILITY_OVER_1_5 = 'home_o15_prob'  # THESE STATS ARE BASED ON THE LAST 5 GAMES
+    HOME_SCORE_PROBABILITY_OVER_2_5 = 'home_o25_prob'
+    HOME_SCORE_PROBABILITY_OVER_3_5 = 'home_o35_prob'
+    HOME_SCORE_PROBABILITY_UNDER_1_5 = 'home_u15_prob'
+    HOME_SCORE_PROBABILITY_UNDER_2_5 = 'home_u25_prob'
+    HOME_SCORE_PROBABILITY_UNDER_3_5 = 'home_u35_prob'
+    AWAY_SCORE_PROBABILITY_OVER_1_5 = 'away_o15_prob'
+    AWAY_SCORE_PROBABILITY_OVER_2_5 = 'away_o25_prob'
+    AWAY_SCORE_PROBABILITY_OVER_3_5 = 'away_o35_prob'
+    AWAY_SCORE_PROBABILITY_UNDER_1_5 = 'away_u15_prob'
+    AWAY_SCORE_PROBABILITY_UNDER_2_5 = 'away_u25_prob'
+    AWAY_SCORE_PROBABILITY_UNDER_3_5 = 'away_u35_prob'
     HOME_FORM = 'home_form'
     AWAY_FORM = 'away_form'
     HOME_TEAM_FLS_ID = 'home_team_fls_id'
@@ -101,6 +103,7 @@ class Match:
     FANTASY_GAME_WEEK = 'fantasy_game_week'
     FANTASY_GAME_WEEK_ID = 'fantasy_game_week_id'
     GOALS_SCORED = 'goals_scored'
+    GOALS_CONCEDED = 'goals_concended'
     ASSISTS = 'assists'
     OWN_GOALS = 'own_goals'
     PENALTIES_SAVED = 'penalties_saved'
@@ -110,14 +113,14 @@ class Match:
     SAVES = 'saves'
     BONUS = 'bonus'
     BPS = 'bps'
-    FANTASY_HOME_TEAM_DIFFICULTY = 'fantasy_home_team_difficulty'
-    FANTASY_AWAY_TEAM_DIFFICULTY = 'fantasy_away_team_difficulty'
+    HOME_TEAM_DIFFICULTY = 'home_team_difficulty'
+    AWAY_TEAM_DIFFICULTY = 'away_team_difficulty'
     FANTASY_MATCH_CODE = 'fantasy_match_code'
     MINUTES = 'minutes'
-    FANTASY_HOME_TEAM_CODE = 'fantasy_home_team_code'
-    FANTASY_AWAY_TEAM_CODE = 'fantasy_away_team_code'
-    FANTASY_HOME_TEAM_ID = 'fantasy_home_team_id'
-    FANTASY_AWAY_TEAM_ID = 'fantasy_away_team_id'
+    FANTASY_HOME_TEAM_CODE = 'f_home_team_code'
+    FANTASY_AWAY_TEAM_CODE = 'f_away_team_code'
+    FANTASY_HOME_TEAM_ID = 'f_home_team_id'
+    FANTASY_AWAY_TEAM_ID = 'f_away_team_id'
     SIDE = 'side'
     GOAL_AMOUNT = 'amount'
 
@@ -134,11 +137,13 @@ class MatchEvent:
     SCORER_FLS_ID = 'scorer_fls_id'
     ASSIST_FLS_ID = 'assist_fls_id'
     TYPE = 'type'
+    SUBSTITUTION = 'substitution'
+    CLEAN_SHEET = 'clean_sheet'
 
 
 class Team:
     ID = 'id'
-    FOOTBALL_DATA_ID = 'football_data_id'
+    FOOTBALL_DATA_ID = 'team_fd_id'
     COUNTRY = 'country'
     NAME = 'name'
     SHORT_NAME = 'short_name'
@@ -157,7 +162,7 @@ class Team:
     ACTIVE_COMPETITIONS = 'active_competitions'
     SQUAD = 'squad'
     SQUAD_ROLE = 'squad_role'
-    FASTEST_LIVE_SCORES_API_ID = 'fls_api_id'
+    FASTEST_LIVE_SCORES_API_ID = 'team_fls_id'
     FANTASY_CODE = 'fantasy_code'
     FANTASY_WEEK_STRENGTH = 'fantasy_week_strength'
     FANTASY_OVERALL_HOME_STRENGTH = 'fantasy_overall_home_strength'
@@ -193,6 +198,7 @@ class Standings:
     GOAL_DIFFERENCE = 'goals_difference'
     LIMIT = 'limit'
 
+
 class Player:
     NAME = 'name'
     FIRST_NAME = 'first_name'
@@ -213,21 +219,22 @@ class Player:
     RED_CARDS = 'red_cards'
     COMPETITION_FLS_ID = 'competition_fls_id'
     YELLOW_CARDS = 'yellow_cards'
-    FOOTBALL_DATA_API_ID = 'football_data_id'
-    FASTEST_LIVE_SCORES_API_ID = 'fls_api_id'
+    FOOTBALL_DATA_API_ID = 'fd_id'
+    FASTEST_LIVE_SCORES_API_ID = 'fls_id'
     COMPETITION_STATS = 'competition_stats'
     PLAYED_AT_HOME = 'played_at_home'
     PLAYED = 'played'
     NOT_PLAYED = 'not_played'
     FUTURE_FIXTURES = 'future_fixtures'
     SEASON_MATCH_HISTORY = 'season_match_history'
+    FANTASY_PHOTO_URL = 'photo_url'
 
     # Fantasy fields:
     FANTASY_WEB_NAME = 'web_name'
     FANTASY_TEAM_CODE = 'fantasy_team_code'
-    FANTASY_ID = 'fantasy_player_id'
+    FANTASY_ID = 'fantasy_id'
     FANTASY_STATUS = 'fantasy_status'
-    FANTASY_CODE = 'player_fantasy_code'
+    FANTASY_CODE = 'fantasy_code'
     FANTASY_PRICE = 'fantasy_price'
     FANTASY_NEWS = 'fantasy_news'
     FANTASY_NEWS_TIMESTAMP = 'fantasy_news_timestamp'
@@ -242,13 +249,13 @@ class Player:
     FANTASY_OVERALL_PRICE_FALL = 'fantasy_overall_price_fall'
     FANTASY_WEEK = 'fantasy_week'
     FANTASY_WEEK_ID = 'fantasy_week_id'  # ID made up of season year and game week e.g. 20171801 for 2017/2018 week 1
-    FANTASY_DREAM_TEAM_COUNT = 'dream_team_count'  # No. of times in dream team
-    FANTASY_SELECTION_PERCENTAGE = 'selection_percentage'  # % of fantasy users selecting player
+    FANTASY_DREAM_TEAM_COUNT = 'fantasy_dream_team_count'  # No. of times in dream team
+    FANTASY_SELECTION_PERCENTAGE = 'fantasy_selection_percentage'  # % of fantasy users selecting player
     FANTASY_FORM = 'fantasy_form'
     FANTASY_OVERALL_TRANSFERS_IN = 'fantasy_overall_transfers_in'
     FANTASY_WEEK_TRANSFERS_IN = 'fantasy_week_transfers_in'
     FANTASY_OVERALL_TRANSFERS_OUT = 'fantasy_overall_transfers_out'
-    FANTASY_WEEK_TRANSFERS_OUT = 'fantasy_week_transfers_out'
+    FANTASY_WEEK_TRANSFERS_OUT = 'fantasy_transfers_out'
     FANTASY_OVERALL_POINTS = 'fantasy_overall_points'
     FANTASY_WEEK_POINTS = 'fantasy_week_points'
     FANTASY_POINT_AVERAGE = 'fantasy_point_average'
@@ -269,7 +276,7 @@ class Player:
     FANTASY_THREAT = 'fantasy_threat'
     FANTASY_ICT_INDEX = 'fantasy_ict_index'  # Influence, creativity, threat index
     FANTASY_TEAM_ID = 'fantasy_team_id'
-    FANTASY_PHOTO_URL = 'fantasy_photo_url'
+
     FANTASY_SEASON_START_PRICE = 'fantasy_season_start_price'
     FANTASY_SEASON_END_PRICE = 'fantasy_season_start_price'
     FANTASY_TRANSFERS_BALANCE = 'fantasy_transfers_balance'
@@ -336,6 +343,7 @@ class FLS_STATES:
 
 class FantasyGameWeek:
     ID = 'id'
+    WEEK = 'game_week'
     NAME = 'name'
     FANTASY_ID = 'fantasy_id'
     DEADLINE_TIME = 'deadline_time'

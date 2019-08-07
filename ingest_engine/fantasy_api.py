@@ -160,11 +160,11 @@ def team_mapper(team_id):
 
 class Fantasy(ApiIntegration):
     """
-    Wrapper for API available at -> https://fantasy.premierleague.com/drf/
+    Wrapper for API available at -> https://fantasy.premierleague.com/api/
     """
     def __init__(self):
         super().__init__()
-        self.uri = 'https://fantasy.premierleague.com/drf/'
+        self.uri = 'https://fantasy.premierleague.com/api/'
 
     def request_base_information(self, full=False):
         """
@@ -391,7 +391,7 @@ class Fantasy(ApiIntegration):
 
     def request_matches(self):
         """
-        Returns fixture (match) information from https://fantasy.premierleague.com/drf/fixtures/
+        Returns fixture (match) information from https://fantasy.premierleague.com/api/fixtures/
         :return: Parsed list of fixtures from API endpoint
         :rtype: list
         """
@@ -405,8 +405,8 @@ class Fantasy(ApiIntegration):
                         Match.START_TIME: match["kickoff_time"],
                         Match.FINISHED: match['started'],
                         Match.FANTASY_GAME_WEEK: match["event"],
-                        Match.FANTASY_HOME_TEAM_DIFFICULTY: match["team_h_difficulty"],
-                        Match.FANTASY_AWAY_TEAM_DIFFICULTY: match["team_a_difficulty"],
+                        Match.HOME_TEAM_DIFFICULTY: match["team_h_difficulty"],
+                        Match.AWAY_TEAM_DIFFICULTY: match["team_a_difficulty"],
                         Match.FANTASY_MATCH_CODE: match["code"],
                         Match.FULL_TIME_HOME_SCORE: match["team_h_score"],
                         Match.FULL_TIME_AWAY_SCORE: match["team_a_score"],

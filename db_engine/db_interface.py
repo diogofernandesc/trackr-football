@@ -1,7 +1,8 @@
-from sqlalchemy import or_
+from typing import Union
 
-from db_engine.db_driver import Competition, Team, Standings, StandingsEntry
-from ingest_engine.cons import IGNORE, Team as TEAM, Standings as STANDINGS, Competition as COMPETITION
+from sqlalchemy import or_, func
+from db_engine.db_driver import Competition, Team, Standings, StandingsEntry, Match
+from ingest_engine.cons import IGNORE, Team as TEAM, Standings as STANDINGS, Competition as COMPETITION, Match as MATCH
 
 
 def col_exists(table, col):
@@ -35,19 +36,18 @@ def filter_parse(query_str, table, column):
 
     if isinstance(query_str, str):
         if any(x in query_str for x in ["$lt", "$gt", "$lte", "$gte"]):
-            val = query_str.split(":")[1]
-            if "$lt" in query_str:
+            [op, val] = query_str.split(":")
+            if op == "$lt":
                 return table.c[column] < val
 
-            elif "$gt" in query_str:
+            elif op == "$gt":
                 return table.c[column] > val
 
-            elif "$lte" in query_str:
+            elif op == "$lte":
                 return table.c[column] <= val
 
-            elif "$gte" in query_str:
+            elif op == "$gte":
                 return table.c[column] >= val
-
     return table.c[column] == query_str
 
 
@@ -63,15 +63,15 @@ def to_json(result_map, limit=10):
         return list_dict_result[0]
 
     else:
-
         return list_dict_result[:limit]
 
 
-def clean_output(query_res, as_list=False):
+def clean_output(query_res, as_list=False, limit=10):
     """
     Ensure only the right fields come out following a DB query
     :param query_res: the query result to be clean
     :param as_list: format output to output as list even when result is solely one entity e.g. for a standings table
+    :param limit:
     :return:
     """
     result = []
@@ -85,13 +85,32 @@ def clean_output(query_res, as_list=False):
     if not as_list and len(result) == 1:
         return result[0]
 
-    return result
+    return result[:limit]
 
 
 class DBInterface(object):
 
     def __init__(self, db):
         self.db = db
+
+    def get_last_game_week(self, filters) -> int:
+        """
+        Get the latest game week
+        :return: int indicator
+        """
+        base_standings_filters = []
+        bs_query = self.db.session.query(func.max(Standings.match_day))
+
+        if isinstance(filters, list):
+            active_filters = filters
+        else:
+            active_filters = [(f, v) for f, v in filters._asdict().items() if v]
+
+        for filter_ in active_filters:
+            for filter_val in filter_[1]:
+                base_standings_filters.append(Standings.__table__.c[filter_[0]] == filter_val)
+
+        return bs_query.filter(*base_standings_filters).scalar()
 
     def get_competition(self, multi=False, filters=None):
         """
@@ -159,7 +178,9 @@ class DBInterface(object):
         :return: matched (if any) standings records
         """
         db_filters = []
-        stan_query = self.db.session.query(Standings, StandingsEntry)
+        stan_query = self.db.session\
+            .query(Standings, StandingsEntry)\
+            .join(StandingsEntry, Standings.id == StandingsEntry.standings_id)
 
         active_filters = [(f, v) for f, v in filters._asdict().items() if v]
 
@@ -172,13 +193,17 @@ class DBInterface(object):
 
                 else:
                     active_table = Standings.__table__
-                    if col_exists(table=Standings, col=filter_[0]):
+                    if col_exists(table=Standings, col=filter_[0]) and filter_[0] != STANDINGS.ID:
                         active_table = Standings.__table__
 
                     elif col_exists(table=StandingsEntry, col=filter_[0]):
                         active_table = StandingsEntry.__table__
 
-                    db_filters.append(filter_parse(query_str=filter_val, table=active_table, column=filter_[0]))
+                    column = filter_[0]
+                    if filter_[0] == STANDINGS.ID:  # Ensure that standings_id column is used when querying DB
+                        column = STANDINGS.STANDINGS_ID
+
+                    db_filters.append(filter_parse(query_str=filter_val, table=active_table, column=column))
 
         if multi:
             stan_query = stan_query.filter(or_(*db_filters)).limit(100).all()
@@ -196,6 +221,51 @@ class DBInterface(object):
 
         result = to_json(standings_map, limit=limit)
         return result
+
+    def get_match(self, limit: int = 10, multi: bool = False, filters=None) -> dict:
+        """
+        Query DB for match record
+        :param multi: Perform OR query on filters, SQL OR otherwise SQL AND
+        :param filters: namedtuple with all available filter fields
+        :param limit: Result set size
+        :return: matched (if any) match records
+        """
+        db_filters = []
+        match_query = self.db.session.query(Match)
+        active_filters = [(f, v) for f, v in filters._asdict().items() if v]
+
+        for filter_ in active_filters:
+            for filter_val in filter_[1]:
+
+                if any(filter_name in filter_[0] for filter_name in [MATCH.HOME_TEAM,
+                                                                     MATCH.AWAY_TEAM,
+                                                                     MATCH.COMPETITION,
+                                                                     ]):
+                    db_filters.append(Match.__table__.c[filter_[0]].ilike(f"%{filter_val}%"))
+
+                else:
+                    db_filters.append(Match.__table__.c[filter_[0]] == filter_val)
+
+        if multi:
+            query_result = match_query.filter(or_(*db_filters))
+
+        else:
+            query_result = match_query.filter(*db_filters)
+
+        return clean_output(query_result, limit=limit)
+
+    def insert_match(self, record: Union[list, dict]):
+        """
+        Insert record into DB
+        :return:
+        """
+        if isinstance(record, dict):
+            record = [record]
+
+        for match in record:
+            self.db.session.add(Match(**match))
+
+        self.db.session.commit()
 
 
 

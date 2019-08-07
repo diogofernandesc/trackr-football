@@ -5,7 +5,8 @@ from sqlalchemy.exc import IntegrityError
 import logging
 from ingest_engine.ingest_driver import Driver, str_comparator
 from ingest_engine.cons import Competition as COMP, \
-    Standings as STANDINGS, Team as TEAM, Match as MATCH, Player as PLAYER
+    Standings as STANDINGS, Team as TEAM, Match as MATCH, Player as PLAYER, MatchEvent as MATCH_EVENT, \
+    FantasyGameWeek as FANTASY_GAME_WEEK
 
 logging.basicConfig(format='%(asctime)s - %(message)s', level=logging.INFO)
 
@@ -36,24 +37,25 @@ player_match_table = db.Table('player_matches',
 
 
 class Competition(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(COMP.ID, db.Integer, primary_key=True)
     standings = db.relationship('Standings', backref='competition', lazy=True)
     name = db.Column(db.String(80), unique=False, nullable=False)
     code = db.Column(db.String(20), unique=False, nullable=True)
     location = db.Column(db.String(80), unique=False, nullable=False)
-    fd_api_id = db.Column(COMP.FOOTBALL_DATA_API_ID, db.Integer, unique=True, nullable=False)
-    fls_api_id = db.Column(COMP.FASTEST_LIVE_SCORES_API_ID, db.Integer, unique=True, nullable=False)
+    fd_api_id = db.Column(db.Integer, unique=True, nullable=False)
+    fls_api_id = db.Column(db.Integer, unique=True, nullable=False)
 
 
 class Standings(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(STANDINGS.ID, db.Integer, primary_key=True)
     # standings_entries = db.relationship('StandingsEntry', backpopulates="standings")
     standings_entries = db.relationship('StandingsEntry', backref='standings', lazy='dynamic')
                                         # primaryjoin="standings.id==standings_entry.standings_id")
     competition_id = db.Column(db.Integer, db.ForeignKey('competition.id'), nullable=False)
-    type = db.Column(db.String(20), unique=False, nullable=False)
-    season = db.Column(db.String(20), unique=False, nullable=False)
-    match_day = db.Column(db.Integer, unique=False, nullable=False)
+    type = db.Column(db.String(20), unique=False, nullable=True)
+    season = db.Column(db.String(20), unique=False, nullable=True)
+    match_day = db.Column(db.Integer, unique=False, nullable=True)
+    group = db.Column(db.String, unique=False, nullable=True)
 
 
 class StandingsEntry(db.Model):
@@ -61,7 +63,7 @@ class StandingsEntry(db.Model):
     standings_id = db.Column(db.Integer, db.ForeignKey('standings.id'), nullable=False)
     position = db.Column(db.Integer, unique=False, nullable=False)
     team_name = db.Column(db.String(80), unique=False, nullable=False)
-    fd_team_id = db.Column(STANDINGS.FOOTBALL_DATA_TEAM_ID, db.Integer, unique=False, nullable=False)
+    fd_team_id = db.Column(db.Integer, unique=False, nullable=False)
     games_played = db.Column(db.Integer, unique=False, nullable=False)
     games_won = db.Column(db.Integer, unique=False, nullable=False)
     games_drawn = db.Column(db.Integer, unique=False, nullable=False)
@@ -75,61 +77,61 @@ class StandingsEntry(db.Model):
 class Match(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     stats = db.relationship('MatchStats', uselist=False, backref='match')
-    fd_id = db.Column(MATCH.FOOTBALL_DATA_ID, db.Integer, unique=True, nullable=False)
-    season_start_date = db.Column(db.Date, unique=False, nullable=False)
-    season_end_date = db.Column(db.Date, unique=False, nullable=False)
-    season_year = db.Column(db.Integer, unique=False, nullable=False)
-    utc_date = db.Column(db.Date, unique=False, nullable=False)
-    start_time_epoch = db.Column(db.Time, unique=False, nullable=False)
-    start_time = db.Column(db.DateTime, unique=False, nullable=False)
-    status = db.Column(db.String(20), unique=False, nullable=False)
-    match_day = db.Column(db.Integer, unique=False, nullable=False)
-    ft_home_score = db.Column(MATCH.FULL_TIME_HOME_SCORE, db.Integer, unique=False, nullable=False)
-    ft_away_score = db.Column(MATCH.FULL_TIME_AWAY_SCORE, db.Integer, unique=False, nullable=False)
-    ht_home_score = db.Column(MATCH.HALF_TIME_HOME_SCORE, db.Integer, unique=False, nullable=False)
-    ht_away_score = db.Column(MATCH.HALF_TIME_AWAY_SCORE, db.Integer, unique=False, nullable=False)
-    et_home_score = db.Column(MATCH.EXTRA_TIME_HOME_SCORE, db.Integer, unique=False, nullable=True)
-    et_away_score = db.Column(MATCH.EXTRA_TIME_AWAY_SCORE, db.Integer, unique=False, nullable=True)
-    p_home_score = db.Column(MATCH.PENALTY_HOME_SCORE, db.Integer, unique=False, nullable=True)
-    p_away_score = db.Column(MATCH.PENALTY_AWAY_SCORE, db.Integer, unique=False, nullable=True)
-    winner = db.Column(db.String(10), unique=False, nullable=False)
-    home_team = db.Column(db.String(80), unique=False, nullable=False)
-    away_team = db.Column(db.String(80), unique=False, nullable=False)
-    referees = db.Column(db.ARRAY(db.String), unique=False, nullable=False)
-    fls_match_id = db.Column(MATCH.FLS_MATCH_ID, db.Integer, unique=True, nullable=False)
-    fls_competition_id = db.Column(MATCH.FLS_API_COMPETITION_ID, db.Integer, unique=False, nullable=False)
-    competition = db.Column(MATCH.COMPETITION, db.String, unique=False, nullable=False)
-    home_score_probability = db.Column(db.Float, unique=False, nullable=False)
-    away_score_probability = db.Column(db.Float, unique=False, nullable=False)
-    home_concede_probability = db.Column(db.Float, unique=False, nullable=False)
-    away_concede_probability = db.Column(db.Float, unique=False, nullable=False)
-    home_o15_prob = db.Column(MATCH.HOME_SCORE_PROBABILITY_OVER_1_5, db.Float, unique=False, nullable=False)
-    home_o25_prob = db.Column(MATCH.HOME_SCORE_PROBABILITY_OVER_2_5, db.Float, unique=False, nullable=False)
-    home_o35_prob = db.Column(MATCH.HOME_SCORE_PROBABILITY_OVER_3_5, db.Float, unique=False, nullable=False)
-    home_u15_prob = db.Column(MATCH.HOME_SCORE_PROBABILITY_UNDER_1_5, db.Float, unique=False, nullable=False)
-    home_u25_prob = db.Column(MATCH.HOME_SCORE_PROBABILITY_UNDER_2_5, db.Float, unique=False, nullable=False)
-    home_u35_prob = db.Column(MATCH.HOME_SCORE_PROBABILITY_UNDER_3_5, db.Float, unique=False, nullable=False)
-    away_o15_prob = db.Column(MATCH.AWAY_SCORE_PROBABILITY_OVER_1_5, db.Float, unique=False, nullable=False)
-    away_o25_prob = db.Column(MATCH.AWAY_SCORE_PROBABILITY_OVER_2_5, db.Float, unique=False, nullable=False)
-    away_o35_prob = db.Column(MATCH.AWAY_SCORE_PROBABILITY_OVER_3_5, db.Float, unique=False, nullable=False)
-    away_u15_prob = db.Column(MATCH.AWAY_SCORE_PROBABILITY_UNDER_1_5, db.Float, unique=False, nullable=False)
-    away_u25_prob = db.Column(MATCH.AWAY_SCORE_PROBABILITY_UNDER_2_5, db.Float, unique=False, nullable=False)
-    away_u35_prob = db.Column(MATCH.AWAY_SCORE_PROBABILITY_UNDER_3_5, db.Float, unique=False, nullable=False)
-    home_form = db.Column(db.ARRAY(db.String), unique=False, nullable=False)
-    away_form = db.Column(db.ARRAY(db.String), unique=False, nullable=False)
-    h_fls_id = db.Column(MATCH.HOME_TEAM_FLS_ID, db.Integer, unique=False, nullable=False)
-    a_fls_id = db.Column(MATCH.AWAY_TEAM_FLS_ID, db.Integer, unique=False, nullable=False)
-    psc = db.Column(MATCH.PENALTY_SHOOTOUT_SCORE, db.String, unique=False, nullable=False)
-    finished = db.Column(db.Boolean, unique=False, nullable=False)
-    fantasy_game_week = db.Column(db.Integer, unique=False, nullable=False)
-    home_team_difficulty = db.Column(db.Integer, unique=False, nullable=False)
-    away_team_difficulty = db.Column(db.Integer, unique=False, nullable=False)
-    fantasy_match_code = db.Column(db.Integer, unique=True, nullable=False)
-    minutes = db.Column(db.Integer, unique=False, nullable=False)
-    f_home_team_code = db.Column(MATCH.FANTASY_HOME_TEAM_CODE, db.Integer, unique=False, nullable=False)
-    f_away_team_code = db.Column(MATCH.FANTASY_AWAY_TEAM_CODE, db.Integer, unique=False, nullable=False)
-    f_home_team_id = db.Column(MATCH.FANTASY_HOME_TEAM_ID, db.Integer, unique=False, nullable=False)
-    f_away_team_id = db.Column(MATCH.FANTASY_AWAY_TEAM_ID, db.Integer, unique=False, nullable=False)
+    match_fd_id = db.Column(db.Integer, unique=True, nullable=False)
+    season_start_date = db.Column(db.Date, unique=False, nullable=True)
+    season_end_date = db.Column(db.Date, unique=False, nullable=True)
+    season_year = db.Column(db.String, unique=False, nullable=True)
+    utc_date = db.Column(db.Date, unique=False, nullable=True)
+    start_time_epoch = db.Column(db.Time, unique=False, nullable=True)
+    start_time = db.Column(db.DateTime, unique=False, nullable=True)
+    status = db.Column(db.String(20), unique=False, nullable=True)
+    match_day = db.Column(db.Integer, unique=False, nullable=True)
+    ft_home_score = db.Column(db.Integer, unique=False, nullable=True)
+    ft_away_score = db.Column(db.Integer, unique=False, nullable=True)
+    ht_home_score = db.Column(db.Integer, unique=False, nullable=True)
+    ht_away_score = db.Column(db.Integer, unique=False, nullable=True)
+    et_home_score = db.Column(db.Integer, unique=False, nullable=True)
+    et_away_score = db.Column(db.Integer, unique=False, nullable=True)
+    p_home_score = db.Column(db.Integer, unique=False, nullable=True)
+    p_away_score = db.Column(db.Integer, unique=False, nullable=True)
+    winner = db.Column(db.String(10), unique=False, nullable=True)
+    home_team = db.Column(db.String(80), unique=False, nullable=True)
+    away_team = db.Column(db.String(80), unique=False, nullable=True)
+    referees = db.Column(db.ARRAY(db.String), unique=False, nullable=True)
+    fls_match_id = db.Column(db.Integer, unique=True, nullable=False)
+    fls_competition_id = db.Column(db.Integer, unique=False, nullable=False)
+    competition = db.Column(db.String, unique=False, nullable=True)
+    home_score_probability = db.Column(db.Float, unique=False, nullable=True)
+    away_score_probability = db.Column(db.Float, unique=False, nullable=True)
+    home_concede_probability = db.Column(db.Float, unique=False, nullable=True)
+    away_concede_probability = db.Column(db.Float, unique=False, nullable=True)
+    home_o15_prob = db.Column(db.Float, unique=False, nullable=True)
+    home_o25_prob = db.Column(db.Float, unique=False, nullable=True)
+    home_o35_prob = db.Column(db.Float, unique=False, nullable=True)
+    home_u15_prob = db.Column(db.Float, unique=False, nullable=True)
+    home_u25_prob = db.Column(db.Float, unique=False, nullable=True)
+    home_u35_prob = db.Column(db.Float, unique=False, nullable=True)
+    away_o15_prob = db.Column(db.Float, unique=False, nullable=True)
+    away_o25_prob = db.Column(db.Float, unique=False, nullable=True)
+    away_o35_prob = db.Column(db.Float, unique=False, nullable=True)
+    away_u15_prob = db.Column(db.Float, unique=False, nullable=True)
+    away_u25_prob = db.Column(db.Float, unique=False, nullable=True)
+    away_u35_prob = db.Column(db.Float, unique=False, nullable=True)
+    home_form = db.Column(db.ARRAY(db.String), unique=False, nullable=True)
+    away_form = db.Column(db.ARRAY(db.String), unique=False, nullable=True)
+    home_team_fls_id = db.Column(db.Integer, unique=False, nullable=False)
+    away_team_fls_id = db.Column(db.Integer, unique=False, nullable=False)
+    penalty_shootout_score = db.Column(db.String, unique=False, nullable=True)
+    finished = db.Column(db.Boolean, unique=False, nullable=True)
+    fantasy_game_week = db.Column(db.Integer, unique=False, nullable=True)
+    home_team_difficulty = db.Column(db.Integer, unique=False, nullable=True)
+    away_team_difficulty = db.Column(db.Integer, unique=False, nullable=True)
+    fantasy_match_code = db.Column(db.Integer, unique=True, nullable=True)
+    minutes = db.Column(db.Integer, unique=False, nullable=True)
+    f_home_team_code = db.Column(db.Integer, unique=False, nullable=True)
+    f_away_team_code = db.Column(db.Integer, unique=False, nullable=True)
+    f_home_team_id = db.Column(db.Integer, unique=False, nullable=True)
+    f_away_team_id = db.Column(db.Integer, unique=False, nullable=True)
 
 
 class Player(db.Model):
@@ -154,11 +156,11 @@ class Player(db.Model):
     gender = db.Column(db.String(20), unique=False, nullable=True)
     height = db.Column(db.Float, unique=False, nullable=True)
     team_fls_id = db.Column(db.Integer, unique=False, nullable=False)
-    fd_api_id = db.Column(PLAYER.FOOTBALL_DATA_API_ID, db.Integer, unique=False, nullable=True)
-    fls_api_id = db.Column(PLAYER.FASTEST_LIVE_SCORES_API_ID, db.Integer, unique=False, nullable=False)
-    web_name = db.Column(PLAYER.FANTASY_WEB_NAME, db.String(80), unique=False, nullable=True)
-    f_team_code = db.Column(PLAYER.FANTASY_TEAM_CODE, db.Integer, unique=False, nullable=True)
-    f_id = db.Column(PLAYER.FANTASY_ID, db.Integer, unique=False, nullable=True)
+    fd_id = db.Column(db.Integer, unique=False, nullable=True)
+    fls_id = db.Column(db.Integer, unique=False, nullable=False)
+    web_name = db.Column(db.String(80), unique=False, nullable=True)
+    fantasy_team_code = db.Column(db.Integer, unique=False, nullable=True)
+    fantasy_id = db.Column(db.Integer, unique=False, nullable=True)
     fantasy_status = db.Column(db.String(80), unique=False, nullable=True)
     fantasy_code = db.Column(db.Integer, unique=False, nullable=True)
     fantasy_price = db.Column(db.Float, unique=False, nullable=True)
@@ -169,10 +171,10 @@ class Player(db.Model):
 
 
 class MatchStats(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(MATCH.ID, db.Integer, primary_key=True)
     match_id = db.Column(db.Integer, db.ForeignKey('match.id'), nullable=False)
     player_id = db.Column(db.Integer, db.ForeignKey('player.id'), nullable=False)
-    occurred_timestamp = db.Column(db.TIMESTAMP, unique=False, nullable=True)
+    occurred_at = db.Column(db.TIMESTAMP, unique=False, nullable=True)
     goals_scored = db.Column(db.Integer, unique=False, nullable=True)
     goals_conceded = db.Column(db.Integer, unique=False, nullable=True)
     assists = db.Column(db.Integer, unique=False, nullable=True)
@@ -212,16 +214,16 @@ class MatchStats(db.Model):
 
 
 class FantasyWeekStats(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(FANTASY_GAME_WEEK.ID, db.Integer, primary_key=True)
     player_id = db.Column(db.Integer, db.ForeignKey('player.id'), nullable=False)
     game_week = db.Column(db.Integer, unique=False, nullable=True)
     fantasy_price = db.Column(db.Integer, unique=False, nullable=True)
     season_value = db.Column(db.Integer, unique=False, nullable=True)  # Fantasy value
-    week_points = db.Column(db.Integer, unique=False, nullable=True)
-    transfers_balance = db.Column(db.Integer, unique=False, nullable=True)
-    selection_count = db.Column(db.Integer, unique=False, nullable=True)
-    transfers_in = db.Column(db.Integer, unique=False, nullable=True)
-    transfers_out = db.Column(db.Integer, unique=False, nullable=True)
+    fantasy_week_points = db.Column(db.Integer, unique=False, nullable=True)
+    fantasy_transfers_balance = db.Column(db.Integer, unique=False, nullable=True)
+    fantasy_selection_count = db.Column(db.Integer, unique=False, nullable=True)
+    fantasy_transfers_in = db.Column(db.Integer, unique=False, nullable=True)
+    fantasy_transfers_out = db.Column(db.Integer, unique=False, nullable=True)
     fantasy_overall_price_rise = db.Column(db.Float, unique=False, nullable=True)
     fantasy_overall_price_fall = db.Column(db.Float, unique=False, nullable=True)
     fantasy_week_price_rise = db.Column(db.Integer, unique=False, nullable=True)
@@ -231,26 +233,26 @@ class FantasyWeekStats(db.Model):
     fantasy_overall_points = db.Column(db.Integer, unique=False, nullable=True)
     fantasy_point_average = db.Column(db.Float, unique=False, nullable=True)
     fantasy_total_bonus = db.Column(db.Float, unique=False, nullable=True)
-    week_bonus = db.Column(db.Integer, unique=False, nullable=True)
+    fantasy_week_bonus = db.Column(db.Integer, unique=False, nullable=True)
     chance_of_playing_this_week = db.Column(db.Integer, unique=False, nullable=True)
     chance_of_playing_next_week = db.Column(db.Integer, unique=False, nullable=True)
     fantasy_dream_team_member = db.Column(db.Boolean, unique=False, nullable=True)
-    dream_team_count = db.Column(db.Integer, unique=False, nullable=True)
-    selection_percentage = db.Column(db.Integer, unique=False, nullable=True)
+    fantasy_dream_team_count = db.Column(db.Integer, unique=False, nullable=True)
+    fantasy_selection_percentage = db.Column(db.Integer, unique=False, nullable=True)
     fantasy_form = db.Column(db.Integer, unique=False, nullable=True)
     fantasy_special = db.Column(db.Boolean, unique=False, nullable=True)
-    total_minutes_played = db.Column(db.Integer, unique=False, nullable=True)
+    minutes_played = db.Column(db.Integer, unique=False, nullable=True)
 
 
 class Team(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(TEAM.ID, db.Integer, primary_key=True)
     competitions = db.relationship('Competition', secondary=comp_team_table, lazy='subquery',
                                    backref=db.backref('comp_teams', lazy=True))
     matches = db.relationship('Match', secondary=team_match_table, lazy='subquery',
                               backref=db.backref('match_teams', lazy=True))
     squad = db.relationship('Player', backref='player_team', lazy=True)
     fantasy_id = db.Column(db.Integer, unique=True, nullable=False)
-    fd_id = db.Column(TEAM.FOOTBALL_DATA_ID, db.Integer, unique=False, nullable=False)
+    team_fd_id = db.Column(db.Integer, unique=False, nullable=False)
     name = db.Column(db.String(80), unique=False, nullable=False)
     country = db.Column(db.String(80), unique=False, nullable=False)
     short_name = db.Column(db.String(80), unique=False, nullable=False)
@@ -266,14 +268,14 @@ class Team(db.Model):
     stadium_lat = db.Column(db.Float, unique=False, nullable=False)
     stadium_long = db.Column(db.Float, unique=False, nullable=False)
     stadium_capacity = db.Column(db.Integer, unique=False, nullable=False)
-    fls_api_id = db.Column(TEAM.FASTEST_LIVE_SCORES_API_ID, db.Integer, unique=True, nullable=False)
+    team_fls_id = db.Column(db.Integer, unique=True, nullable=False)
     fantasy_code = db.Column(db.Integer, unique=True, nullable=False)
-    home_strength = db.Column(TEAM.FANTASY_OVERALL_HOME_STRENGTH, db.Integer, unique=False, nullable=False)
-    away_strength = db.Column(TEAM.FANTASY_OVERALL_AWAY_STRENGTH, db.Integer, unique=False, nullable=False)
-    attack_home_strength = db.Column(TEAM.FANTASY_ATTACK_HOME_STRENGTH, db.Integer, unique=False, nullable=False)
-    attack_away_strength = db.Column(TEAM.FANTASY_ATTACK_AWAY_STRENGTH, db.Integer, unique=False, nullable=False)
-    defense_home_strength = db.Column(TEAM.FANTASY_DEFENCE_HOME_STRENGTH, db.Integer, unique=False, nullable=False)
-    defense_away_strength = db.Column(TEAM.FANTASY_DEFENCE_AWAY_STRENGTH, db.Integer, unique=False, nullable=False)
+    fantasy_overall_home_strength = db.Column(db.Integer, unique=False, nullable=False)
+    fantasy_overall_away_strength = db.Column(db.Integer, unique=False, nullable=False)
+    fantasy_attack_home_strength = db.Column(db.Integer, unique=False, nullable=False)
+    fantasy_attack_away_strength = db.Column(db.Integer, unique=False, nullable=False)
+    fantasy_defense_home_strength = db.Column(db.Integer, unique=False, nullable=False)
+    fantasy_defense_away_strength = db.Column(db.Integer, unique=False, nullable=False)
 
 
 # db.create_all()
@@ -284,32 +286,21 @@ def ingest_competitions():
     """
     competitions = driver.request_competitions()
     for comp in competitions:
-        db_comp = Competition(name=comp[COMP.NAME],
-                              code=comp[COMP.CODE],
-                              location=comp[COMP.LOCATION],
-                              fd_api_id=comp[COMP.FOOTBALL_DATA_API_ID],
-                              fls_api_id=comp[COMP.FASTEST_LIVE_SCORES_API_ID]
-                              )
+        db_comp = Competition(**comp)
+        # db_comp = Competition(name=comp[COMP.NAME],
+        #                       code=comp[COMP.CODE],
+        #                       location=comp[COMP.LOCATION],
+        #                       fd_api_id=comp[COMP.FOOTBALL_DATA_API_ID],
+        #                       fls_api_id=comp[COMP.FASTEST_LIVE_SCORES_API_ID]
+        #                       )
         standings = driver.request_standings(competition_id=comp[COMP.FOOTBALL_DATA_API_ID])
         if standings:
             for stan in standings['standings']:
-                db_standing = Standings(type=stan[STANDINGS.TYPE],
-                                        season=stan[STANDINGS.SEASON],
-                                        match_day=stan[STANDINGS.MATCH_DAY])
-                for entry in stan[STANDINGS.TABLE]:
-                    se = StandingsEntry(
-                        position=entry[STANDINGS.POSITION],
-                        team_name=entry[STANDINGS.TEAM_NAME],
-                        fd_team_id=entry[STANDINGS.FOOTBALL_DATA_TEAM_ID],
-                        games_played=entry[STANDINGS.GAMES_PLAYED],
-                        games_won=entry[STANDINGS.GAMES_WON],
-                        games_drawn=entry[STANDINGS.GAMES_DRAWN],
-                        games_lost=entry[STANDINGS.GAMES_LOST],
-                        points=entry[STANDINGS.POINTS],
-                        goals_for=entry[STANDINGS.GOALS_FOR],
-                        goals_against=entry[STANDINGS.GOALS_AGAINST],
-                        goals_difference=entry[STANDINGS.GOAL_DIFFERENCE]
-                    )
+                table = stan.pop(STANDINGS.TABLE, [])
+                db_standing = Standings(**stan)
+
+                for entry in table:
+                    se = StandingsEntry(**entry)
                     db_standing.standings_entries.append(se)
 
                 db_comp.standings.append(db_standing)
@@ -532,6 +523,7 @@ def ingest_teams(fls_comp_id, fd_comp_id, season):
 if __name__ == "__main__":
     db.create_all()
     ingest_competitions()
+
     # teams = db.session\
     #     .query(func.max(StandingsEntry.points),
     #            StandingsEntry.team_name, StandingsEntry.team).filter_by(standings_id=8).group_by(StandingsEntry.team_name).all()

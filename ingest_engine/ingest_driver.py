@@ -1,3 +1,6 @@
+from datetime import datetime, timedelta
+from itertools import filterfalse
+
 from ingest_engine.football_data import FootballData
 from ingest_engine.fastest_live_scores_api import FastestLiveScores
 from ingest_engine.fantasy_api import Fantasy, team_mapper, ingest_historical_base_csv, ingest_historical_gameweek_csv
@@ -97,29 +100,37 @@ class Driver(object):
         """
         return self.fd.request_competition_standings(competition_id=competition_id, standing_type=standing_type)
 
-    def request_match(self, competition_name, game_week, season):
+    def request_match(self, fls_comp_id, fd_comp_id, game_week, season, limit=None):
         """
         Retrieve the match details
-        :param competition_name: Name of the competition for which to retrieve matches
+        :param fls_comp_id: FLS comp id
+        :param fd_comp_id: footballdata comp id
         :param game_week: 1, 2, 3....n
         :param season: Identifier for the season e.g. 2018-2019 (for football-data API)
+        :param limit: result set limiter
         :return: Matches over a given gameweek for a given competition and season
         :rtype: list
         """
         # Placeholder
         # competition_id = 2002
         # In FLS, 2 is id for premier league, 2021 in football-data
-        fls_comp_id = 2
-        fd_comp_id = 2021
+        # fls_comp_id = 2
+        # fd_comp_id = 2021
+
+        if isinstance(season, str):
+            season = int(season.split("-")[0])
 
         joint_matches = []
-        fantasy_matches = self.fantasy.request_matches()
+        # fantasy_matches = self.fantasy.request_matches()
         fd_matches = self.fd.request_competition_match(competition_id=fd_comp_id,
                                                        **{fdf.MATCHDAY: game_week, fdf.SEASON: season})
 
-        game_week_start = f'{fd_matches[0][Match.MATCH_UTC_DATE].split("T")[0]}T00:00:00'
-        fls_matches = self.fls.request_matches(**{flsf.COMPETITION_ID: fls_comp_id,
-                                                  flsf.FROM_DATETIME: game_week_start})
+        game_week_start = datetime.strptime(fd_matches[0][Match.MATCH_UTC_DATE], '%Y-%m-%dT%H:%M:%SZ')
+        game_week_end = game_week_start + timedelta(days=4)  # 4 days per game week
+        fls_matches = self.fls.request_matches(**{flsf.FROM_DATETIME: game_week_start,
+                                                  flsf.TO_DATETIME: game_week_end})
+
+        fls_matches = list(filterfalse(lambda x: x[Match.FLS_API_COMPETITION_ID] != fls_comp_id, fls_matches))
 
         for match in fd_matches:
             match_start_datetime = match[Match.MATCH_UTC_DATE]
@@ -133,16 +144,23 @@ class Driver(object):
                         away_score == fls_match[Match.FULL_TIME_AWAY_SCORE]:
                     temp_dict = {**match, **fls_match}
                     adv_match_details = self.fls.request_match_details(match_id=fls_match[Match.FLS_MATCH_ID])
-                    temp_dict2 = {**temp_dict, **adv_match_details}
-                    for f_match in fantasy_matches:
-                        f_home_team = team_mapper(f_match[Match.FANTASY_HOME_TEAM_ID])
-                        f_away_team = team_mapper(f_match[Match.FANTASY_AWAY_TEAM_ID])
-                        if f_match[Match.START_TIME] == match_start_datetime:
-                            if f_home_team in home_team and f_away_team in away_team and \
-                                    home_score == f_match[Match.FULL_TIME_HOME_SCORE] and \
-                                    away_score == f_match[Match.FULL_TIME_AWAY_SCORE]:
-                                final_dict = {**f_match, **temp_dict2}
-                                joint_matches.append(final_dict)
+                    final_dict = {**temp_dict, **adv_match_details}
+                    final_dict.pop(Match.PREVIOUS_ENCOUNTERS)  # for now ignore previous encounters data
+                    final_dict.pop(Match.EVENTS)  # for now ignore events data
+                    joint_matches.append(final_dict)
+                    # for f_match in fantasy_matches:
+                    #     f_home_team = team_mapper(f_match[Match.FANTASY_HOME_TEAM_ID])
+                    #     f_away_team = team_mapper(f_match[Match.FANTASY_AWAY_TEAM_ID])
+                    #     if f_match[Match.START_TIME] == match_start_datetime:
+                    #         if f_home_team in home_team and f_away_team in away_team and \
+                    #                 home_score == f_match[Match.FULL_TIME_HOME_SCORE] and \
+                    #                 away_score == f_match[Match.FULL_TIME_AWAY_SCORE]:
+                    #             final_dict = {**f_match, **temp_dict2}
+                    #             # final_dict = {**f_match, **temp_dict}
+                    #             joint_matches.append(final_dict)
+
+        if limit:
+            return joint_matches[:limit]
 
         return joint_matches
 
@@ -254,9 +272,10 @@ class Driver(object):
 if __name__ == "__main__":
     driver = Driver()
     # print(driver.request_standings(competition_id=2021))
-    print(driver.request_player_details(team_fls_id=1))
+    # print(driver.request_player_details(team_fls_id=1))
     # print(driver.request_player_details(team_name="Liverpool", competition_name="test"))
     # print(driver.request_teams("banter", 2018))
+    print(driver.request_match(fls_comp_id=2,fd_comp_id=2021,game_week=37,season='2018-2019'))
     # print(driver.request_match("banter", game_week=1, season=2018))
     # print(driver.request_competitions())
 
