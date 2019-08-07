@@ -259,7 +259,7 @@ class DBInterface(object):
         Insert record into DB
         :return:
         """
-        if type(record) == dict:
+        if isinstance(record, dict):
             record = [record]
 
         for match in record:
