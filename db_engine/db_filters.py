@@ -119,3 +119,4 @@ match_filter_field = [MATCH.ID,
                       MATCH.FANTASY_AWAY_TEAM_ID]
 
 MatchFilters = namedtuple('match_filters', match_filter_field, defaults=(None,) * len(match_filter_field))
+

@@ -122,17 +122,17 @@ def competition():
         raise InvalidUsage(API_ERROR.COMPETITION_404, status_code=404)
 
 
+@api_service.route('/team/all', methods=['GET'])
 @api_service.route('/team', methods=['GET'])
-@api_service.route('/teams', methods=['GET'])
 def team():
     """
-    /v1/teams will be used to allow OR type querying across all the available teams
+    /v1/team/all will be used to allow OR type querying across all the available teams
     /v1/team is AND querying on competitions but still allows multiple values to be chosen per field
     :return: API request json format
     """
     with current_app.app_context():
         db_interface = current_app.config['db_interface']
-    multi = 'teams' in request.url_rule.rule
+    multi = 'team/all' in request.url_rule.rule
     ra = request.args
     team_filters = TeamFilters(**{k: get_vals(v) for k, v in ra.items()})
     result = jsonify(db_interface.get_team(multi=multi, filters=team_filters))

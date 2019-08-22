@@ -186,7 +186,7 @@ class Driver(object):
             fd_teams[idx] = {**team, **fd_team_extra}
 
         fls_teams = self.fls.request_teams(**{flsf.COMPETITION_ID: fls_comp_id})
-        f_teams = self.fantasy.request_base_information()['teams']
+        # f_teams = self.fantasy.request_base_information()['teams']
 
         for fd_team in fd_teams:
             temp_dict = {}
@@ -194,16 +194,17 @@ class Driver(object):
             for fls_team in fls_teams:
                 if str_comparator(team_name, fls_team[Team.NAME]) >= 0.9:
                     temp_dict = {**fls_team, **fd_team}
+                    joint_teams.append(temp_dict)
                     break
 
-            for f_team in f_teams:
-                # if team_name in f_team[Team.NAME] or f_team[Team.NAME] in team_name:
-                f_team[Team.NAME] = team_mapper(f_team[Team.FANTASY_ID])
-                if str_comparator(team_name, f_team[Team.NAME]) >= 0.9:
-                    final_dict = {**f_team, **temp_dict}
-
-                    joint_teams.append(final_dict)
-                    break
+            # for f_team in f_teams:
+            #     if team_name in f_team[Team.NAME] or f_team[Team.NAME] in team_name:
+                # f_team[Team.NAME] = team_mapper(f_team[Team.FANTASY_ID])
+                # if str_comparator(team_name, f_team[Team.NAME]) >= 0.9:
+                #     final_dict = {**f_team, **temp_dict}
+                #
+                #     joint_teams.append(final_dict)
+                #     break
 
         return joint_teams
 
