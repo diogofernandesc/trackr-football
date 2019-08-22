@@ -1,5 +1,10 @@
 from collections import namedtuple
-from ingest_engine.cons import Team as TEAM, Standings as STANDINGS, Competition as COMPETITION, Match as MATCH
+from ingest_engine.cons import\
+    Team as TEAM,\
+    Standings as STANDINGS, \
+    Competition as COMPETITION, \
+    Match as MATCH, \
+    Player as PLAYER
 
 """
 To add a new table filter:
@@ -119,3 +124,42 @@ match_filter_field = [MATCH.ID,
                       MATCH.FANTASY_AWAY_TEAM_ID]
 
 MatchFilters = namedtuple('match_filters', match_filter_field, defaults=(None,) * len(match_filter_field))
+
+
+player_filter_field = [PLAYER.ID,
+                       PLAYER.NAME,
+                       PLAYER.FIRST_NAME,
+                       PLAYER.LAST_NAME,
+                       PLAYER.DATE_OF_BIRTH,
+                       PLAYER.DATE_OF_BIRTH_EPOCH,
+                       PLAYER.NATIONALITY,
+                       PLAYER.POSITION,
+                       PLAYER.SHIRT_NUMBER,
+                       PLAYER.TEAM,
+                       PLAYER.NUMBER_OF_GOALS,
+                       PLAYER.WEIGHT,
+                       PLAYER.GENDER,
+                       PLAYER.HEIGHT,
+                       PLAYER.TEAM_FLS_ID,
+                       PLAYER.ASSISTS,
+                       PLAYER.RED_CARDS,
+                       PLAYER.COMPETITION_FLS_ID,
+                       PLAYER.YELLOW_CARDS,
+                       PLAYER.FOOTBALL_DATA_API_ID,
+                       PLAYER.FASTEST_LIVE_SCORES_API_ID,
+                       PLAYER.COMPETITION_STATS,
+                       PLAYER.PLAYED_AT_HOME,
+                       PLAYER.PLAYED,
+                       PLAYER.NOT_PLAYED,
+                       PLAYER.FANTASY_TEAM_CODE,
+                       PLAYER.FANTASY_ID,
+                       PLAYER.FANTASY_STATUS,
+                       PLAYER.FANTASY_CODE,
+                       PLAYER.FANTASY_PRICE,
+                       PLAYER.FANTASY_DREAM_TEAM_MEMBER,
+                       PLAYER.FANTASY_SEASON_VALUE,
+                       PLAYER.FANTASY_WEEK_VALUE,
+                       PLAYER.FANTASY_WEEK_PRICE_RISE,
+                       PLAYER.FANTASY_WEEK_PRICE_FALL,
+                       PLAYER.FANTASY_OVERALL_PRICE_RISE,
+                       PLAYER.FANTASY_OVERALL_PRICE_FALL]  # not finished

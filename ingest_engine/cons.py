@@ -200,6 +200,7 @@ class Standings:
 
 
 class Player:
+    ID = 'id'
     NAME = 'name'
     FIRST_NAME = 'first_name'
     LAST_NAME = 'last_name'
