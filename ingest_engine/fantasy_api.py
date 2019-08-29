@@ -128,37 +128,6 @@ def ingest_historical_base_csv(csv_file, season):
     return player_data
 
 
-def team_mapper(team_id):
-    """
-    Retrieve team name based on team_code
-    :param team_code: Fantasy code for a given team
-    :return: team name
-    """
-    mapper = {
-        1: "Arsenal",
-        2: "Bournemouth",
-        3: "Brighton & Hove Albion",
-        4: "Burnley",
-        5: "Cardiff City",
-        6: "Chelsea",
-        7: "Crystal Palace",
-        8: "Everton",
-        9: "Fulham",
-        10: "Huddersfield Town",
-        11: "Leicester City",
-        12: "Liverpool",
-        13: "Manchester City",
-        14: "Manchester United",
-        15: "Newcastle United",
-        16: "Southampton",
-        17: "Tottenham Hotspur",
-        18: "Watford",
-        19: "West Ham United",
-        20: "Wolverhampton Wanderers",
-    }
-    return mapper.get(team_id)
-
-
 class Fantasy(ApiIntegration):
     """
     Wrapper for API available at -> https://fantasy.premierleague.com/api/
@@ -166,6 +135,52 @@ class Fantasy(ApiIntegration):
     def __init__(self):
         super().__init__()
         self.uri = 'https://fantasy.premierleague.com/api/'
+        self.team_mapper = self.build_team_mapper()
+
+    def name_to_id(self, team_id) -> str:
+        """
+        Retrieve team name based on team_code
+        :param team_id: Fantasy code for a given team
+        :return: team name
+        """
+        return self.team_mapper.get(team_id)
+
+    def build_team_mapper(self):
+        """
+        Retrieve team name based on team_code
+        :param team_code: Fantasy code for a given team
+        :return: team name
+        """
+        teams = self.perform_get(built_uri=self.uri + 'bootstrap-static/').get('teams')
+        team_mapper = {}
+        if teams:
+            for team in teams:
+                team_mapper[team[Team.ID]] = team[Team.NAME]
+        else:
+            team_mapper = {
+                1: "Arsenal",
+                2: "Aston Villa",
+                3: "Bournemouth",
+                4: "Brighton & Hove Albion",
+                5: "Burnley",
+                6: "Chelsea",
+                7: "Crystal Palace",
+                8: "Everton",
+                9: "Leicester City",
+                10: "Liverpool",
+                11: "Manchester City",
+                12: "Manchester United",
+                13: "Newcastle United",
+                14: "Norwich",
+                15: "Sheffield United",
+                16: "Southampton",
+                17: "Tottenham Hotspur",
+                18: "Watford",
+                19: "West Ham United",
+                20: "Wolverhampton Wanderers",
+            }
+
+        return team_mapper
 
     def request_base_information(self):
         """
