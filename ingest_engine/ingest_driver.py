@@ -3,7 +3,7 @@ from itertools import filterfalse
 
 from ingest_engine.football_data import FootballData
 from ingest_engine.fastest_live_scores_api import FastestLiveScores
-from ingest_engine.fantasy_api import Fantasy, team_mapper, ingest_historical_base_csv, ingest_historical_gameweek_csv
+from ingest_engine.fantasy_api import Fantasy, ingest_historical_base_csv, ingest_historical_gameweek_csv
 from ingest_engine.cons import Competition, Match, Team, Player
 from ingest_engine.cons import FootballDataApiFilters as fdf
 from ingest_engine.cons import FLSApiFilters as flsf
@@ -121,7 +121,7 @@ class Driver(object):
             season = int(season.split("-")[0])
 
         joint_matches = []
-        # fantasy_matches = self.fantasy.request_matches()
+        fantasy_matches = self.fantasy.request_matches()
         fd_matches = self.fd.request_competition_match(competition_id=fd_comp_id,
                                                        **{fdf.MATCHDAY: game_week, fdf.SEASON: season})
 
@@ -144,20 +144,16 @@ class Driver(object):
                         away_score == fls_match[Match.FULL_TIME_AWAY_SCORE]:
                     temp_dict = {**match, **fls_match}
                     adv_match_details = self.fls.request_match_details(match_id=fls_match[Match.FLS_MATCH_ID])
-                    final_dict = {**temp_dict, **adv_match_details}
-                    final_dict.pop(Match.PREVIOUS_ENCOUNTERS)  # for now ignore previous encounters data
-                    final_dict.pop(Match.EVENTS)  # for now ignore events data
-                    joint_matches.append(final_dict)
-                    # for f_match in fantasy_matches:
-                    #     f_home_team = team_mapper(f_match[Match.FANTASY_HOME_TEAM_ID])
-                    #     f_away_team = team_mapper(f_match[Match.FANTASY_AWAY_TEAM_ID])
-                    #     if f_match[Match.START_TIME] == match_start_datetime:
-                    #         if f_home_team in home_team and f_away_team in away_team and \
-                    #                 home_score == f_match[Match.FULL_TIME_HOME_SCORE] and \
-                    #                 away_score == f_match[Match.FULL_TIME_AWAY_SCORE]:
-                    #             final_dict = {**f_match, **temp_dict2}
-                    #             # final_dict = {**f_match, **temp_dict}
-                    #             joint_matches.append(final_dict)
+                    temp_dict2 = {**temp_dict, **adv_match_details}
+                    for f_match in fantasy_matches:
+                        f_home_team = self.fantasy.name_to_id(f_match[Match.FANTASY_HOME_TEAM_ID])
+                        f_away_team = self.fantasy.name_to_id(f_match[Match.FANTASY_AWAY_TEAM_ID])
+                        if f_match[Match.START_TIME] == match_start_datetime:
+                            if f_home_team in home_team and f_away_team in away_team and \
+                                    home_score == f_match[Match.FULL_TIME_HOME_SCORE] and \
+                                    away_score == f_match[Match.FULL_TIME_AWAY_SCORE]:
+                                final_dict = {**f_match, **temp_dict2}
+                                joint_matches.append(final_dict)
 
         if limit:
             return joint_matches[:limit]
@@ -197,14 +193,17 @@ class Driver(object):
                     joint_teams.append(temp_dict)
                     break
 
-            # for f_team in f_teams:
-            #     if team_name in f_team[Team.NAME] or f_team[Team.NAME] in team_name:
-                # f_team[Team.NAME] = team_mapper(f_team[Team.FANTASY_ID])
-                # if str_comparator(team_name, f_team[Team.NAME]) >= 0.9:
-                #     final_dict = {**f_team, **temp_dict}
-                #
-                #     joint_teams.append(final_dict)
-                #     break
+
+            for f_team in f_teams:
+                # if team_name in f_team[Team.NAME] or f_team[Team.NAME] in team_name:
+                f_team[Team.NAME] = self.fantasy.name_to_id(f_team[Team.FANTASY_ID])
+                if str_comparator(team_name, f_team[Team.NAME]) >= 0.9:
+                    if f_team[Team.NAME] == "Liverpool":
+                        print(f_team)
+                    final_dict = {**f_team, **temp_dict}
+
+                    joint_teams.append(final_dict)
+                    break
 
         return joint_teams
 
@@ -263,7 +262,8 @@ class Driver(object):
 
                 elif str_comparator(player[Player.NAME].split(" ")[0], f_player[Player.FIRST_NAME]) >= 0.8 or \
                         str_comparator(player[Player.NAME].split(" ")[0], f_player[Player.FANTASY_WEB_NAME]) >= 0.8:
-                    if str_comparator(player[Player.TEAM], team_mapper(f_player[Player.FANTASY_TEAM_ID])) >= 0.8:
+                    if str_comparator(player[Player.TEAM],
+                                      self.fantasy.name_to_id(f_player[Player.FANTASY_TEAM_ID])) >= 0.8:
                         final_dict = {**player, **f_player}
                         total_players.append(final_dict)
 
