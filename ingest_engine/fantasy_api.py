@@ -151,11 +151,24 @@ class Fantasy(ApiIntegration):
         :param team_code: Fantasy code for a given team
         :return: team name
         """
+        team_name_fix = {
+            "Spurs": "Tottenham Hotspur",
+            "Wolves": "Wolverhampton Wanderers",
+            "Brighton": "Brighton & Hove Albion",
+            "Leicester": "Leicester City",
+            "Man Utd": "Manchester United",
+            "Man City": "Manchester City",
+            "Sheffield Utd": "Sheffield United",
+            "Newcastle": "Newcastle United",
+            "Norwich": "Norwich City",
+            "West Ham": "West Ham United"
+        }
+
         teams = self.perform_get(built_uri=self.uri + 'bootstrap-static/').get('teams')
         team_mapper = {}
         if teams:
             for team in teams:
-                team_mapper[team[Team.ID]] = team[Team.NAME]
+                team_mapper[team[Team.ID]] = team_name_fix.get(team[Team.NAME], team[Team.NAME])
         else:
             team_mapper = {
                 1: "Arsenal",

@@ -245,7 +245,7 @@ class Team(db.Model):
     phone = db.Column(db.String, unique=True, nullable=True)
     website = db.Column(db.String(120), unique=True, nullable=True)
     email = db.Column(db.String(80), unique=True, nullable=True)
-    year_founded = db.Column(db.Integer, unique=False, nullable=False)
+    year_founded = db.Column(db.Integer, unique=False, nullable=True)
     club_colours = db.Column(db.String(40), unique=False, nullable=False)
     stadium = db.Column(db.String(120), unique=False, nullable=False)
     stadium_lat = db.Column(db.Float, unique=False, nullable=False)
