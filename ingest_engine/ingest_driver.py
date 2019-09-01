@@ -160,20 +160,21 @@ class Driver(object):
 
         return joint_matches
 
-    def request_teams(self, fd_comp_id, fls_comp_id, season):
+    def request_teams(self, fd_comp_id, fls_comp_id, season, limit=None) -> list:
         """
         Retrieve team information from a given competition
         :param fls_comp_id: Competition id from FLS
         :param fd_comp_id: Competition id from FootballData.org
         :param season: season for which to retrieve info
+        :param limit: result set limiter
         :return: list of team info
         :rtype: list
         """
         # In FLS, 2 is id for premier league, 2021 in football-data
-        #   TODO: Database query based on competition name and retrieve fd_id and fls_id for teams
-        # Testing
-        # fls_comp_id = 2
+            # fls_comp_id = 2
         # fd_comp_id = 2021
+        if isinstance(season, str):
+            season = int(season.split("-")[0])
 
         joint_teams = []
         fd_teams = self.fd.request_competition_team(competition_id=fd_comp_id, season=season)
@@ -190,17 +191,18 @@ class Driver(object):
             for fls_team in fls_teams:
                 if str_comparator(team_name, fls_team[Team.NAME]) >= 0.9:
                     temp_dict = {**fls_team, **fd_team}
-                    joint_teams.append(temp_dict)
                     break
 
             for f_team in f_teams:
                 # if team_name in f_team[Team.NAME] or f_team[Team.NAME] in team_name:
                 f_team[Team.NAME] = self.fantasy.name_to_id(f_team[Team.FANTASY_ID])
-                print(f_team)
                 if str_comparator(team_name, f_team[Team.NAME]) >= 0.9:
                     final_dict = {**f_team, **temp_dict}
                     joint_teams.append(final_dict)
                     break
+
+        if limit:
+            return joint_teams[:limit]
 
         return joint_teams
 

@@ -148,16 +148,16 @@ class Player(db.Model):
     date_of_birth_epoch = db.Column(db.BigInteger, unique=False, nullable=True)
     country_of_birth = db.Column(db.String(80), unique=False, nullable=True)
     nationality = db.Column(db.String(80), unique=False, nullable=True)
-    position = db.Column(db.String(80), unique=False, nullable=False)
-    shirt_number = db.Column(db.Integer, unique=False, nullable=False)
+    position = db.Column(db.String(80), unique=False, nullable=True)
+    shirt_number = db.Column(db.Integer, unique=False, nullable=True)
     team = db.Column(db.String(80), unique=False, nullable=False)
-    number_of_goals = db.Column(db.Integer, unique=False, nullable=False)
+    number_of_goals = db.Column(db.Integer, unique=False, nullable=True)
     weight = db.Column(db.Float, unique=False, nullable=True)
     gender = db.Column(db.String(20), unique=False, nullable=True)
     height = db.Column(db.Float, unique=False, nullable=True)
-    team_fls_id = db.Column(db.Integer, unique=False, nullable=False)
-    fd_id = db.Column(db.Integer, unique=False, nullable=True)
-    fls_id = db.Column(db.Integer, unique=False, nullable=False)
+    team_fls_id = db.Column(db.Integer, unique=False, nullable=True)
+    fd_id = db.Column(db.Integer, unique=False, nullable=False)
+    fls_id = db.Column(db.Integer, unique=False, nullable=True)
     web_name = db.Column(db.String(80), unique=False, nullable=True)
     fantasy_team_code = db.Column(db.Integer, unique=False, nullable=True)
     fantasy_id = db.Column(db.Integer, unique=False, nullable=True)
@@ -168,6 +168,7 @@ class Player(db.Model):
     fantasy_news_timestamp = db.Column(db.TIMESTAMP, unique=False, nullable=True)
     photo_url = db.Column(db.String(200), unique=False, nullable=True)
     fantasy_team_id = db.Column(db.Integer, unique=False, nullable=True)
+
 
 
 class MatchStats(db.Model):
@@ -240,10 +241,10 @@ class Team(db.Model):
     short_name = db.Column(db.String(80), unique=False, nullable=False)
     acronym = db.Column(db.String(20), unique=False, nullable=False)
     crest_url = db.Column(db.String(120), unique=True, nullable=False)
-    address = db.Column(db.String(120), unique=True, nullable=False)
-    phone = db.Column(db.String, unique=True, nullable=False)
-    website = db.Column(db.String(120), unique=True, nullable=False)
-    email = db.Column(db.String(80), unique=True, nullable=False)
+    address = db.Column(db.String(120), unique=True, nullable=True)
+    phone = db.Column(db.String, unique=True, nullable=True)
+    website = db.Column(db.String(120), unique=True, nullable=True)
+    email = db.Column(db.String(80), unique=True, nullable=True)
     year_founded = db.Column(db.Integer, unique=False, nullable=False)
     club_colours = db.Column(db.String(40), unique=False, nullable=False)
     stadium = db.Column(db.String(120), unique=False, nullable=False)
@@ -256,8 +257,9 @@ class Team(db.Model):
     fantasy_overall_away_strength = db.Column(db.Integer, unique=False, nullable=False)
     fantasy_attack_home_strength = db.Column(db.Integer, unique=False, nullable=False)
     fantasy_attack_away_strength = db.Column(db.Integer, unique=False, nullable=False)
-    fantasy_defense_home_strength = db.Column(db.Integer, unique=False, nullable=False)
-    fantasy_defense_away_strength = db.Column(db.Integer, unique=False, nullable=False)
+    fantasy_defence_home_strength = db.Column(db.Integer, unique=False, nullable=False)
+    fantasy_defence_away_strength = db.Column(db.Integer, unique=False, nullable=False)
+    fantasy_week_strength = db.Column(db.Integer, unique=False, nullable=False)
 
 
 # db.create_all()
@@ -503,8 +505,8 @@ def ingest_teams(fls_comp_id, fd_comp_id, season):
 
 
 if __name__ == "__main__":
-    # db.create_all()
-    # ingest_competitions()
+    db.create_all()
+    ingest_competitions()
 
     # teams = db.session\
     #     .query(func.max(StandingsEntry.points),
@@ -516,7 +518,7 @@ if __name__ == "__main__":
     # competitions = Competition.query.all()
     # ingest_competitions()
 
-    ingest_teams(fls_comp_id=2, fd_comp_id=2021, season=2019)
+    # ingest_teams(fls_comp_id=2, fd_comp_id=2021, season=2019)
 
 
 

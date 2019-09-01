@@ -1,8 +1,8 @@
 from typing import Union
 
 from sqlalchemy import or_, func
-from db_engine.db_driver import Competition, Team, Standings, StandingsEntry, Match
-from ingest_engine.cons import IGNORE, Team as TEAM, Standings as STANDINGS, Competition as COMPETITION, Match as MATCH
+from db_engine.db_driver import Competition, Team, Standings, StandingsEntry, Match, Player
+from ingest_engine.cons import IGNORE, Team as TEAM, Standings as STANDINGS, Competition as COMPETITION, Match as MATCH, Player as PLAYER
 
 
 def col_exists(table, col):
@@ -150,7 +150,7 @@ class DBInterface(object):
         """
 
         db_filters = []
-        team_query = self.db.session.query(Team).join(Competition, Team.id == Competition.team_id)
+        team_query = self.db.session.query(Team)
         active_filters = [(f, v) for f, v in filters._asdict().items() if v]
 
         for filter_ in active_filters:
@@ -169,6 +169,50 @@ class DBInterface(object):
             query_result = team_query.filter(*db_filters)
 
         return clean_output(query_result, limit=limit)
+
+    def insert_team(self, record: Union[list, dict]):
+        """
+        Insert team record into DB
+        :return:
+        """
+        if isinstance(record, dict):
+            record = [record]
+
+        for team in record:
+            for player in team.get(TEAM.SQUAD):
+                player[PLAYER.TEAM] = team[TEAM.NAME]
+                self.insert_basic_player(fd_id=player[PLAYER.FOOTBALL_DATA_API_ID], record=player)
+            team.pop(TEAM.ACTIVE_COMPETITIONS)  # for now ignore
+            print(team)
+            self.db.session.add(Team(fantasy_id=team[TEAM.FANTASY_ID],
+                                     team_fd_id=team[TEAM.FOOTBALL_DATA_ID],
+                                     name=team[TEAM.NAME],
+                                     country=team[TEAM.COUNTRY],
+                                     short_name=team[TEAM.SHORT_NAME],
+                                     acronym=team[TEAM.ACRONYM],
+                                     crest_url=team[TEAM.CREST_URL],
+                                     address=team[TEAM.ADDRESS],
+                                     phone=team[TEAM.PHONE],
+                                     website=team[TEAM.WEBSITE],
+                                     email=team[TEAM.EMAIL],
+                                     year_founded=team[TEAM.YEAR_FOUNDED],
+                                     club_colours=team[TEAM.CLUB_COLOURS],
+                                     stadium=team[TEAM.STADIUM],
+                                     stadium_lat=team[TEAM.STADIUM_LAT],
+                                     stadium_long=team[TEAM.STADIUM_LONG],
+                                     stadium_capacity=team[TEAM.STADIUM_CAPACITY],
+                                     team_fls_id=team[TEAM.FASTEST_LIVE_SCORES_API_ID],
+                                     fantasy_code=team[TEAM.FANTASY_CODE],
+                                     fantasy_overall_home_strength=team[TEAM.FANTASY_OVERALL_HOME_STRENGTH],
+                                     fantasy_overall_away_strength=team[TEAM.FANTASY_OVERALL_AWAY_STRENGTH],
+                                     fantasy_attack_home_strength=team[TEAM.FANTASY_ATTACK_HOME_STRENGTH],
+                                     fantasy_attack_away_strength=team[TEAM.FANTASY_ATTACK_AWAY_STRENGTH],
+                                     fantasy_defence_home_strength=team[TEAM.FANTASY_DEFENCE_HOME_STRENGTH],
+                                     fantasy_defence_away_strength=team[TEAM.FANTASY_DEFENCE_AWAY_STRENGTH],
+                                     fantasy_week_strength=team[TEAM.FANTASY_WEEK_STRENGTH]))
+                                     # Team(**team))
+
+        self.db.session.commit()
 
     def get_standings(self, limit=10, multi=False, filters=None):
         """
@@ -267,6 +311,21 @@ class DBInterface(object):
             self.db.session.add(Match(**match))
 
         self.db.session.commit()
+
+    def insert_basic_player(self, fd_id, record: Union[list, dict]):
+        """
+        Inserts basic player record
+        :param fd_id: Column used to check if record already exists
+        :param record: Record to insert
+        :return:
+        """
+        player_query = self.db.session.query(Player).filter(Player.fd_id == fd_id)
+        if not player_query.count():  # If player exists
+            record.pop(TEAM.SQUAD_ROLE)
+            self.db.session.add(Player(**record))
+
+        self.db.session.commit()
+
 
 
 

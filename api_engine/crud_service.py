@@ -168,30 +168,23 @@ def get_team() -> dict:
     team_filters = TeamFilters(**{k: get_vals(v) for k, v in ra.items() if k != "limit"})
     db_teams = db_interface.get_team(limit=limit, multi=multi, filters=team_filters)
 
-    match_filters = MatchFilters(**{k: get_vals(v) for k, v in ra.items() if k != "limit"})
-    db_matches = db_interface.get_match(limit=limit, multi=False, filters=match_filters)
-    if db_matches:
-        matches = db_matches
+    if db_teams:
+        teams = db_teams
 
     else:
-        if not multi and MATCH.ID in ra:
-            raise InvalidUsage(API_ERROR.MATCH_404, status_code=404)
+        # if not multi and MATCH.ID in ra:
+        #     raise InvalidUsage(API_ERROR.TEAM_404, status_code=404)
 
-        matches = api_ingest.request_match(fls_comp_id=comp_fls_id,
-                                           fd_comp_id=comp_fd_id,
-                                           game_week=match_day,
-                                           season=season,
-                                           limit=limit
-                                           )
+        teams = api_ingest.request_teams(fd_comp_id=comp_fd_id, fls_comp_id=comp_fls_id, season=season, limit=limit)
 
         # Inserts record into the database in parallel
-        thread = Thread(target=lambda record: db_interface.insert_match(record), kwargs={'record': matches})
+        thread = Thread(target=lambda record: db_interface.insert_team(record), kwargs={'record': teams})
         thread.start()
         thread.join()
 
-    if matches:
-        return jsonify(matches)
+    if teams:
+        return jsonify(teams)
 
     else:
-        raise InvalidUsage(API_ERROR.MATCH_404, status_code=404)
+        raise InvalidUsage(API_ERROR.TEAM_404, status_code=404)
 
