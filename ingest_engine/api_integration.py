@@ -1,6 +1,5 @@
 import requests as re
 import json
-
 SECOND = 1
 
 
@@ -17,7 +16,6 @@ class ApiIntegration(object):
         :param built_uri: API Url to use in GET request
         :return: Parsed results or {} if failed
         """
-
         request = self.session.get(built_uri)
         try:
             result = json.loads(request.text)
@@ -27,6 +25,5 @@ class ApiIntegration(object):
 
         except json.decoder.JSONDecodeError:
             result = {}
-
         return result
 
