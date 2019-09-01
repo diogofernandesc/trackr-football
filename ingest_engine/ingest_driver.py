@@ -196,11 +196,9 @@ class Driver(object):
             for f_team in f_teams:
                 # if team_name in f_team[Team.NAME] or f_team[Team.NAME] in team_name:
                 f_team[Team.NAME] = self.fantasy.name_to_id(f_team[Team.FANTASY_ID])
+                print(f_team)
                 if str_comparator(team_name, f_team[Team.NAME]) >= 0.9:
-                    if f_team[Team.NAME] == "Liverpool":
-                        print(f_team)
                     final_dict = {**f_team, **temp_dict}
-
                     joint_teams.append(final_dict)
                     break
 

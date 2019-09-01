@@ -140,16 +140,17 @@ class DBInterface(object):
 
         return clean_output(query_result)
 
-    def get_team(self, multi=False, filters=None):
+    def get_team(self, limit: int=10,  multi=False, filters=None):
         """
         Query DB for team record
+        :param limit: Optional limit for number of teams to retrieve
         :param multi: Perform OR query on filters, SQL OR otherwise SQL AND
         :param filters: namedtuple with all available filter fields
         :return: matched (if any) team records
         """
 
         db_filters = []
-        team_query = self.db.session.query(Team)
+        team_query = self.db.session.query(Team).join(Competition, Team.id == Competition.team_id)
         active_filters = [(f, v) for f, v in filters._asdict().items() if v]
 
         for filter_ in active_filters:
@@ -167,7 +168,7 @@ class DBInterface(object):
         else:
             query_result = team_query.filter(*db_filters)
 
-        return clean_output(query_result)
+        return clean_output(query_result, limit=limit)
 
     def get_standings(self, limit=10, multi=False, filters=None):
         """

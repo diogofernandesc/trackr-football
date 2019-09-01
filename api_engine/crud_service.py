@@ -1,7 +1,7 @@
 from threading import Thread
 
 from flask import Blueprint, request, jsonify, current_app
-from db_engine.db_filters import StandingsBaseFilters, CompFilters, MatchFilters
+from db_engine.db_filters import StandingsBaseFilters, CompFilters, MatchFilters, TeamFilters
 from api_engine.api_service import get_vals, InvalidUsage
 from api_engine.api_cons import API_ERROR
 from ingest_engine.cons import  Standings as STANDINGS, Competition as COMPETITION, Match as MATCH
@@ -149,21 +149,25 @@ def get_team() -> dict:
     else:
         raise InvalidUsage(API_ERROR.MISSING_COMPETITION_404, status_code=404)
 
-    if STANDINGS.SEASON in ra:
-        season = ra[STANDINGS.SEASON]
+    # if STANDINGS.SEASON in ra:
+    #     season = ra[STANDINGS.SEASON]
 
-    temp_filters[STANDINGS.COMPETITION_ID] = db_id
+    # temp_filters[STANDINGS.COMPETITION_ID] = db_id
 
-    if MATCH.MATCHDAY not in ra:
-        standings_filters = StandingsBaseFilters(**{k: get_vals(v) for k, v in temp_filters.items()})
-        match_day = db_interface.get_last_game_week(filters=standings_filters)
+    # if MATCH.MATCHDAY not in ra:
+    #     standings_filters = StandingsBaseFilters(**{k: get_vals(v) for k, v in temp_filters.items()})
+    #     match_day = db_interface.get_last_game_week(filters=standings_filters)
 
-    else:
-        match_day = ra[MATCH.MATCHDAY]
+    # else:
+    #     match_day = ra[MATCH.MATCHDAY]
 
     # To be used when API compatible with multiple leagues
     # comp_filters = CompFilters(**{k: get_vals(v) for k, v in ra.items()})
     # comp = db_interface.get_competition(multi=False, filters=comp_filters)
+
+    team_filters = TeamFilters(**{k: get_vals(v) for k, v in ra.items() if k != "limit"})
+    db_teams = db_interface.get_team(limit=limit, multi=multi, filters=team_filters)
+
     match_filters = MatchFilters(**{k: get_vals(v) for k, v in ra.items() if k != "limit"})
     db_matches = db_interface.get_match(limit=limit, multi=False, filters=match_filters)
     if db_matches:
