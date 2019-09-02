@@ -45,16 +45,7 @@ def get_match() -> dict:
     season = '2019-2020'
     comp_fd_id = 2021
     comp_fls_id = 2
-    db_id = 2
-    match_day = None
     temp_filters = {}
-
-    # To be used when API compatible with multiple leagues
-    # try:
-    #     assert COMPETITION.ID in ra
-    #
-    # except AssertionError:
-    #     raise InvalidUsage(API_ERROR.NO_COMPETITION_400, status_code=400)
 
     # Get premier league db_id
     comp_filters = CompFilters(**{k: get_vals(v) for k, v in {COMPETITION.NAME: "Premier League"}.items()})
@@ -129,41 +120,6 @@ def get_team() -> dict:
     season = '2019-2020'
     comp_fd_id = 2021
     comp_fls_id = 2
-    db_id = 2
-    match_day = None
-    temp_filters = {}
-
-    # To be used when API compatible with multiple leagues
-    # try:
-    #     assert COMPETITION.ID in ra
-    #
-    # except AssertionError:
-    #     raise InvalidUsage(API_ERROR.NO_COMPETITION_400, status_code=400)
-
-    # Get premier league db_id
-    comp_filters = CompFilters(**{k: get_vals(v) for k, v in {COMPETITION.NAME: "Premier League"}.items()})
-    comp = db_interface.get_competition(filters=comp_filters)
-    if comp:
-        db_id = comp[COMPETITION.ID]
-
-    else:
-        raise InvalidUsage(API_ERROR.MISSING_COMPETITION_404, status_code=404)
-
-    # if STANDINGS.SEASON in ra:
-    #     season = ra[STANDINGS.SEASON]
-
-    # temp_filters[STANDINGS.COMPETITION_ID] = db_id
-
-    # if MATCH.MATCHDAY not in ra:
-    #     standings_filters = StandingsBaseFilters(**{k: get_vals(v) for k, v in temp_filters.items()})
-    #     match_day = db_interface.get_last_game_week(filters=standings_filters)
-
-    # else:
-    #     match_day = ra[MATCH.MATCHDAY]
-
-    # To be used when API compatible with multiple leagues
-    # comp_filters = CompFilters(**{k: get_vals(v) for k, v in ra.items()})
-    # comp = db_interface.get_competition(multi=False, filters=comp_filters)
 
     team_filters = TeamFilters(**{k: get_vals(v) for k, v in ra.items() if k != "limit"})
     db_teams = db_interface.get_team(limit=limit, multi=multi, filters=team_filters)
@@ -172,8 +128,6 @@ def get_team() -> dict:
         teams = db_teams
 
     else:
-        # if not multi and MATCH.ID in ra:
-        #     raise InvalidUsage(API_ERROR.TEAM_404, status_code=404)
 
         teams = api_ingest.request_teams(fd_comp_id=comp_fd_id, fls_comp_id=comp_fls_id, season=season, limit=limit)
 
