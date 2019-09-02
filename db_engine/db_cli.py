@@ -43,6 +43,6 @@ class QueryEngine(object):
         return player_query
 
 
-if __name__ == "__main__":
-    qe = QueryEngine()
-    qe.get_player(fls_api_id=18866, name="Aubameyang")
+# if __name__ == "__main__":
+#     qe = QueryEngine()
+#     qe.get_player(fls_api_id=18866, name="Aubameyang")

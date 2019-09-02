@@ -1,6 +1,6 @@
 import unittest
 from flask_run import app
-from ingest_engine.cons import Competition as COMPETITION, Standings as STANDINGS, Match as MATCH
+from ingest_engine.cons import Competition as COMPETITION, Standings as STANDINGS, Match as MATCH, Team as TEAM
 from api_engine.api_cons import API_ENDPOINTS, API, API_ERROR
 
 
@@ -156,32 +156,6 @@ class ApiInterfaceTest(unittest.TestCase):
         # comp_fd_id = 2021
         # comp_fls_id = 2
 
-        def filter_test(filter_str, filter_val):
-            filter_result = self.api.get(f'/v1/match?{filter_str}={filter_val}').get_json()
-            if not isinstance(filter_result, list):
-                filter_result = [filter_result]
-
-            for result in filter_result:
-                self.assertTrue(result[filter_str], filter_val)
-
-        def filter_test_adv(filter_str, filter_val, op):
-            filter_result = self.api.get(f'/v1/match/all?{filter_str}=${op}:{filter_val}').get_json()
-            if not isinstance(filter_result, list):
-                filter_result = [filter_result]  # Handle returns as dict or list
-
-            for result in filter_result:
-                if op == "lt":
-                    self.assertLess(result[filter_str], filter_val)
-
-                elif op == "lte":
-                    self.assertLessEqual(result[filter_str], filter_val)
-
-                elif op == "gt":
-                    self.assertGreater(result[filter_str], filter_val)
-
-                elif op == "gte":
-                    self.assertGreaterEqual(result[filter_str], filter_val)
-
         all_result = self.api.get('/v1/match/all?limit=5').get_json()
         for result in all_result:
             self.assertTrue(all(k in result for k in (MATCH.ID,
@@ -208,15 +182,24 @@ class ApiInterfaceTest(unittest.TestCase):
         single_result = self.api.get('/v1/match?id=1').get_json()
         self.assertIsInstance(single_result, dict)
 
-        filter_test(MATCH.ID, 1)
-        filter_test(MATCH.MATCHDAY, 2)
-        filter_test(MATCH.HOME_TEAM, "fulham")
+        self.filter_test(MATCH.ID, 1, "match")
 
-        filter_test_adv(filter_str=MATCH.HOME_SCORE_PROBABILITY, filter_val=60, op="lt")
-        filter_test_adv(filter_str=MATCH.AWAY_SCORE_PROBABILITY, filter_val=20, op="gt")
-        filter_test_adv(filter_str=MATCH.HOME_SCORE_PROBABILITY_OVER_1_5, filter_val=10, op="gte")
-        filter_test_adv(filter_str=MATCH.AWAY_SCORE_PROBABILITY_UNDER_3_5, filter_val=90, op="lte")
-        filter_test_adv(filter_str=MATCH.FULL_TIME_AWAY_SCORE, filter_val=2, op="gte")
+        self.filter_test_adv(filter_str=MATCH.HOME_SCORE_PROBABILITY, filter_val=100, op="lt", endpoint="match")
+        self.filter_test_adv(filter_str=MATCH.AWAY_SCORE_PROBABILITY, filter_val=20, op="gt", endpoint="match")
+        self.filter_test_adv(filter_str=MATCH.HOME_SCORE_PROBABILITY_OVER_1_5,
+                             filter_val=10,
+                             op="gte",
+                             endpoint="match")
+
+        self.filter_test_adv(filter_str=MATCH.AWAY_SCORE_PROBABILITY_UNDER_3_5,
+                             filter_val=90,
+                             op="lte",
+                             endpoint="match")
+
+        self.filter_test_adv(filter_str=MATCH.FULL_TIME_AWAY_SCORE,
+                             filter_val=2,
+                             op="gte",
+                             endpoint="match")
 
         filter_result = self.api.get('/v1/match?id=-1').get_json()
         self.assertEqual(filter_result[API.MESSAGE], API_ERROR.MATCH_404)
@@ -229,8 +212,107 @@ class ApiInterfaceTest(unittest.TestCase):
         error_result = self.api.get('v1/match/all?hdas=1').get_json()
         self.assertEqual(error_result[API.MESSAGE], API_ERROR.RESOURCE_NOT_FOUND_404)
         self.assertEqual(error_result[API.STATUS_CODE], 404)
-#
 
+    def testDBTeamUrl(self):
+        # Whilst API is PL only
+        # comp_fd_id = 2021
+        # comp_fls_id = 2
+
+        all_result = self.api.get('/v1/team/all?limit=5').get_json()
+        for result in all_result:
+            self.assertTrue(all(k in result for k in (TEAM.NAME,
+                                                      TEAM.ID,
+                                                      TEAM.FANTASY_CODE,
+                                                      TEAM.FANTASY_ID,
+                                                      TEAM.FANTASY_WEEK_STRENGTH,
+                                                      TEAM.FANTASY_OVERALL_HOME_STRENGTH,
+                                                      TEAM.FANTASY_OVERALL_AWAY_STRENGTH,
+                                                      TEAM.FANTASY_ATTACK_HOME_STRENGTH,
+                                                      TEAM.FANTASY_ATTACK_AWAY_STRENGTH,
+                                                      TEAM.FANTASY_DEFENCE_HOME_STRENGTH,
+                                                      TEAM.FANTASY_DEFENCE_AWAY_STRENGTH,
+                                                      TEAM.SHORT_NAME,
+                                                      TEAM.FASTEST_LIVE_SCORES_API_ID,
+                                                      TEAM.FOOTBALL_DATA_ID)))
+
+        self.assertIsInstance(all_result, list)
+        self.assertEqual(len(all_result), 5)
+
+        fantasy_id_result = self.api.get('/v1/team?fantasy_id=1').get_json()
+        self.assertTrue(all(k in fantasy_id_result for k in (TEAM.NAME,
+                                                             TEAM.ID,
+                                                             TEAM.FANTASY_CODE,
+                                                             TEAM.FANTASY_ID,
+                                                             TEAM.FANTASY_WEEK_STRENGTH,
+                                                             TEAM.FANTASY_OVERALL_HOME_STRENGTH,
+                                                             TEAM.FANTASY_OVERALL_AWAY_STRENGTH,
+                                                             TEAM.FANTASY_ATTACK_HOME_STRENGTH,
+                                                             TEAM.FANTASY_ATTACK_AWAY_STRENGTH,
+                                                             TEAM.FANTASY_DEFENCE_HOME_STRENGTH,
+                                                             TEAM.FANTASY_DEFENCE_AWAY_STRENGTH,
+                                                             TEAM.SHORT_NAME,
+                                                             TEAM.FASTEST_LIVE_SCORES_API_ID,
+                                                             TEAM.FOOTBALL_DATA_ID)))
+        self.assertEqual(fantasy_id_result[TEAM.FANTASY_ID], 1)
+
+        single_result = self.api.get('/v1/team?id=1').get_json()
+        self.assertIsInstance(single_result, dict)
+
+        self.filter_test(TEAM.FOOTBALL_DATA_ID, 61, "team")
+        self.filter_test(TEAM.FANTASY_ID, 2, "team")
+        self.filter_test(TEAM.NAME, "Chelsea", "team")
+
+        self.filter_test_adv(filter_str=TEAM.YEAR_FOUNDED, filter_val=1875, op="lt", endpoint="team")
+        self.filter_test_adv(filter_str=TEAM.FANTASY_OVERALL_HOME_STRENGTH, filter_val=1330, op="gt", endpoint="team")
+        self.filter_test_adv(filter_str=TEAM.FANTASY_OVERALL_AWAY_STRENGTH,
+                             filter_val=1200,
+                             op="gte",
+                             endpoint="team")
+
+        self.filter_test_adv(filter_str=TEAM.FANTASY_ATTACK_HOME_STRENGTH,
+                             filter_val=1240,
+                             op="lte",
+                             endpoint="team")
+
+        self.filter_test_adv(filter_str=TEAM.FANTASY_DEFENCE_AWAY_STRENGTH, filter_val=1100, op="gte", endpoint="team")
+
+        filter_result = self.api.get('/v1/team?id=-1').get_json()
+        self.assertEqual(filter_result[API.MESSAGE], API_ERROR.TEAM_404)
+        self.assertEqual(filter_result[API.STATUS_CODE], 404)
+
+        error_result = self.api.get('/v1/team?fantasy_id=$ltr:3').get_json()
+        self.assertEqual(error_result[API.MESSAGE], API_ERROR.FILTER_PROBLEM_400)
+        self.assertEqual(error_result[API.STATUS_CODE], 400)
+
+        error_result = self.api.get('v1/team/all?hdas=1').get_json()
+        self.assertEqual(error_result[API.MESSAGE], API_ERROR.RESOURCE_NOT_FOUND_404)
+        self.assertEqual(error_result[API.STATUS_CODE], 404)
+
+    def filter_test(self, filter_str, filter_val, endpoint):
+        filter_result = self.api.get(f'/v1/{endpoint}?{filter_str}={filter_val}').get_json()
+        if not isinstance(filter_result, list):
+            filter_result = [filter_result]
+
+        for result in filter_result:
+            self.assertTrue(result[filter_str], filter_val)
+
+    def filter_test_adv(self, filter_str, filter_val, op, endpoint):
+        filter_result = self.api.get(f'/v1/{endpoint}/all?{filter_str}=${op}:{filter_val}').get_json()
+        if not isinstance(filter_result, list):
+            filter_result = [filter_result]  # Handle returns as dict or list
+
+        for result in filter_result:
+            if op == "lt":
+                self.assertLess(result[filter_str], filter_val)
+
+            elif op == "lte":
+                self.assertLessEqual(result[filter_str], filter_val)
+
+            elif op == "gt":
+                self.assertGreater(result[filter_str], filter_val)
+
+            elif op == "gte":
+                self.assertGreaterEqual(result[filter_str], filter_val)
 
 
 

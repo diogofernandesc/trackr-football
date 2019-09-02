@@ -22,7 +22,7 @@ team_filter_fields = [TEAM.ID,
                       TEAM.YEAR_FOUNDED,
                       TEAM.STADIUM_CAPACITY,
                       TEAM.FASTEST_LIVE_SCORES_API_ID,
-                      TEAM.FANTASY_CODE,
+                      TEAM.FANTASY_WEEK_STRENGTH,
                       TEAM.FANTASY_OVERALL_HOME_STRENGTH,
                       TEAM.FANTASY_OVERALL_AWAY_STRENGTH,
                       TEAM.FANTASY_ATTACK_HOME_STRENGTH,
@@ -119,3 +119,4 @@ match_filter_field = [MATCH.ID,
                       MATCH.FANTASY_AWAY_TEAM_ID]
 
 MatchFilters = namedtuple('match_filters', match_filter_field, defaults=(None,) * len(match_filter_field))
+
