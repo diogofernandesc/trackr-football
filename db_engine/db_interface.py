@@ -161,7 +161,7 @@ class DBInterface(object):
                     db_filters.append(Team.name.ilike(f"%{filter_val}%"))
 
                 else:
-                    db_filters.append(Team.__table__.c[filter_[0]] == filter_val)
+                    db_filters.append(filter_parse(query_str=filter_val, table=Team.__table__, column=filter_[0]))
 
         if multi:
             query_result = team_query.filter(or_(*db_filters))
@@ -184,7 +184,9 @@ class DBInterface(object):
                 self.insert_basic_player(fd_id=player[PLAYER.FOOTBALL_DATA_API_ID], record=player)
             team.pop(TEAM.ACTIVE_COMPETITIONS) # for now ignore
             team.pop(TEAM.SQUAD)
-            self.db.session.add(Team(**team))
+            team_query = self.db.session.query(Team).filter(Team.fantasy_id == team.get(TEAM.FANTASY_ID))
+            if not team_query.count():
+                self.db.session.add(Team(**team))
 
         self.db.session.commit()
 
