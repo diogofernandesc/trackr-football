@@ -42,7 +42,7 @@ def get_match() -> dict:
     except ValueError:
         raise InvalidUsage(API_ERROR.INTEGER_LIMIT_400, status_code=400)
 
-    season = '2018-2019'
+    season = '2019-2020'
     comp_fd_id = 2021
     comp_fls_id = 2
     db_id = 2

@@ -301,8 +301,8 @@ class FastestLiveScores(ApiIntegration):
         return total_result
 
 
-if __name__ == "__main__":
-    fls = FastestLiveScores(api_key=os.getenv('FASTEST_LIVE_SCORES_API_KEY'))
+# if __name__ == "__main__":
+#     fls = FastestLiveScores(api_key=os.getenv('FASTEST_LIVE_SCORES_API_KEY'))
 
 
 

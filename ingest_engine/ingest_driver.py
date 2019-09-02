@@ -269,13 +269,13 @@ class Driver(object):
         return total_players
 
 
-if __name__ == "__main__":
-    driver = Driver()
+# if __name__ == "__main__":
+#     driver = Driver()
     # print(driver.request_standings(competition_id=2021))
     # print(driver.request_player_details(team_fls_id=1))
     # print(driver.request_player_details(team_name="Liverpool", competition_name="test"))
     # print(driver.request_teams("banter", 2018))
-    print(driver.request_match(fls_comp_id=2,fd_comp_id=2021,game_week=37,season='2018-2019'))
+    # print(driver.request_match(fls_comp_id=2,fd_comp_id=2021,game_week=37,season='2018-2019'))
     # print(driver.request_match("banter", game_week=1, season=2018))
     # print(driver.request_competitions())
 

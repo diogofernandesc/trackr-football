@@ -445,30 +445,30 @@ class Fantasy(ApiIntegration):
         return total_result
 
 
-if __name__ == "__main__":
-    fantasy = Fantasy()
+# if __name__ == "__main__":
+    # fantasy = Fantasy()
+    # # fantasy.request_base_information()
+    # fantasy.request_matches()
+    # fantasy.request_player_data(player_id=176)
     # fantasy.request_base_information()
-    fantasy.request_matches()
-    fantasy.request_player_data(player_id=176)
-    fantasy.request_base_information()
-    current_path = os.path.dirname(os.path.abspath(__file__))
-    current_path = "/".join(current_path.split("/")[:-1])
-
-    # Extracting week by week player data
-    for week_i in range(1, 38):
-        # Season 2016-2017
-        ingest_historical_gameweek_csv(csv_file=f'{current_path}/historical_fantasy/2016-17/gws/gw{week_i}.csv',
-                                       season='201617')
-
-        # Season 2017-2018
-        ingest_historical_gameweek_csv(csv_file=f'{current_path}/historical_fantasy/2017-18/gws/gw{week_i}.csv',
-                                       season='201718')
-
-    # Extracting historical player information (GIVEN SEASON DETAILED SUMMARY INFORMATION - cleaned_players.csv)
-    # This is equivalent to base information
-    for season in ['2016-17', '2017-18']:
-        ingest_historical_base_csv(csv_file=f'{current_path}/historical_fantasy/{season}/cleaned_players.csv',
-                                   season="".join(season.split("-")))
+    # current_path = os.path.dirname(os.path.abspath(__file__))
+    # current_path = "/".join(current_path.split("/")[:-1])
+    #
+    # # Extracting week by week player data
+    # for week_i in range(1, 38):
+    #     # Season 2016-2017
+    #     ingest_historical_gameweek_csv(csv_file=f'{current_path}/historical_fantasy/2016-17/gws/gw{week_i}.csv',
+    #                                    season='201617')
+    #
+    #     # Season 2017-2018
+    #     ingest_historical_gameweek_csv(csv_file=f'{current_path}/historical_fantasy/2017-18/gws/gw{week_i}.csv',
+    #                                    season='201718')
+    #
+    # # Extracting historical player information (GIVEN SEASON DETAILED SUMMARY INFORMATION - cleaned_players.csv)
+    # # This is equivalent to base information
+    # for season in ['2016-17', '2017-18']:
+    #     ingest_historical_base_csv(csv_file=f'{current_path}/historical_fantasy/{season}/cleaned_players.csv',
+    #                                season="".join(season.split("-")))
 
 
 

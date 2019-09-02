@@ -182,35 +182,9 @@ class DBInterface(object):
             for player in team.get(TEAM.SQUAD):
                 player[PLAYER.TEAM] = team[TEAM.NAME]
                 self.insert_basic_player(fd_id=player[PLAYER.FOOTBALL_DATA_API_ID], record=player)
-            team.pop(TEAM.ACTIVE_COMPETITIONS)  # for now ignore
-            print(team)
-            self.db.session.add(Team(fantasy_id=team[TEAM.FANTASY_ID],
-                                     team_fd_id=team[TEAM.FOOTBALL_DATA_ID],
-                                     name=team[TEAM.NAME],
-                                     country=team[TEAM.COUNTRY],
-                                     short_name=team[TEAM.SHORT_NAME],
-                                     acronym=team[TEAM.ACRONYM],
-                                     crest_url=team[TEAM.CREST_URL],
-                                     address=team[TEAM.ADDRESS],
-                                     phone=team[TEAM.PHONE],
-                                     website=team[TEAM.WEBSITE],
-                                     email=team[TEAM.EMAIL],
-                                     year_founded=team[TEAM.YEAR_FOUNDED],
-                                     club_colours=team[TEAM.CLUB_COLOURS],
-                                     stadium=team[TEAM.STADIUM],
-                                     stadium_lat=team[TEAM.STADIUM_LAT],
-                                     stadium_long=team[TEAM.STADIUM_LONG],
-                                     stadium_capacity=team[TEAM.STADIUM_CAPACITY],
-                                     team_fls_id=team[TEAM.FASTEST_LIVE_SCORES_API_ID],
-                                     fantasy_code=team[TEAM.FANTASY_CODE],
-                                     fantasy_overall_home_strength=team[TEAM.FANTASY_OVERALL_HOME_STRENGTH],
-                                     fantasy_overall_away_strength=team[TEAM.FANTASY_OVERALL_AWAY_STRENGTH],
-                                     fantasy_attack_home_strength=team[TEAM.FANTASY_ATTACK_HOME_STRENGTH],
-                                     fantasy_attack_away_strength=team[TEAM.FANTASY_ATTACK_AWAY_STRENGTH],
-                                     fantasy_defence_home_strength=team[TEAM.FANTASY_DEFENCE_HOME_STRENGTH],
-                                     fantasy_defence_away_strength=team[TEAM.FANTASY_DEFENCE_AWAY_STRENGTH],
-                                     fantasy_week_strength=team[TEAM.FANTASY_WEEK_STRENGTH]))
-                                     # Team(**team))
+            team.pop(TEAM.ACTIVE_COMPETITIONS) # for now ignore
+            team.pop(TEAM.SQUAD)
+            self.db.session.add(Team(**team))
 
         self.db.session.commit()
 
@@ -308,6 +282,19 @@ class DBInterface(object):
             record = [record]
 
         for match in record:
+            match.pop(MATCH.GOALS_SCORED, None)
+            match.pop(MATCH.EVENTS, None)
+            match.pop(MATCH.ASSISTS, None)
+            match.pop(MATCH.OWN_GOALS, None)
+            match.pop(MATCH.BPS, None)
+            match.pop(MATCH.BONUS, None)
+            match.pop(MATCH.BPS, None)
+            match.pop(MATCH.PENALTIES_SAVED, None)
+            match.pop(MATCH.PENALTIES_MISSED, None)
+            match.pop(MATCH.YELLOW_CARDS, None)
+            match.pop(MATCH.RED_CARDS, None)
+            match.pop(MATCH.SAVES, None)
+            match.pop(MATCH.PREVIOUS_ENCOUNTERS, None)
             self.db.session.add(Match(**match))
 
         self.db.session.commit()

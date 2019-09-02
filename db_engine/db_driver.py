@@ -504,9 +504,9 @@ def ingest_teams(fls_comp_id, fd_comp_id, season):
                         db.session.rollback()
 
 
-if __name__ == "__main__":
-    db.create_all()
-    ingest_competitions()
+# if __name__ == "__main__":
+#     db.create_all()
+#     ingest_competitions()
 
     # teams = db.session\
     #     .query(func.max(StandingsEntry.points),
