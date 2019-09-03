@@ -169,14 +169,14 @@ def get_player() -> dict:
     # # player_fd_id = None
     # team_fls_id = None
 
-    if PLAYER.TEAM_FLS_ID in ra:
-        team_fls_id = ra[PLAYER.TEAM_FLS_ID]
+    if PLAYER.FANTASY_TEAM_ID in ra:
+        f_team_id = ra[PLAYER.FANTASY_TEAM_ID]
 
     else:
         raise InvalidUsage(API_ERROR.FILTER_PROBLEM_400, status_code=400)
 
     # Retrieve the player's team
-    temp_filters = {TEAM.FASTEST_LIVE_SCORES_API_ID: team_fls_id}
+    temp_filters = {TEAM.FANTASY_ID: f_team_id}
     team_filters = TeamFilters(**{k: get_vals(v) for k, v in temp_filters.items() if k != "limit"})
     player_team = db_interface.get_team(limit=1, multi=False, filters=team_filters)
     if not player_team:
@@ -189,12 +189,12 @@ def get_player() -> dict:
         players = db_players
 
     else:
-        players = api_ingest.request_player_details(team_fls_id=player_team[TEAM.FASTEST_LIVE_SCORES_API_ID])
+        players = api_ingest.request_player_details(f_team_id=f_team_id)
 
         # Inserts record into the database in parallel
-        # thread = Thread(target=lambda record: db_interface.insert_team(record), kwargs={'record': teams})
-        # thread.start()
-        # thread.join()
+        thread = Thread(target=lambda record: db_interface.insert_player(record), kwargs={'record': players})
+        thread.start()
+        thread.join()
 
     if players:
         return jsonify(players)

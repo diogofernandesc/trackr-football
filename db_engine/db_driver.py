@@ -170,12 +170,31 @@ class Player(db.Model):
     fantasy_news_timestamp = db.Column(db.TIMESTAMP, unique=False, nullable=True)
     photo_url = db.Column(db.String(200), unique=False, nullable=True)
     fantasy_team_id = db.Column(db.Integer, unique=False, nullable=True)
+    bps = db.Column(db.Integer, unique=False, nullable=True)
+    fantasy_overall_price_rise = db.Column(db.Float, unique=False, nullable=True)
+    fantasy_overall_price_fall = db.Column(db.Float, unique=False, nullable=True)
+    fantasy_week_price_rise = db.Column(db.Integer, unique=False, nullable=True)
+    fantasy_week_price_fall = db.Column(db.Integer, unique=False, nullable=True)
+    fantasy_overall_transfers_in = db.Column(db.Integer, unique=False, nullable=True)
+    fantasy_overall_transfers_out = db.Column(db.Integer, unique=False, nullable=True)
+    fantasy_overall_points = db.Column(db.Integer, unique=False, nullable=True)
+    fantasy_point_average = db.Column(db.Float, unique=False, nullable=True)
+    fantasy_total_bonus = db.Column(db.Float, unique=False, nullable=True)
+    fantasy_price = db.Column(db.Integer, unique=False, nullable=True)
+
+    chance_of_playing_this_week = db.Column(db.Integer, unique=False, nullable=True)
+    chance_of_playing_next_week = db.Column(db.Integer, unique=False, nullable=True)
+    fantasy_dream_team_member = db.Column(db.Boolean, unique=False, nullable=True)
+    fantasy_dream_team_count = db.Column(db.Integer, unique=False, nullable=True)
+    fantasy_selection_percentage = db.Column(db.Integer, unique=False, nullable=True)
+    fantasy_form = db.Column(db.Integer, unique=False, nullable=True)
+    fantasy_special = db.Column(db.Boolean, unique=False, nullable=True)
 
 
 class MatchStats(db.Model):
-    id = db.Column(MATCH.ID, db.Integer, primary_key=True)
-    match_id = db.Column(db.Integer, db.ForeignKey('match.id'), nullable=False)
-    player_id = db.Column(db.Integer, db.ForeignKey('player.id'), nullable=False)
+    id = db.Column(db.Integer, primary_key=True)
+    match_id = db.Column(db.Integer, db.ForeignKey('match.id'), nullable=True)
+    player_id = db.Column(db.Integer, db.ForeignKey('player.id'), nullable=True)
     goals_scored = db.Column(db.Integer, unique=False, nullable=True)
     goals_conceded = db.Column(db.Integer, unique=False, nullable=True)
     assists = db.Column(db.Integer, unique=False, nullable=True)
@@ -186,7 +205,6 @@ class MatchStats(db.Model):
     red_cards = db.Column(db.Integer, unique=False, nullable=True)
     saves = db.Column(db.Integer, unique=False, nullable=True)
     bonus = db.Column(db.Integer, unique=False, nullable=True)
-    bps = db.Column(db.Integer, unique=False, nullable=True)
     substitution = db.Column(db.Integer, unique=False, nullable=True)
     clean_sheet = db.Column(db.Boolean, unique=False, nullable=True)
     fantasy_influence = db.Column(db.Float, unique=False, nullable=True)
@@ -194,37 +212,20 @@ class MatchStats(db.Model):
     fantasy_threat = db.Column(db.Float, unique=False, nullable=True)
     fantasy_ict_index = db.Column(db.Float, unique=False, nullable=True)
     played_at_home = db.Column(db.Boolean, unique=False, nullable=True)
+    minutes_played = db.Column(db.Integer, unique=False, nullable=True)
 
 
 class FantasyWeekStats(db.Model):
     id = db.Column(FANTASY_GAME_WEEK.ID, db.Integer, primary_key=True)
     player_id = db.Column(db.Integer, db.ForeignKey('player.id'), nullable=False)
     game_week = db.Column(db.Integer, unique=False, nullable=True)
-    fantasy_price = db.Column(db.Integer, unique=False, nullable=True)
     season_value = db.Column(db.Integer, unique=False, nullable=True)  # Fantasy value
     fantasy_week_points = db.Column(db.Integer, unique=False, nullable=True)
     fantasy_transfers_balance = db.Column(db.Integer, unique=False, nullable=True)
     fantasy_selection_count = db.Column(db.Integer, unique=False, nullable=True)
     fantasy_transfers_in = db.Column(db.Integer, unique=False, nullable=True)
     fantasy_transfers_out = db.Column(db.Integer, unique=False, nullable=True)
-    fantasy_overall_price_rise = db.Column(db.Float, unique=False, nullable=True)
-    fantasy_overall_price_fall = db.Column(db.Float, unique=False, nullable=True)
-    fantasy_week_price_rise = db.Column(db.Integer, unique=False, nullable=True)
-    fantasy_week_price_fall = db.Column(db.Integer, unique=False, nullable=True)
-    fantasy_overall_transfers_in = db.Column(db.Integer, unique=False, nullable=True)
-    fantasy_overall_transfers_out = db.Column(db.Integer, unique=False, nullable=True)
-    fantasy_overall_points = db.Column(db.Integer, unique=False, nullable=True)
-    fantasy_point_average = db.Column(db.Float, unique=False, nullable=True)
-    fantasy_total_bonus = db.Column(db.Float, unique=False, nullable=True)
     fantasy_week_bonus = db.Column(db.Integer, unique=False, nullable=True)
-    chance_of_playing_this_week = db.Column(db.Integer, unique=False, nullable=True)
-    chance_of_playing_next_week = db.Column(db.Integer, unique=False, nullable=True)
-    fantasy_dream_team_member = db.Column(db.Boolean, unique=False, nullable=True)
-    fantasy_dream_team_count = db.Column(db.Integer, unique=False, nullable=True)
-    fantasy_selection_percentage = db.Column(db.Integer, unique=False, nullable=True)
-    fantasy_form = db.Column(db.Integer, unique=False, nullable=True)
-    fantasy_special = db.Column(db.Boolean, unique=False, nullable=True)
-    minutes_played = db.Column(db.Integer, unique=False, nullable=True)
 
 
 class Team(db.Model):
@@ -504,8 +505,8 @@ def ingest_teams(fls_comp_id, fd_comp_id, season):
                         db.session.rollback()
 
 
-# if __name__ == "__main__":
-#     db.create_all()
+if __name__ == "__main__":
+    db.create_all()
 #     ingest_competitions()
 
     # teams = db.session\

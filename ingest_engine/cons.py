@@ -279,6 +279,7 @@ class Player:
     FANTASY_THREAT = 'fantasy_threat'
     FANTASY_ICT_INDEX = 'fantasy_ict_index'  # Influence, creativity, threat index
     FANTASY_TEAM_ID = 'fantasy_team_id'
+    FANTASY_SELECTED = 'fantasy_selected'
 
     FANTASY_SEASON_START_PRICE = 'fantasy_season_start_price'
     FANTASY_SEASON_END_PRICE = 'fantasy_season_start_price'

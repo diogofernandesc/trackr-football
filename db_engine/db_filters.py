@@ -129,7 +129,8 @@ MatchFilters = namedtuple('match_filters', match_filter_field, defaults=(None,) 
 player_crud_filter_field = [
     PLAYER.FOOTBALL_DATA_API_ID,
     PLAYER.TEAM_FD_ID,
-    PLAYER.TEAM_FLS_ID
+    PLAYER.TEAM_FLS_ID,
+    PLAYER.FANTASY_TEAM_ID
 ]
 
 PlayerCrudFilters = namedtuple('player_crud_filters', player_crud_filter_field,

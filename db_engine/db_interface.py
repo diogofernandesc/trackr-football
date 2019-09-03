@@ -1,8 +1,9 @@
 from typing import Union
 
 from sqlalchemy import or_, func
-from db_engine.db_driver import Competition, Team, Standings, StandingsEntry, Match, Player, MatchStats
-from ingest_engine.cons import IGNORE, Team as TEAM, Standings as STANDINGS, Competition as COMPETITION, Match as MATCH, Player as PLAYER
+from db_engine.db_driver import Competition, Team, Standings, StandingsEntry, Match, Player, MatchStats, FantasyWeekStats
+from ingest_engine.cons import IGNORE, Team as TEAM, Standings as STANDINGS, Competition as COMPETITION, Match as MATCH,\
+    Player as PLAYER, MatchEvent as MATCH_EVENT
 
 
 def col_exists(table, col):
@@ -229,6 +230,7 @@ class DBInterface(object):
             record = [record]
 
         for player in record:
+            player_record = None
             player_query = self.db.session.query(Player).filter(Player.name.ilike(player[PLAYER.NAME]))
             if not player_query.count():
                 player_query = self.db.session.query(Player).filter(Player.name.ilike(player[PLAYER.FANTASY_WEB_NAME]))
@@ -245,35 +247,66 @@ class DBInterface(object):
                 player_record.fantasy_news = player.get(PLAYER.FANTASY_NEWS, None)
                 player_record.fantasy_news_timestamp = player.get(PLAYER.FANTASY_NEWS_TIMESTAMP, None)
                 player_record.photo_url = player.get(PLAYER.FANTASY_PHOTO_URL, None)
+                player_record.fantasy_overall_price_rise = player.get(PLAYER.FANTASY_OVERALL_PRICE_RISE, None)
+                player_record.fantasy_overall_price_fall = player.get(PLAYER.FANTASY_OVERALL_PRICE_FALL, None)
+                player_record.fantasy_week_price_rise = player.get(PLAYER.FANTASY_WEEK_PRICE_RISE, None)
+                player_record.fantasy_week_price_fall = player.get(PLAYER.FANTASY_WEEK_PRICE_FALL, None)
+                player_record.fantasy_overall_transfers_in = player.get(PLAYER.FANTASY_OVERALL_TRANSFERS_IN, None)
+                player_record.fantasy_overall_transfers_out = player.get(PLAYER.FANTASY_OVERALL_TRANSFERS_OUT, None)
+                player_record.fantasy_overall_points = player.get(PLAYER.FANTASY_OVERALL_POINTS, None)
+                player_record.fantasy_point_average = player.get(PLAYER.FANTASY_POINT_AVERAGE, None)
+                player_record.fantasy_total_bonus = player.get(PLAYER.FANTASY_TOTAL_BONUS, None)
+                player_record.fantasy_price = player.get(PLAYER.FANTASY_PRICE, None)
+                player_record.chance_of_playing_this_week = player.get(PLAYER.FANTASY_CHANCE_OF_PLAYING_THIS_WEEK, None)
+                player_record.chance_of_playing_next_week = player.get(PLAYER.FANTASY_CHANCE_OF_PLAYING_NEXT_WEEK, None)
+                player_record.fantasy_dream_team_member = player.get(PLAYER.FANTASY_DREAM_TEAM_MEMBER, None)
+                player_record.fantasy_dream_team_count = player.get(PLAYER.FANTASY_DREAM_TEAM_COUNT, None)
+                player_record.fantasy_selection_percentage = player.get(PLAYER.FANTASY_SELECTION_PERCENTAGE, None)
+                player_record.fantasy_form = player.get(PLAYER.FANTASY_FORM, None)
+                player_record.fantasy_special = player.get(PLAYER.FANTASY_SPECIAL, None)
+                player_record.bps = player.get(PLAYER.FANTASY_TOTAL_BONUS, None)
 
             for match in player.get(PLAYER.SEASON_MATCH_HISTORY, []):
-                match_query = self.db.session.query(Match)\
+                fantasy_stats = MatchStats()
+                fantasy_stats.goals_scored = match[PLAYER.NUMBER_OF_GOALS]
+                fantasy_stats.goals_conceded = match[PLAYER.GOALS_CONCEDED]
+                fantasy_stats.assists = match[PLAYER.ASSISTS]
+                fantasy_stats.own_goals = match[PLAYER.OWN_GOALS]
+                fantasy_stats.penalties_saved = match[PLAYER.PENALTIES_SAVED]
+                fantasy_stats.penalties_missed = match[PLAYER.PENALTIES_MISSED]
+                fantasy_stats.yellow_cards = match[PLAYER.YELLOW_CARDS]
+                fantasy_stats.red_cards = match[PLAYER.RED_CARDS]
+                fantasy_stats.saves = match[PLAYER.SAVES]
+                fantasy_stats.clean_sheet = match[MATCH_EVENT.CLEAN_SHEET]
+                fantasy_stats.fantasy_influence = match[PLAYER.FANTASY_INFLUENCE]
+                fantasy_stats.fantasy_creativity = match[PLAYER.FANTASY_CREATIVITY]
+                fantasy_stats.fantasy_threat = match[PLAYER.FANTASY_THREAT]
+                fantasy_stats.fantasy_ict_index = match[PLAYER.FANTASY_ICT_INDEX]
+                fantasy_stats.played_at_home = match[PLAYER.PLAYED_AT_HOME]
+                fantasy_stats.minutes_played = match[PLAYER.MINUTES_PLAYED]
+
+                fantasy_week_stats = FantasyWeekStats()
+                fantasy_week_stats.game_week = match[MATCH.FANTASY_GAME_WEEK]
+                fantasy_week_stats.season_value = match[PLAYER.FANTASY_SEASON_VALUE]
+                fantasy_week_stats.fantasy_week_points = match[PLAYER.FANTASY_WEEK_POINTS]
+                fantasy_week_stats.fantasy_transfers_balance = match[PLAYER.FANTASY_TRANSFERS_BALANCE]
+                fantasy_week_stats.fantasy_selection_count = match[PLAYER.FANTASY_SELECTION_COUNT]
+                fantasy_week_stats.fantasy_transfers_in = match[PLAYER.FANTASY_WEEK_TRANSFERS_IN]
+                fantasy_week_stats.fantasy_transfers_out = match[PLAYER.FANTASY_WEEK_TRANSFERS_OUT]
+                fantasy_week_stats.fantasy_week_bonus = match[PLAYER.FANTASY_WEEK_BONUS]
+
+                if player_record:
+                    player_record.match_stats.append(fantasy_stats)
+                    player_record.week_stats.append(fantasy_week_stats)
+
+                match_query = self.db.session.query(Match) \
                     .filter(Match.fantasy_match_id == match[MATCH.FANTASY_MATCH_ID])
 
                 if match_query.count():
                     match_record = match_query.first()
+                    match_record.stats.append(fantasy_stats)
 
-                else:
-                    match_record = Match()
-                    # match_record.stats.append()
-                match_stats = MatchStats()
-                match_stats.goals_scored = match[PLAYER.NUMBER_OF_GOALS]
-                match_stats.own_goals = match[PLAYER.OWN_GOALS]
-            match_stats.
-
-
-
-            # for player in team.get(TEAM.SQUAD):
-            #     player[PLAYER.TEAM] = team[TEAM.NAME]
-            #     player[PLAYER.TEAM_FD_ID] = team[TEAM.FOOTBALL_DATA_ID]
-            #     self.insert_basic_player(fd_id=player[PLAYER.FOOTBALL_DATA_API_ID], record=player)
-            team.pop(TEAM.ACTIVE_COMPETITIONS)  # for now ignore
-            team.pop(TEAM.SQUAD)
-            team_query = self.db.session.query(Team).filter(Team.fantasy_id == team.get(TEAM.FANTASY_ID))
-            if not team_query.count():
-                self.db.session.add(Team(**team))
-
-        self.db.session.commit()
+            self.db.session.commit()
 
     def get_standings(self, limit=10, multi=False, filters=None):
         """
