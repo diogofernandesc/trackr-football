@@ -5,6 +5,7 @@ import os
 import pandas as pd
 
 
+
 def ingest_historical_gameweek_csv(csv_file, season):
     """
     Parse historical CSVs to json
@@ -127,37 +128,6 @@ def ingest_historical_base_csv(csv_file, season):
     return player_data
 
 
-def team_mapper(team_id):
-    """
-    Retrieve team name based on team_code
-    :param team_code: Fantasy code for a given team
-    :return: team name
-    """
-    mapper = {
-        1: "Arsenal",
-        2: "Bournemouth",
-        3: "Brighton & Hove Albion",
-        4: "Burnley",
-        5: "Cardiff City",
-        6: "Chelsea",
-        7: "Crystal Palace",
-        8: "Everton",
-        9: "Fulham",
-        10: "Huddersfield Town",
-        11: "Leicester City",
-        12: "Liverpool",
-        13: "Manchester City",
-        14: "Manchester United",
-        15: "Newcastle United",
-        16: "Southampton",
-        17: "Tottenham Hotspur",
-        18: "Watford",
-        19: "West Ham United",
-        20: "Wolverhampton Wanderers",
-    }
-    return mapper.get(team_id)
-
-
 class Fantasy(ApiIntegration):
     """
     Wrapper for API available at -> https://fantasy.premierleague.com/api/
@@ -165,24 +135,82 @@ class Fantasy(ApiIntegration):
     def __init__(self):
         super().__init__()
         self.uri = 'https://fantasy.premierleague.com/api/'
+        self.team_mapper = self.build_team_mapper()
 
-    def request_base_information(self, full=False):
+    def name_to_id(self, team_id) -> str:
         """
-        Base information from /bootstrap/ or /bootstrap-static/ endpoint
-        /bootstrap/ call should only be run at database migration or export
-        /bootstrap-static/ called per week for latest updates
-        :param full: Determines whether or not to provide extra info e.g. team codes & field information
+        Retrieve team name based on team_code
+        :param team_id: Fantasy code for a given team
+        :return: team name
+        """
+        return self.team_mapper.get(team_id)
+
+    def build_team_mapper(self):
+        """
+        Retrieve team name based on team_code
+        :param team_code: Fantasy code for a given team
+        :return: team name
+        """
+        team_name_fix = {
+            "Spurs": "Tottenham Hotspur",
+            "Wolves": "Wolverhampton Wanderers",
+            "Brighton": "Brighton & Hove Albion",
+            "Leicester": "Leicester City",
+            "Man Utd": "Manchester United",
+            "Man City": "Manchester City",
+            "Sheffield Utd": "Sheffield United",
+            "Newcastle": "Newcastle United",
+            "Norwich": "Norwich City",
+            "West Ham": "West Ham United"
+        }
+
+        teams = self.perform_get(built_uri=self.uri + 'bootstrap-static/').get('teams')
+        team_mapper = {}
+        if teams:
+            for team in teams:
+                team_mapper[team[Team.ID]] = team_name_fix.get(team[Team.NAME], team[Team.NAME])
+        else:
+            team_mapper = {
+                1: "Arsenal",
+                2: "Aston Villa",
+                3: "Bournemouth",
+                4: "Brighton & Hove Albion",
+                5: "Burnley",
+                6: "Chelsea",
+                7: "Crystal Palace",
+                8: "Everton",
+                9: "Leicester City",
+                10: "Liverpool",
+                11: "Manchester City",
+                12: "Manchester United",
+                13: "Newcastle United",
+                14: "Norwich",
+                15: "Sheffield United",
+                16: "Southampton",
+                17: "Tottenham Hotspur",
+                18: "Watford",
+                19: "West Ham United",
+                20: "Wolverhampton Wanderers",
+            }
+
+        return team_mapper
+
+    def request_base_information(self):
+        """
+        Base information from /bootstrap-static/ endpoint
         :return: Player, team, field etc information
         :rtype: List
         """
-        built_uri = 'bootstrap-static'
-        if full:
-            built_uri = 'bootstrap'
-
+        built_uri = 'bootstrap-static/'
         total_result = {}
 
         result = self.perform_get(built_uri=self.uri+built_uri)
         if result:
+            current_game_week = None
+            for game_week in result['events']:
+                if game_week['is_current']:
+                    current_game_week = int(game_week['id'])  # Retrieve current game week from the id in events
+
             players = []
             teams = []
             game_weeks = []
@@ -238,7 +266,7 @@ class Fantasy(ApiIntegration):
                     Player.FANTASY_CREATIVITY: float(player['creativity']),
                     Player.FANTASY_THREAT: float(player['threat']),
                     Player.FANTASY_ICT_INDEX: float(player['ict_index']),
-                    Player.FANTASY_WEEK: result['current-event']
+                    Player.FANTASY_WEEK: current_game_week
                 }
 
                 if 'ep_this' in player:  # Is there a value for estimated points for next week
@@ -294,7 +322,7 @@ class Fantasy(ApiIntegration):
         :return: Parsed results for player info
         :rtype: dict
         """
-        built_uri = f'element-summary/{player_id}'
+        built_uri = f'element-summary/{player_id}/'
         dict_result = {}
         result = self.perform_get(built_uri=self.uri+built_uri)
         if result:
@@ -305,7 +333,6 @@ class Fantasy(ApiIntegration):
                     for entry in result['history_past']:
                         season_history.append({
                             Season.NAME: entry['season_name'],
-                            Season.FANTASY_CODE: entry['season'],
                             Player.FANTASY_SEASON_START_PRICE: entry['start_cost'],
                             Player.FANTASY_SEASON_END_PRICE: entry['end_cost'],
                             Player.FANTASY_OVERALL_POINTS: entry['total_points'],
@@ -356,24 +383,6 @@ class Fantasy(ApiIntegration):
                             Player.FANTASY_CREATIVITY: match['creativity'],
                             Player.FANTASY_THREAT: match['threat'],
                             Player.FANTASY_ICT_INDEX: match['ict_index'],
-                            Player.OPEN_PLAY_CROSSES: match['open_play_crosses'],
-                            Player.BIG_CHANCES_CREATED: match['big_chances_created'],
-                            Player.CLEARANCES_BLOCKS_INTERCEPTIONS: match['clearances_blocks_interceptions'],
-                            Player.RECOVERIES: match['recoveries'],
-                            Player.KEY_PASSES: match['key_passes'],
-                            Player.TACKLES: match['tackles'],
-                            Player.WINNING_GOALS: match['winning_goals'],
-                            Player.ATTEMPTED_PASSES: match['attempted_passes'],
-                            Player.COMPLETED_PASSES: match['completed_passes'],
-                            Player.PENALTIES_CONCEDED: match['penalties_conceded'],
-                            Player.BIG_CHANCES_MISSED: match['big_chances_missed'],
-                            Player.ERRORS_LEADING_TO_GOAL: match['errors_leading_to_goal'],
-                            Player.ERRORS_LEADING_TO_GOAL_ATTEMPT: match['errors_leading_to_goal_attempt'],
-                            Player.TACKLED: match['tackled'],
-                            Player.OFFSIDE: match['offside'],
-                            Player.TARGET_MISSED: match['target_missed'],
-                            Player.FOULS: match['fouls'],
-                            Player.DRIBBLES: match['dribbles'],
                             Player.FANTASY_OPPONENT_TEAM_ID: match['opponent_team']
                         })
 
@@ -395,7 +404,7 @@ class Fantasy(ApiIntegration):
         :return: Parsed list of fixtures from API endpoint
         :rtype: list
         """
-        built_uri = 'fixtures'
+        built_uri = 'fixtures/'
         total_result = []
         result = self.perform_get(built_uri=self.uri + built_uri)
         if result:
@@ -413,17 +422,16 @@ class Fantasy(ApiIntegration):
                         Match.MINUTES: round(float(match["minutes"])),
                         Match.FANTASY_HOME_TEAM_ID: match["team_h"],
                         Match.FANTASY_AWAY_TEAM_ID: match["team_a"]
-                        # Match.FANTASY_HOME_TEAM_CODE: match["team_h"],
-                        # Match.FANTASY_AWAY_TEAM_CODE: match["team_a"]
                     }
 
                     stats = match["stats"]
                     for stat in stats:
-                        for stat_name, value in stat.items():
+                        stat_name = stat.get('identifier')
+                        if stat_name:
+                            stat.pop('identifier')
                             if stat_name not in match_data:
                                 match_data[stat_name] = []
-
-                            for side, side_value in value.items():
+                            for side, side_value in stat.items():
                                 for entry in side_value:
                                     stat_result = {
                                         Match.GOAL_AMOUNT: entry["value"],
@@ -437,29 +445,30 @@ class Fantasy(ApiIntegration):
         return total_result
 
 
-if __name__ == "__main__":
-    fantasy = Fantasy()
-    # fantasy.request_base_information()
-    fantasy.request_player_data(player_id=1)
+# if __name__ == "__main__":
+    # fantasy = Fantasy()
+    # # fantasy.request_base_information()
     # fantasy.request_matches()
-    current_path = os.path.dirname(os.path.abspath(__file__))
-    current_path = "/".join(current_path.split("/")[:-1])
-
-    # Extracting week by week player data
-    for week_i in range(1, 38):
-        # Season 2016-2017
-        ingest_historical_gameweek_csv(csv_file=f'{current_path}/historical_fantasy/2016-17/gws/gw{week_i}.csv',
-                                       season='201617')
-
-        # Season 2017-2018
-        ingest_historical_gameweek_csv(csv_file=f'{current_path}/historical_fantasy/2017-18/gws/gw{week_i}.csv',
-                                       season='201718')
-
-    # Extracting historical player information (GIVEN SEASON DETAILED SUMMARY INFORMATION - cleaned_players.csv)
-    # This is equivalent to base information
-    for season in ['2016-17', '2017-18']:
-        ingest_historical_base_csv(csv_file=f'{current_path}/historical_fantasy/{season}/cleaned_players.csv',
-                                   season="".join(season.split("-")))
+    # fantasy.request_player_data(player_id=176)
+    # fantasy.request_base_information()
+    # current_path = os.path.dirname(os.path.abspath(__file__))
+    # current_path = "/".join(current_path.split("/")[:-1])
+    #
+    # # Extracting week by week player data
+    # for week_i in range(1, 38):
+    #     # Season 2016-2017
+    #     ingest_historical_gameweek_csv(csv_file=f'{current_path}/historical_fantasy/2016-17/gws/gw{week_i}.csv',
+    #                                    season='201617')
+    #
+    #     # Season 2017-2018
+    #     ingest_historical_gameweek_csv(csv_file=f'{current_path}/historical_fantasy/2017-18/gws/gw{week_i}.csv',
+    #                                    season='201718')
+    #
+    # # Extracting historical player information (GIVEN SEASON DETAILED SUMMARY INFORMATION - cleaned_players.csv)
+    # # This is equivalent to base information
+    # for season in ['2016-17', '2017-18']:
+    #     ingest_historical_base_csv(csv_file=f'{current_path}/historical_fantasy/{season}/cleaned_players.csv',
+    #                                season="".join(season.split("-")))
 
 
 

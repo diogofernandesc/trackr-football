@@ -122,20 +122,37 @@ def competition():
         raise InvalidUsage(API_ERROR.COMPETITION_404, status_code=404)
 
 
+@api_service.route('/team/all', methods=['GET'])
 @api_service.route('/team', methods=['GET'])
-@api_service.route('/teams', methods=['GET'])
 def team():
     """
-    /v1/teams will be used to allow OR type querying across all the available teams
+    /v1/team/all will be used to allow OR type querying across all the available teams
     /v1/team is AND querying on competitions but still allows multiple values to be chosen per field
     :return: API request json format
     """
     with current_app.app_context():
         db_interface = current_app.config['db_interface']
-    multi = 'teams' in request.url_rule.rule
+    multi = 'team/all' in request.url_rule.rule
     ra = request.args
-    team_filters = TeamFilters(**{k: get_vals(v) for k, v in ra.items()})
-    result = jsonify(db_interface.get_team(multi=multi, filters=team_filters))
+    limit = ra.get("limit", 10)
+    result = {}
+    try:
+        limit = int(limit)
+    except ValueError:
+        raise InvalidUsage(API_ERROR.INTEGER_LIMIT_400, status_code=400)
+
+    try:
+        team_filters = TeamFilters(**{k: get_vals(v) for k, v in ra.items() if k != "limit"})
+        result = jsonify(db_interface.get_team(limit=limit, multi=multi, filters=team_filters))
+
+    except exc.DataError as e:
+        if "invalid input syntax" in e.args[0]:  # e.args[0] is the psycopg2 errors text field
+            raise InvalidUsage(API_ERROR.FILTER_PROBLEM_400, status_code=400)
+        else:
+            abort(400)
+
+    except TypeError:
+        raise InvalidUsage(API_ERROR.RESOURCE_NOT_FOUND_404, status_code=404)
 
     if result.json:
         return result
@@ -157,13 +174,24 @@ def standings():
     multi = 'standings/all' in request.url_rule.rule
     ra = request.args
     limit = ra.get("limit", 10)
+    result = {}
     try:
         limit = int(limit)
     except ValueError:
         raise InvalidUsage(API_ERROR.INTEGER_LIMIT_400, status_code=400)
 
-    standings_filters = StandingsFilters(**{k: get_vals(v) for k, v in ra.items() if k != "limit"})
-    result = jsonify(db_interface.get_standings(limit=limit, multi=multi, filters=standings_filters))
+    try:
+        standings_filters = StandingsFilters(**{k: get_vals(v) for k, v in ra.items() if k != "limit"})
+        result = jsonify(db_interface.get_standings(limit=limit, multi=multi, filters=standings_filters))
+
+    except exc.DataError as e:
+        if "invalid input syntax" in e.args[0]:  # e.args[0] is the psycopg2 errors text field
+            raise InvalidUsage(API_ERROR.FILTER_PROBLEM_400, status_code=400)
+        else:
+            abort(400)
+
+    except TypeError:
+        raise InvalidUsage(API_ERROR.RESOURCE_NOT_FOUND_404, status_code=404)
 
     if result.json:
         return result
@@ -186,6 +214,7 @@ def match():
     multi = 'match/all' in request.url_rule.rule
     ra = request.args
     limit = ra.get("limit", 10)
+    result = {}
     try:
         limit = int(limit)
         match_filters = MatchFilters(**{k: get_vals(v) for k, v in ra.items() if k != "limit"})

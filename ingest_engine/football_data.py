@@ -304,18 +304,20 @@ class FootballData(ApiIntegration):
         if match_id and player_id:
             raise ValueError('You cannot request a match passing match_id AND player_id')
 
-        built_uri = f'matches?'
+        built_uri = f'matches'
         if fda.ID in kwargs:
-            built_uri += f'{kwargs.get(fda.ID)}'
+            built_uri += f'/{kwargs.get(fda.ID)}'
 
         elif match_id:
-            built_uri += f'{match_id}'
+            built_uri += f'/{match_id}'
 
         elif player_id:
-            built_uri += f'{player_id}'
+            built_uri = f'players/{player_id}/matches'
 
         else:
             for name_filter, value in kwargs.items():
+                if '?' not in built_uri:
+                    built_uri += '?'
                 built_uri += f'{name_filter}={value}&'
 
         result = self.perform_get(built_uri=built_uri)
@@ -449,10 +451,10 @@ class FootballData(ApiIntegration):
         return data
 
 
-if __name__ == "__main__":
-    fd = FootballData(api_key=os.getenv("FOOTBALL_DATA_API_KEY"))
+# if __name__ == "__main__":
+#     fd = FootballData(api_key=os.getenv("FOOTBALL_DATA_API_KEY"))
     # print(fd.request_competition_standings(competition_id=2002))
-    print(fd.request_competition_standings(competition_id=2002))
+    # print(fd.request_competition_standings(competition_id=2002))
     # fd.request_competition_scorers(competition_id=2002)
 
     # print(fd.request_player(player_id=1))

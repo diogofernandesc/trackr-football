@@ -1,8 +1,8 @@
 from typing import Union
 
 from sqlalchemy import or_, func
-from db_engine.db_driver import Competition, Team, Standings, StandingsEntry, Match
-from ingest_engine.cons import IGNORE, Team as TEAM, Standings as STANDINGS, Competition as COMPETITION, Match as MATCH
+from db_engine.db_driver import Competition, Team, Standings, StandingsEntry, Match, Player
+from ingest_engine.cons import IGNORE, Team as TEAM, Standings as STANDINGS, Competition as COMPETITION, Match as MATCH, Player as PLAYER
 
 
 def col_exists(table, col):
@@ -140,9 +140,10 @@ class DBInterface(object):
 
         return clean_output(query_result)
 
-    def get_team(self, multi=False, filters=None):
+    def get_team(self, limit: int=10,  multi=False, filters=None):
         """
         Query DB for team record
+        :param limit: Optional limit for number of teams to retrieve
         :param multi: Perform OR query on filters, SQL OR otherwise SQL AND
         :param filters: namedtuple with all available filter fields
         :return: matched (if any) team records
@@ -160,14 +161,34 @@ class DBInterface(object):
                     db_filters.append(Team.name.ilike(f"%{filter_val}%"))
 
                 else:
-                    db_filters.append(Team.__table__.c[filter_[0]] == filter_val)
+                    db_filters.append(filter_parse(query_str=filter_val, table=Team.__table__, column=filter_[0]))
 
         if multi:
             query_result = team_query.filter(or_(*db_filters))
         else:
             query_result = team_query.filter(*db_filters)
 
-        return clean_output(query_result)
+        return clean_output(query_result, limit=limit)
+
+    def insert_team(self, record: Union[list, dict]):
+        """
+        Insert team record into DB
+        :return:
+        """
+        if isinstance(record, dict):
+            record = [record]
+
+        for team in record:
+            for player in team.get(TEAM.SQUAD):
+                player[PLAYER.TEAM] = team[TEAM.NAME]
+                self.insert_basic_player(fd_id=player[PLAYER.FOOTBALL_DATA_API_ID], record=player)
+            team.pop(TEAM.ACTIVE_COMPETITIONS) # for now ignore
+            team.pop(TEAM.SQUAD)
+            team_query = self.db.session.query(Team).filter(Team.fantasy_id == team.get(TEAM.FANTASY_ID))
+            if not team_query.count():
+                self.db.session.add(Team(**team))
+
+        self.db.session.commit()
 
     def get_standings(self, limit=10, multi=False, filters=None):
         """
@@ -263,9 +284,37 @@ class DBInterface(object):
             record = [record]
 
         for match in record:
+            match.pop(MATCH.GOALS_SCORED, None)
+            match.pop(MATCH.EVENTS, None)
+            match.pop(MATCH.ASSISTS, None)
+            match.pop(MATCH.OWN_GOALS, None)
+            match.pop(MATCH.BPS, None)
+            match.pop(MATCH.BONUS, None)
+            match.pop(MATCH.BPS, None)
+            match.pop(MATCH.PENALTIES_SAVED, None)
+            match.pop(MATCH.PENALTIES_MISSED, None)
+            match.pop(MATCH.YELLOW_CARDS, None)
+            match.pop(MATCH.RED_CARDS, None)
+            match.pop(MATCH.SAVES, None)
+            match.pop(MATCH.PREVIOUS_ENCOUNTERS, None)
             self.db.session.add(Match(**match))
 
         self.db.session.commit()
+
+    def insert_basic_player(self, fd_id, record: Union[list, dict]):
+        """
+        Inserts basic player record
+        :param fd_id: Column used to check if record already exists
+        :param record: Record to insert
+        :return:
+        """
+        player_query = self.db.session.query(Player).filter(Player.fd_id == fd_id)
+        if not player_query.count():  # If player exists
+            record.pop(TEAM.SQUAD_ROLE)
+            self.db.session.add(Player(**record))
+
+        self.db.session.commit()
+
 
 
 

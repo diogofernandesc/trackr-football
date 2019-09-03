@@ -1,7 +1,7 @@
 from threading import Thread
 
 from flask import Blueprint, request, jsonify, current_app
-from db_engine.db_filters import StandingsBaseFilters, CompFilters, MatchFilters
+from db_engine.db_filters import StandingsBaseFilters, CompFilters, MatchFilters, TeamFilters
 from api_engine.api_service import get_vals, InvalidUsage
 from api_engine.api_cons import API_ERROR
 from ingest_engine.cons import  Standings as STANDINGS, Competition as COMPETITION, Match as MATCH
@@ -42,19 +42,10 @@ def get_match() -> dict:
     except ValueError:
         raise InvalidUsage(API_ERROR.INTEGER_LIMIT_400, status_code=400)
 
-    season = '2018-2019'
+    season = '2019-2020'
     comp_fd_id = 2021
     comp_fls_id = 2
-    db_id = 2
-    match_day = None
     temp_filters = {}
-
-    # To be used when API compatible with multiple leagues
-    # try:
-    #     assert COMPETITION.ID in ra
-    #
-    # except AssertionError:
-    #     raise InvalidUsage(API_ERROR.NO_COMPETITION_400, status_code=400)
 
     # Get premier league db_id
     comp_filters = CompFilters(**{k: get_vals(v) for k, v in {COMPETITION.NAME: "Premier League"}.items()})
@@ -106,3 +97,48 @@ def get_match() -> dict:
 
     else:
         raise InvalidUsage(API_ERROR.MATCH_404, status_code=404)
+
+
+@crud_service.route('/teams', methods=['GET'])
+@crud_service.route('/team', methods=['GET'])
+def get_team() -> dict:
+    """
+    CRUD endpoint for inserting teams into DB
+    :return: Result that is also inserted into DB
+    """
+    with current_app.app_context():
+        db_interface = current_app.config['db_interface']
+
+    multi = 'teams' in request.url_rule.rule
+    ra = request.args
+    limit = ra.get("limit", 20)
+    try:
+        limit = int(limit)
+    except ValueError:
+        raise InvalidUsage(API_ERROR.INTEGER_LIMIT_400, status_code=400)
+
+    season = '2019-2020'
+    comp_fd_id = 2021
+    comp_fls_id = 2
+
+    team_filters = TeamFilters(**{k: get_vals(v) for k, v in ra.items() if k != "limit"})
+    db_teams = db_interface.get_team(limit=limit, multi=multi, filters=team_filters)
+
+    if db_teams:
+        teams = db_teams
+
+    else:
+
+        teams = api_ingest.request_teams(fd_comp_id=comp_fd_id, fls_comp_id=comp_fls_id, season=season, limit=limit)
+
+        # Inserts record into the database in parallel
+        thread = Thread(target=lambda record: db_interface.insert_team(record), kwargs={'record': teams})
+        thread.start()
+        thread.join()
+
+    if teams:
+        return jsonify(teams)
+
+    else:
+        raise InvalidUsage(API_ERROR.TEAM_404, status_code=404)
+
