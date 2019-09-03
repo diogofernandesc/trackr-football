@@ -126,6 +126,15 @@ match_filter_field = [MATCH.ID,
 MatchFilters = namedtuple('match_filters', match_filter_field, defaults=(None,) * len(match_filter_field))
 
 
+player_crud_filter_field = [
+    PLAYER.FOOTBALL_DATA_API_ID,
+    PLAYER.TEAM_FD_ID,
+    PLAYER.TEAM_FLS_ID
+]
+
+PlayerCrudFilters = namedtuple('player_crud_filters', player_crud_filter_field,
+                               defaults=(None,) * len(player_crud_filter_field))
+
 player_filter_field = [PLAYER.ID,
                        PLAYER.NAME,
                        PLAYER.FIRST_NAME,
@@ -163,3 +172,5 @@ player_filter_field = [PLAYER.ID,
                        PLAYER.FANTASY_WEEK_PRICE_FALL,
                        PLAYER.FANTASY_OVERALL_PRICE_RISE,
                        PLAYER.FANTASY_OVERALL_PRICE_FALL]  # not finished
+
+PlayerFilters = namedtuple('player_filters', player_filter_field, defaults=(None,) * len(player_filter_field))

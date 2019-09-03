@@ -245,7 +245,7 @@ class Driver(object):
         # Testing
         # fls_comp_id = 2
         # fd_comp_id = 2021
-        fls_players = self.fls.request_player_details(**{flsf.TEAM_IDS: team_fls_id})
+        # fls_players = self.fls.request_player_details(**{flsf.TEAM_IDS: team_fls_id})
         f_players_base = self.fantasy.request_base_information()['players']
 
         # Join together data from fantasy football
@@ -253,20 +253,20 @@ class Driver(object):
             extra_player_data = self.fantasy.request_player_data(player_id=player[Player.FANTASY_ID])
             f_players_base[idx] = {**extra_player_data, **player}
 
-        for player in fls_players:
-            for f_player in f_players_base:
-                if str_comparator(player[Player.NAME], f_player[Player.NAME]) >= 0.8:
-                    final_dict = {**player, **f_player}
-                    total_players.append(final_dict)
+        # for player in fls_players:
+        #     for f_player in f_players_base:
+        #         if str_comparator(player[Player.NAME], f_player[Player.NAME]) >= 0.8:
+        #             final_dict = {**player, **f_player}
+        #             total_players.append(final_dict)
+        #
+        #         elif str_comparator(player[Player.NAME].split(" ")[0], f_player[Player.FIRST_NAME]) >= 0.8 or \
+        #                 str_comparator(player[Player.NAME].split(" ")[0], f_player[Player.FANTASY_WEB_NAME]) >= 0.8:
+        #             if str_comparator(player[Player.TEAM],
+        #                               self.fantasy.name_to_id(f_player[Player.FANTASY_TEAM_ID])) >= 0.8:
+        #                 final_dict = {**player, **f_player}
+        #                 total_players.append(final_dict)
 
-                elif str_comparator(player[Player.NAME].split(" ")[0], f_player[Player.FIRST_NAME]) >= 0.8 or \
-                        str_comparator(player[Player.NAME].split(" ")[0], f_player[Player.FANTASY_WEB_NAME]) >= 0.8:
-                    if str_comparator(player[Player.TEAM],
-                                      self.fantasy.name_to_id(f_player[Player.FANTASY_TEAM_ID])) >= 0.8:
-                        final_dict = {**player, **f_player}
-                        total_players.append(final_dict)
-
-        return total_players
+        return f_players_base
 
 
 # if __name__ == "__main__":

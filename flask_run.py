@@ -5,8 +5,9 @@ import os
 from db_engine.db_interface import DBInterface
 
 
-app = flask.Flask(__name__)
+app = flask.Flask(__name__, subdomain_matching=True)
 app.config['DEBUG'] = True
+app.config["SERVER_NAME"] = "localhost:5000"
 app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('POSTGRES_CONNECTION_STR')
 app.config['JSON_AS_ASCII'] = False
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False

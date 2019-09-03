@@ -4,7 +4,7 @@ from db_engine.db_filters import TeamFilters, StandingsFilters, CompFilters, Mat
 from ingest_engine.ingest_driver import Driver
 from sqlalchemy import exc
 
-api_service = Blueprint('api_service', __name__, template_folder='templates', url_prefix='/v1')
+api_service = Blueprint('api_service', __name__, template_folder='templates', url_prefix='/v1', subdomain='api')
 api_ingest = Driver()
 
 # db = SQLAlchemy(app)

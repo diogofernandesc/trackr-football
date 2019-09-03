@@ -1,7 +1,7 @@
 from typing import Union
 
 from sqlalchemy import or_, func
-from db_engine.db_driver import Competition, Team, Standings, StandingsEntry, Match, Player
+from db_engine.db_driver import Competition, Team, Standings, StandingsEntry, Match, Player, MatchStats
 from ingest_engine.cons import IGNORE, Team as TEAM, Standings as STANDINGS, Competition as COMPETITION, Match as MATCH, Player as PLAYER
 
 
@@ -181,8 +181,93 @@ class DBInterface(object):
         for team in record:
             for player in team.get(TEAM.SQUAD):
                 player[PLAYER.TEAM] = team[TEAM.NAME]
+                player[PLAYER.TEAM_FD_ID] = team[TEAM.FOOTBALL_DATA_ID]
                 self.insert_basic_player(fd_id=player[PLAYER.FOOTBALL_DATA_API_ID], record=player)
-            team.pop(TEAM.ACTIVE_COMPETITIONS) # for now ignore
+            team.pop(TEAM.ACTIVE_COMPETITIONS)  # for now ignore
+            team.pop(TEAM.SQUAD)
+            team_query = self.db.session.query(Team).filter(Team.fantasy_id == team.get(TEAM.FANTASY_ID))
+            if not team_query.count():
+                self.db.session.add(Team(**team))
+
+        self.db.session.commit()
+
+    def get_player(self, limit: int=10,  multi=False, filters=None):
+        """
+        Query DB for player record
+        :param limit: Optional limit for number of teams to retrieve
+        :param multi: Perform OR query on filters, SQL OR otherwise SQL AND
+        :param filters: namedtuple with all available filter fields
+        :return: matched (if any) team records
+        """
+
+        db_filters = []
+        player_query = self.db.session.query(Player)
+        active_filters = [(f, v) for f, v in filters._asdict().items() if v]
+
+        for filter_ in active_filters:
+            for filter_val in filter_[1]:
+
+                if filter_[0] in [PLAYER.NAME, PLAYER.TEAM, PLAYER.COUNTRY_OF_BIRTH, PLAYER.NATIONALITY]:
+                    db_filters.append(Player.name.ilike(f"%{filter_val}%"))
+
+                else:
+                    db_filters.append(filter_parse(query_str=filter_val, table=Player.__table__, column=filter_[0]))
+
+        if multi:
+            query_result = player_query.filter(or_(*db_filters))
+        else:
+            query_result = player_query.filter(*db_filters)
+
+        return clean_output(query_result, limit=limit)
+
+    def insert_player(self, record: Union[list, dict]):
+        """
+        Insert player record into DB
+        :return:
+        """
+        if isinstance(record, dict):
+            record = [record]
+
+        for player in record:
+            player_query = self.db.session.query(Player).filter(Player.name.ilike(player[PLAYER.NAME]))
+            if not player_query.count():
+                player_query = self.db.session.query(Player).filter(Player.name.ilike(player[PLAYER.FANTASY_WEB_NAME]))
+
+            if player_query.count():
+                player_record = player_query.first()
+                player_record.fantasy_id = player.get(PLAYER.FANTASY_ID, None)
+                player_record.fantasy_code = player.get(PLAYER.FANTASY_CODE, None)
+                player_record.fantasy_team_code = player.get(PLAYER.FANTASY_TEAM_CODE, None)
+                player_record.fantasy_team_id = player.get(PLAYER.FANTASY_TEAM_ID, None)
+                player_record.first_name = player.get(PLAYER.FIRST_NAME, None)
+                player_record.last_name = player.get(PLAYER.LAST_NAME, None)
+                player_record.number_of_goals = player.get(PLAYER.NUMBER_OF_GOALS, None)
+                player_record.fantasy_news = player.get(PLAYER.FANTASY_NEWS, None)
+                player_record.fantasy_news_timestamp = player.get(PLAYER.FANTASY_NEWS_TIMESTAMP, None)
+                player_record.photo_url = player.get(PLAYER.FANTASY_PHOTO_URL, None)
+
+            for match in player.get(PLAYER.SEASON_MATCH_HISTORY, []):
+                match_query = self.db.session.query(Match)\
+                    .filter(Match.fantasy_match_id == match[MATCH.FANTASY_MATCH_ID])
+
+                if match_query.count():
+                    match_record = match_query.first()
+
+                else:
+                    match_record = Match()
+                    # match_record.stats.append()
+                match_stats = MatchStats()
+                match_stats.goals_scored = match[PLAYER.NUMBER_OF_GOALS]
+                match_stats.own_goals = match[PLAYER.OWN_GOALS]
+            match_stats.
+
+
+
+            # for player in team.get(TEAM.SQUAD):
+            #     player[PLAYER.TEAM] = team[TEAM.NAME]
+            #     player[PLAYER.TEAM_FD_ID] = team[TEAM.FOOTBALL_DATA_ID]
+            #     self.insert_basic_player(fd_id=player[PLAYER.FOOTBALL_DATA_API_ID], record=player)
+            team.pop(TEAM.ACTIVE_COMPETITIONS)  # for now ignore
             team.pop(TEAM.SQUAD)
             team_query = self.db.session.query(Team).filter(Team.fantasy_id == team.get(TEAM.FANTASY_ID))
             if not team_query.count():

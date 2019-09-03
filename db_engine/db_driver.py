@@ -127,6 +127,7 @@ class Match(db.Model):
     home_team_difficulty = db.Column(db.Integer, unique=False, nullable=True)
     away_team_difficulty = db.Column(db.Integer, unique=False, nullable=True)
     fantasy_match_code = db.Column(db.Integer, unique=True, nullable=True)
+    fantasy_match_id = db.Column(db.Integer, unique=True, nullable=True)
     minutes = db.Column(db.Integer, unique=False, nullable=True)
     f_home_team_code = db.Column(db.Integer, unique=False, nullable=True)
     f_away_team_code = db.Column(db.Integer, unique=False, nullable=True)
@@ -156,6 +157,7 @@ class Player(db.Model):
     gender = db.Column(db.String(20), unique=False, nullable=True)
     height = db.Column(db.Float, unique=False, nullable=True)
     team_fls_id = db.Column(db.Integer, unique=False, nullable=True)
+    team_fd_id = db.Column(db.Integer, unique=False, nullable=True)
     fd_id = db.Column(db.Integer, unique=False, nullable=False)
     fls_id = db.Column(db.Integer, unique=False, nullable=True)
     web_name = db.Column(db.String(80), unique=False, nullable=True)
@@ -170,12 +172,10 @@ class Player(db.Model):
     fantasy_team_id = db.Column(db.Integer, unique=False, nullable=True)
 
 
-
 class MatchStats(db.Model):
     id = db.Column(MATCH.ID, db.Integer, primary_key=True)
     match_id = db.Column(db.Integer, db.ForeignKey('match.id'), nullable=False)
     player_id = db.Column(db.Integer, db.ForeignKey('player.id'), nullable=False)
-    occurred_at = db.Column(db.TIMESTAMP, unique=False, nullable=True)
     goals_scored = db.Column(db.Integer, unique=False, nullable=True)
     goals_conceded = db.Column(db.Integer, unique=False, nullable=True)
     assists = db.Column(db.Integer, unique=False, nullable=True)
