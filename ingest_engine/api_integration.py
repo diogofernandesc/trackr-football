@@ -1,5 +1,6 @@
 import requests as re
 import json
+import orjson
 SECOND = 1
 
 
@@ -18,12 +19,13 @@ class ApiIntegration(object):
         """
         request = self.session.get(built_uri)
         try:
-            result = json.loads(request.text)
+            result = orjson.loads(request.text)
+            # result = json.loads(request.text)
 
         except re.exceptions.ConnectionError:
             result = {}
 
-        except json.decoder.JSONDecodeError:
+        except orjson.JSONDecodeError:
             result = {}
         return result
 

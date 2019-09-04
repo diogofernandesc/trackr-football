@@ -170,7 +170,6 @@ class Player(db.Model):
     fantasy_news_timestamp = db.Column(db.TIMESTAMP, unique=False, nullable=True)
     photo_url = db.Column(db.String(200), unique=False, nullable=True)
     fantasy_team_id = db.Column(db.Integer, unique=False, nullable=True)
-    bps = db.Column(db.Integer, unique=False, nullable=True)
     fantasy_overall_price_rise = db.Column(db.Float, unique=False, nullable=True)
     fantasy_overall_price_fall = db.Column(db.Float, unique=False, nullable=True)
     fantasy_week_price_rise = db.Column(db.Integer, unique=False, nullable=True)
@@ -180,7 +179,6 @@ class Player(db.Model):
     fantasy_overall_points = db.Column(db.Integer, unique=False, nullable=True)
     fantasy_point_average = db.Column(db.Float, unique=False, nullable=True)
     fantasy_total_bonus = db.Column(db.Float, unique=False, nullable=True)
-    fantasy_price = db.Column(db.Integer, unique=False, nullable=True)
 
     chance_of_playing_this_week = db.Column(db.Integer, unique=False, nullable=True)
     chance_of_playing_next_week = db.Column(db.Integer, unique=False, nullable=True)
@@ -195,6 +193,7 @@ class MatchStats(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     match_id = db.Column(db.Integer, db.ForeignKey('match.id'), nullable=True)
     player_id = db.Column(db.Integer, db.ForeignKey('player.id'), nullable=True)
+    fantasy_match_id = db.Column(db.Integer, unique=False, nullable=True)
     goals_scored = db.Column(db.Integer, unique=False, nullable=True)
     goals_conceded = db.Column(db.Integer, unique=False, nullable=True)
     assists = db.Column(db.Integer, unique=False, nullable=True)

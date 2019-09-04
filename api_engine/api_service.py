@@ -1,6 +1,6 @@
 from flask import request, jsonify, Blueprint, current_app, abort
 from api_engine.api_cons import API_ENDPOINTS, API, ENDPOINT_DESCRIPTION, API_ERROR
-from db_engine.db_filters import TeamFilters, StandingsFilters, CompFilters, MatchFilters
+from db_engine.db_filters import TeamFilters, StandingsFilters, CompFilters, MatchFilters, PlayerFilters
 from ingest_engine.ingest_driver import Driver
 from sqlalchemy import exc
 
@@ -255,8 +255,8 @@ def player():
     limit = ra.get("limit", 10)
     try:
         limit = int(limit)
-        match_filters = MatchFilters(**{k: get_vals(v) for k, v in ra.items() if k != "limit"})
-        result = jsonify(db_interface.get_match(limit=limit, multi=multi, filters=match_filters))
+        player_filters = PlayerFilters(**{k: get_vals(v) for k, v in ra.items() if k != "limit"})
+        result = jsonify(db_interface.get_player(limit=limit, multi=multi, filters=player_filters))
 
     except ValueError:
         raise InvalidUsage(API_ERROR.INTEGER_LIMIT_400, status_code=400)
@@ -274,7 +274,7 @@ def player():
         return result
 
     else:
-        raise InvalidUsage(API_ERROR.MATCH_404, status_code=404)
+        raise InvalidUsage(API_ERROR.PLAYER_404, status_code=404)
 
 
 

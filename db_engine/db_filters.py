@@ -162,16 +162,29 @@ player_filter_field = [PLAYER.ID,
                        PLAYER.PLAYED,
                        PLAYER.NOT_PLAYED,
                        PLAYER.FANTASY_TEAM_CODE,
+                       PLAYER.FANTASY_TEAM_ID,
                        PLAYER.FANTASY_ID,
                        PLAYER.FANTASY_STATUS,
                        PLAYER.FANTASY_CODE,
                        PLAYER.FANTASY_PRICE,
                        PLAYER.FANTASY_DREAM_TEAM_MEMBER,
+                       PLAYER.FANTASY_DREAM_TEAM_COUNT,
                        PLAYER.FANTASY_SEASON_VALUE,
                        PLAYER.FANTASY_WEEK_VALUE,
                        PLAYER.FANTASY_WEEK_PRICE_RISE,
                        PLAYER.FANTASY_WEEK_PRICE_FALL,
                        PLAYER.FANTASY_OVERALL_PRICE_RISE,
-                       PLAYER.FANTASY_OVERALL_PRICE_FALL]  # not finished
+                       PLAYER.FANTASY_OVERALL_PRICE_FALL,
+                       PLAYER.FANTASY_OVERALL_TRANSFERS_IN,  # not finished
+                       PLAYER.FANTASY_OVERALL_TRANSFERS_OUT,
+                       PLAYER.FANTASY_OVERALL_POINTS,
+                       PLAYER.FANTASY_POINT_AVERAGE,
+                       PLAYER.FANTASY_TOTAL_BONUS,
+                       PLAYER.FANTASY_CHANCE_OF_PLAYING_THIS_WEEK,
+                       PLAYER.FANTASY_CHANCE_OF_PLAYING_NEXT_WEEK,
+                       PLAYER.FANTASY_SELECTION_PERCENTAGE,
+                       PLAYER.FANTASY_FORM,
+                       PLAYER.FANTASY_SPECIAL]
+
 
 PlayerFilters = namedtuple('player_filters', player_filter_field, defaults=(None,) * len(player_filter_field))

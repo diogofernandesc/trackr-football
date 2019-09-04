@@ -11,6 +11,10 @@ from ingest_engine.ingest_driver import Driver
 crud_service = Blueprint('crud_service', __name__, template_folder='templates', url_prefix='/v1/db', subdomain='api')
 api_ingest = Driver()
 
+class FilterException(Exception):
+   """Raised when filter applied is incorrect"""
+   pass
+
 
 @crud_service.errorhandler(InvalidUsage)
 def handle_invalid_usage(error):
@@ -168,11 +172,12 @@ def get_player() -> dict:
     #
     # # player_fd_id = None
     # team_fls_id = None
+    try:
+        if PLAYER.FANTASY_TEAM_ID not in ra:
+            raise FilterException
+        f_team_id = int(ra[PLAYER.FANTASY_TEAM_ID])
 
-    if PLAYER.FANTASY_TEAM_ID in ra:
-        f_team_id = ra[PLAYER.FANTASY_TEAM_ID]
-
-    else:
+    except (FilterException, ValueError):
         raise InvalidUsage(API_ERROR.FILTER_PROBLEM_400, status_code=400)
 
     # Retrieve the player's team
@@ -182,19 +187,19 @@ def get_player() -> dict:
     if not player_team:
         raise InvalidUsage(API_ERROR.TEAM_404, status_code=404)
 
-    player_filters = PlayerCrudFilters(**{k: get_vals(v) for k, v in ra.items() if k != "limit"})
-    db_players = db_interface.get_player(limit=limit, multi=multi, filters=player_filters)
+    # player_filters = PlayerCrudFilters(**{k: get_vals(v) for k, v in ra.items() if k != "limit"})
+    # db_players = db_interface.get_player(limit=limit, multi=multi, filters=player_filters)
 
-    if db_players:
-        players = db_players
+    # if db_players:
+    #     players = db_players
 
-    else:
-        players = api_ingest.request_player_details(f_team_id=f_team_id)
+    # else:
+    players = api_ingest.request_player_details(f_team_id=f_team_id)
 
-        # Inserts record into the database in parallel
-        thread = Thread(target=lambda record: db_interface.insert_player(record), kwargs={'record': players})
-        thread.start()
-        thread.join()
+    # Inserts record into the database in parallel
+    thread = Thread(target=lambda record: db_interface.insert_player(record), kwargs={'record': players})
+    thread.start()
+    thread.join()
 
     if players:
         return jsonify(players)
