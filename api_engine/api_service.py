@@ -1,4 +1,5 @@
 from flask import request, jsonify, Blueprint, current_app, abort
+from ingest_engine.cons import Player
 from api_engine.api_cons import API_ENDPOINTS, API, ENDPOINT_DESCRIPTION, API_ERROR
 from db_engine.db_filters import TeamFilters, StandingsFilters, CompFilters, MatchFilters, PlayerFilters
 from ingest_engine.ingest_driver import Driver
@@ -247,16 +248,25 @@ def player():
     /v1/player AND querying on players
     :return: Player data as JSON (if available)
     """
+    result = {}
     with current_app.app_context():
         db_interface = current_app.config['db_interface']
 
     multi = 'player/all' in request.url_rule.rule
     ra = request.args
+    if not ra:
+        raise InvalidUsage(API_ERROR.MISSING_FILTER_400, status_code=400)
     limit = ra.get("limit", 10)
     try:
         limit = int(limit)
         player_filters = PlayerFilters(**{k: get_vals(v) for k, v in ra.items() if k != "limit"})
-        result = jsonify(db_interface.get_player(limit=limit, multi=multi, filters=player_filters))
+        result = db_interface.get_player(limit=limit, multi=multi, filters=player_filters)
+        if isinstance(result, dict):
+            result.pop('matches')
+        elif isinstance(result, list):
+            for player_ in result:
+                player_.pop('matches')
+        result = jsonify(result)
 
     except ValueError:
         raise InvalidUsage(API_ERROR.INTEGER_LIMIT_400, status_code=400)

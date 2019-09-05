@@ -17,6 +17,7 @@ class API_ERROR:
     NO_COMPETITION_400 = 'You need to provide a competition id to query this endpoint'
     MISSING_COMPETITION_404 = 'No competition could be found'
     FILTER_PROBLEM_400 = 'Invalid filter applied'
+    MISSING_FILTER_400 = 'You have not specified a filter to this endpoint'
     RESOURCE_NOT_FOUND_404 = "The resource you're looking for could not be found"
 
 
