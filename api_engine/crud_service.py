@@ -1,7 +1,7 @@
 from threading import Thread
 
 from flask import Blueprint, request, jsonify, current_app
-from db_engine.db_filters import StandingsBaseFilters, CompFilters, MatchFilters, TeamFilters, PlayerCrudFilters
+from db_engine.db_filters import StandingsBaseFilters, CompFilters, MatchFilters, TeamFilters
 from api_engine.api_service import get_vals, InvalidUsage
 from api_engine.api_cons import API_ERROR
 from ingest_engine.cons import  Standings as STANDINGS, Competition as COMPETITION, Match as MATCH, Player as PLAYER\
@@ -158,7 +158,6 @@ def get_player() -> dict:
     with current_app.app_context():
         db_interface = current_app.config['db_interface']
 
-    multi = 'players' in request.url_rule.rule
     ra = request.args
     limit = ra.get("limit", 20)
     try:

@@ -1,6 +1,7 @@
 import unittest
 from ingest_engine.ingest_driver import Driver, str_comparator
-from ingest_engine.cons import Competition, Match, Season, Team, Standings, Player, FootballDataApiFilters as fdf
+from ingest_engine.cons import Competition, Match, Season, Team, Standings, Player, FootballDataApiFilters as fdf, \
+    MatchEvent
 from ingest_engine.cons import FLSApiFilters as flsf
 
 
@@ -158,31 +159,62 @@ class ApiTest(unittest.TestCase):
                                                          Standings.GOAL_DIFFERENCE]))
 
     def testPlayerDetails(self):
-        players = self.driver.request_player_details(team_fls_id=1)
+        players = self.driver.request_player_details(f_team_id=1)
         self.assertTrue(len(players) > 0)
         for player in players:
             self.assertTrue(all(k in player for k in [Player.NAME,
-                                                      Player.WEIGHT,
-                                                      Player.GENDER,
-                                                      Player.TEAM,
-                                                      Player.TEAM_FLS_ID,
                                                       Player.SHIRT_NUMBER,
-                                                      Player.HEIGHT,
-                                                      Player.DATE_OF_BIRTH_EPOCH,
-                                                      Player.FASTEST_LIVE_SCORES_API_ID,
-                                                      Player.POSITION,
-                                                      Player.COMPETITION_STATS,
                                                       Player.FANTASY_ID,
                                                       Player.SEASON_SUMMARIES,
+                                                      Player.FUTURE_FIXTURES,
+                                                      Player.FANTASY_PHOTO_URL,
+                                                      Player.FANTASY_TEAM_CODE,
+                                                      Player.FANTASY_TEAM_ID,
+                                                      Player.FIRST_NAME,
+                                                      Player.LAST_NAME,
+                                                      Player.FANTASY_WEB_NAME,
+                                                      Player.FANTASY_STATUS,
+                                                      Player.FANTASY_NEWS_TIMESTAMP,
+                                                      Player.FANTASY_NEWS,
+                                                      Player.FANTASY_PRICE,
+                                                      Player.FANTASY_CHANCE_OF_PLAYING_THIS_WEEK,
+                                                      Player.FANTASY_CHANCE_OF_PLAYING_NEXT_WEEK,
+                                                      Player.FANTASY_SEASON_VALUE,
+                                                      Player.FANTASY_OVERALL_PRICE_RISE,
+                                                      Player.FANTASY_OVERALL_PRICE_FALL,
+                                                      Player.FANTASY_WEEK_PRICE_RISE,
+                                                      Player.FANTASY_WEEK_PRICE_FALL,
+                                                      Player.FANTASY_DREAM_TEAM_MEMBER,
+                                                      Player.FANTASY_DREAM_TEAM_COUNT,
+                                                      Player.FANTASY_SELECTION_PERCENTAGE,
+                                                      Player.FANTASY_FORM,
+                                                      Player.FANTASY_OVERALL_TRANSFERS_OUT,
+                                                      Player.FANTASY_OVERALL_TRANSFERS_IN,
+                                                      Player.FANTASY_WEEK_TRANSFERS_IN,
+                                                      Player.FANTASY_WEEK_TRANSFERS_OUT,
+                                                      Player.FANTASY_WEEK_POINTS,
+                                                      Player.FANTASY_POINT_AVERAGE,
+                                                      Player.FANTASY_SPECIAL,
+                                                      Player.MINUTES_PLAYED,
+                                                      Player.NUMBER_OF_GOALS,
+                                                      Player.ASSISTS,
+                                                      Player.CLEAN_SHEETS,
+                                                      Player.GOALS_CONCEDED,
+                                                      Player.OWN_GOALS,
+                                                      Player.PENALTIES_MISSED,
+                                                      Player.PENALTIES_SAVED,
+                                                      Player.YELLOW_CARDS,
+                                                      Player.RED_CARDS,
+                                                      Player.SAVES,
+                                                      Player.FANTASY_WEEK_BONUS,
+                                                      Player.FANTASY_TOTAL_BONUS,
+                                                      Player.FANTASY_INFLUENCE,
+                                                      Player.FANTASY_CREATIVITY,
+                                                      Player.FANTASY_THREAT,
+                                                      Player.FANTASY_ICT_INDEX,
+                                                      Player.FANTASY_WEEK,
+                                                      Player.FANTASY_ESTIMATED_WEEK_POINTS
                                                       ]))
-
-            for stat in player[Player.COMPETITION_STATS]:
-                self.assertTrue(all(k in stat for k in [Competition.NAME,
-                                                        Competition.FASTEST_LIVE_SCORES_API_ID,
-                                                        Player.ASSISTS,
-                                                        Player.NUMBER_OF_GOALS,
-                                                        Player.RED_CARDS,
-                                                        Player.YELLOW_CARDS]))
 
             for summary in player[Player.SEASON_SUMMARIES]:
                 self.assertTrue(all(k in summary for k in [Season.NAME,
@@ -203,6 +235,7 @@ class ApiTest(unittest.TestCase):
 
             for match in player[Player.SEASON_MATCH_HISTORY]:
                 self.assertTrue(all(k in match for k in [Match.START_TIME,
+                                                         Match.FANTASY_GAME_WEEK,
                                                          Match.FULL_TIME_HOME_SCORE,
                                                          Match.FULL_TIME_AWAY_SCORE,
                                                          Player.PLAYED_AT_HOME,
@@ -215,7 +248,7 @@ class ApiTest(unittest.TestCase):
                                                          Player.MINUTES_PLAYED,
                                                          Player.NUMBER_OF_GOALS,
                                                          Player.ASSISTS,
-                                                         Player.CLEAN_SHEETS,
+                                                         MatchEvent.CLEAN_SHEET,
                                                          Player.GOALS_CONCEDED,
                                                          Player.OWN_GOALS,
                                                          Player.PENALTIES_SAVED,

@@ -1,5 +1,4 @@
 from flask import request, jsonify, Blueprint, current_app, abort
-from ingest_engine.cons import Player
 from api_engine.api_cons import API_ENDPOINTS, API, ENDPOINT_DESCRIPTION, API_ERROR
 from db_engine.db_filters import TeamFilters, StandingsFilters, CompFilters, MatchFilters, PlayerFilters
 from ingest_engine.ingest_driver import Driver

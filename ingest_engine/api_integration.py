@@ -20,7 +20,6 @@ class ApiIntegration(object):
         request = self.session.get(built_uri)
         try:
             result = orjson.loads(request.text)
-            # result = json.loads(request.text)
 
         except re.exceptions.ConnectionError:
             result = {}
