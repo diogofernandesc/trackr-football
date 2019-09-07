@@ -170,7 +170,6 @@ class Player(db.Model):
     fantasy_team_id = db.Column(db.Integer, unique=False, nullable=True)
 
 
-
 class MatchStats(db.Model):
     id = db.Column(MATCH.ID, db.Integer, primary_key=True)
     match_id = db.Column(db.Integer, db.ForeignKey('match.id'), nullable=False)

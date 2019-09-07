@@ -27,6 +27,9 @@ class API_ENDPOINTS:
     STANDINGS = 'standings'
     STATS = 'stats'
 
+class DB_QUERY_FIELD:
+    PLAYER_ID = 'player_id'
+    MATCH_ID = 'match_id'
 
 ENDPOINT_DESCRIPTION = {
     API_ENDPOINTS.TEAMS: "Details about each team",

@@ -1,6 +1,8 @@
 from collections import namedtuple
-from ingest_engine.cons import Team as TEAM, Standings as STANDINGS, Competition as COMPETITION, Match as MATCH
+from ingest_engine.cons import Team as TEAM, Standings as STANDINGS, Competition as COMPETITION, Match as MATCH\
+    , MatchEvent as MATCH_EVENT, Player as PLAYER
 
+from api_engine.api_cons import DB_QUERY_FIELD
 """
 To add a new table filter:
  - Add a list of filters, preferably a list of string constants representing the column names that can be filtered on
@@ -119,4 +121,28 @@ match_filter_field = [MATCH.ID,
                       MATCH.FANTASY_AWAY_TEAM_ID]
 
 MatchFilters = namedtuple('match_filters', match_filter_field, defaults=(None,) * len(match_filter_field))
+
+
+stat_filter_field = [MATCH.GOALS_SCORED,
+                     MATCH.GOALS_CONCEDED,
+                     MATCH.ASSISTS,
+                     MATCH.OWN_GOALS,
+                     MATCH.PENALTIES_SAVED,
+                     MATCH.PENALTIES_MISSED,
+                     MATCH.YELLOW_CARDS,
+                     MATCH.RED_CARDS,
+                     MATCH.SAVES,
+                     MATCH.BONUS,
+                     MATCH.BPS,
+                     MATCH_EVENT.CLEAN_SHEET,
+                     PLAYER.FANTASY_INFLUENCE,
+                     PLAYER.FANTASY_CREATIVITY,
+                     PLAYER.FANTASY_THREAT,
+                     PLAYER.FANTASY_ICT_INDEX,
+                     PLAYER.PLAYED_AT_HOME,
+                     DB_QUERY_FIELD.PLAYER_ID,
+                     DB_QUERY_FIELD.MATCH_ID]
+
+StatFilters = namedtuple('stat_filters', stat_filter_field, defaults=(None,) * len(stat_filter_field))
+
 

@@ -1,6 +1,6 @@
 from flask import request, jsonify, Blueprint, current_app, abort
 from api_engine.api_cons import API_ENDPOINTS, API, ENDPOINT_DESCRIPTION, API_ERROR
-from db_engine.db_filters import TeamFilters, StandingsFilters, CompFilters, MatchFilters
+from db_engine.db_filters import TeamFilters, StandingsFilters, CompFilters, MatchFilters, StatFilters
 from ingest_engine.ingest_driver import Driver
 from sqlalchemy import exc
 
@@ -217,7 +217,7 @@ def match():
     result = {}
     try:
         limit = int(limit)
-        match_filters = MatchFilters(**{k: get_vals(v) for k, v in ra.items() if k != "limit"})
+        match_filters = Matc(**{k: get_vals(v) for k, v in ra.items() if k != "limit"})
         result = jsonify(db_interface.get_match(limit=limit, multi=multi, filters=match_filters))
 
     except ValueError:
@@ -237,6 +237,43 @@ def match():
 
     else:
         raise InvalidUsage(API_ERROR.MATCH_404, status_code=404)
+
+@api_service.route('/stats', methods=['GET'])
+def stats():
+    """
+    Returns match stats for a specific player or match
+    :return: Match stat data as JSON (if available)
+    """
+    with current_app.app_context():
+        db_interface = current_app.config['db_interface']
+
+    ra = request.args
+    limit = ra.get("limit", 10)
+    result = {}
+    try:
+        limit = int(limit)
+        match_filters = StatFilters(**{k: get_vals(v) for k, v in ra.items() if k != "limit"})
+        result = jsonify(db_interface.get_stats(limit=limit, filters=match_filters))
+
+    except ValueError:
+        raise InvalidUsage(API_ERROR.INTEGER_LIMIT_400, status_code=400)
+
+    except exc.DataError as e:
+        if "invalid input syntax" in e.args[0]:  # e.args[0] is the psycopg2 errors text field
+            raise InvalidUsage(API_ERROR.FILTER_PROBLEM_400, status_code=400)
+        else:
+            abort(400)
+
+    except TypeError:
+        raise InvalidUsage(API_ERROR.RESOURCE_NOT_FOUND_404, status_code=404)
+
+    if result.json:
+        return result
+
+    else:
+        raise InvalidUsage(API_ERROR.MATCH_404, status_code=404)
+
+
 
 
 

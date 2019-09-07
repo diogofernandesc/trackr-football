@@ -1,7 +1,7 @@
 from typing import Union
 
 from sqlalchemy import or_, func
-from db_engine.db_driver import Competition, Team, Standings, StandingsEntry, Match, Player
+from db_engine.db_driver import Competition, Team, Standings, StandingsEntry, Match, Player, MatchStats
 from ingest_engine.cons import IGNORE, Team as TEAM, Standings as STANDINGS, Competition as COMPETITION, Match as MATCH, Player as PLAYER
 
 
@@ -300,6 +300,25 @@ class DBInterface(object):
             self.db.session.add(Match(**match))
 
         self.db.session.commit()
+
+    def get_stats(self, limit: int = 10, filters=None) -> dict:
+        """
+        Query DB for stats record
+        :param filters: namedtuple with all available filter fields
+        :param limit: Result set size
+        :return: matched (if any) match stats records
+        """
+        db_filters = []
+        match_query = self.db.session.query(MatchStats)
+        active_filters = [(f, v) for f, v in filters._asdict().items() if v]
+
+        for filter_ in active_filters:
+            for filter_val in filter_[1]:
+                db_filters.append(filter_parse(query_str=filter_val, table=MatchStats.__table__, column=filter_[0]))
+
+        query_result = match_query.filter(*db_filters)
+
+        return clean_output(query_result, limit=limit)
 
     def insert_basic_player(self, fd_id, record: Union[list, dict]):
         """
