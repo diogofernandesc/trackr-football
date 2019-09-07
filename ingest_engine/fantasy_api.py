@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from ingest_engine.cons import *
 from ingest_engine.cons import FANTASY_STATUS_MAPPER as st_mapper
 from ingest_engine.api_integration import ApiIntegration
@@ -355,11 +357,15 @@ class Fantasy(ApiIntegration):
             if fixture_data:
                 if 'history' in result:
                     match_history = []
-                    for match in result['history']:
+                    # Sort matches per week to know which game week the match belongs to
+                    sorted(result['history'], key=lambda m: datetime.strptime(m['kickoff_time'], '%Y-%m-%dT%H:%M:%SZ'))
+                    for idx, match in enumerate(result['history']):
                         match_history.append({
                             Match.START_TIME: match['kickoff_time'],
+                            Match.FANTASY_GAME_WEEK: idx + 1,
                             Match.FULL_TIME_HOME_SCORE: match['team_h_score'],
                             Match.FULL_TIME_AWAY_SCORE: match['team_a_score'],
+                            Match.FANTASY_MATCH_ID: match['fixture'],
                             Player.PLAYED_AT_HOME: match['was_home'],
                             Player.FANTASY_WEEK_POINTS: match['total_points'],
                             Player.FANTASY_SEASON_VALUE: match['value'],
@@ -370,7 +376,7 @@ class Fantasy(ApiIntegration):
                             Player.MINUTES_PLAYED: round(float(match['minutes'])),
                             Player.NUMBER_OF_GOALS: match['goals_scored'],
                             Player.ASSISTS: match['assists'],
-                            Player.CLEAN_SHEETS: match['clean_sheets'],
+                            MatchEvent.CLEAN_SHEET: match['clean_sheets'],
                             Player.GOALS_CONCEDED: match['goals_conceded'],
                             Player.OWN_GOALS: match['own_goals'],
                             Player.PENALTIES_SAVED: match['penalties_saved'],
@@ -383,7 +389,8 @@ class Fantasy(ApiIntegration):
                             Player.FANTASY_CREATIVITY: match['creativity'],
                             Player.FANTASY_THREAT: match['threat'],
                             Player.FANTASY_ICT_INDEX: match['ict_index'],
-                            Player.FANTASY_OPPONENT_TEAM_ID: match['opponent_team']
+                            Player.FANTASY_OPPONENT_TEAM_ID: match['opponent_team'],
+
                         })
 
                     dict_result[Player.SEASON_MATCH_HISTORY] = match_history
@@ -417,6 +424,7 @@ class Fantasy(ApiIntegration):
                         Match.HOME_TEAM_DIFFICULTY: match["team_h_difficulty"],
                         Match.AWAY_TEAM_DIFFICULTY: match["team_a_difficulty"],
                         Match.FANTASY_MATCH_CODE: match["code"],
+                        Match.FANTASY_MATCH_ID: match["id"],
                         Match.FULL_TIME_HOME_SCORE: match["team_h_score"],
                         Match.FULL_TIME_AWAY_SCORE: match["team_a_score"],
                         Match.MINUTES: round(float(match["minutes"])),
