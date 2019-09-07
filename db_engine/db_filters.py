@@ -4,7 +4,8 @@ from ingest_engine.cons import\
     Standings as STANDINGS, \
     Competition as COMPETITION, \
     Match as MATCH, \
-    Player as PLAYER
+    Player as PLAYER, \
+    FantasyGameWeek as FANTASY_GAME_WEEK
 
 """
 To add a new table filter:
@@ -184,7 +185,8 @@ player_filter_field = [PLAYER.ID,
                        PLAYER.FANTASY_CHANCE_OF_PLAYING_NEXT_WEEK,
                        PLAYER.FANTASY_SELECTION_PERCENTAGE,
                        PLAYER.FANTASY_FORM,
-                       PLAYER.FANTASY_SPECIAL]
+                       PLAYER.FANTASY_SPECIAL,
+                       FANTASY_GAME_WEEK.WEEK]
 
 
 PlayerFilters = namedtuple('player_filters', player_filter_field, defaults=(None,) * len(player_filter_field))

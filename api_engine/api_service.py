@@ -3,9 +3,12 @@ from api_engine.api_cons import API_ENDPOINTS, API, ENDPOINT_DESCRIPTION, API_ER
 from db_engine.db_filters import TeamFilters, StandingsFilters, CompFilters, MatchFilters, PlayerFilters
 from ingest_engine.ingest_driver import Driver
 from sqlalchemy import exc
+import logging
 
 api_service = Blueprint('api_service', __name__, template_folder='templates', url_prefix='/v1', subdomain='api')
 api_ingest = Driver()
+
+logging.basicConfig(format='%(asctime)s - %(message)s', level=logging.INFO)
 
 # db = SQLAlchemy(app)
 # db_interface = DBInterface(db=db)
@@ -276,7 +279,8 @@ def player():
         else:
             abort(400)
 
-    except TypeError:
+    except TypeError as e:
+        logging.error(e)
         raise InvalidUsage(API_ERROR.RESOURCE_NOT_FOUND_404, status_code=404)
 
     if result.json:

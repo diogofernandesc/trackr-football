@@ -222,8 +222,8 @@ class FantasyWeekStats(db.Model):
     fantasy_week_points = db.Column(db.Integer, unique=False, nullable=True)
     fantasy_transfers_balance = db.Column(db.Integer, unique=False, nullable=True)
     fantasy_selection_count = db.Column(db.Integer, unique=False, nullable=True)
-    fantasy_transfers_in = db.Column(db.Integer, unique=False, nullable=True)
-    fantasy_transfers_out = db.Column(db.Integer, unique=False, nullable=True)
+    fantasy_week_transfers_in = db.Column(db.Integer, unique=False, nullable=True)
+    fantasy_week_transfers_out = db.Column(db.Integer, unique=False, nullable=True)
     fantasy_week_bonus = db.Column(db.Integer, unique=False, nullable=True)
 
 

@@ -1,7 +1,7 @@
 import unittest
 from flask_run import app
 from ingest_engine.cons import Competition as COMPETITION, Standings as STANDINGS, Match as MATCH, Team as TEAM,\
-    Player as PLAYER
+    Player as PLAYER, FantasyGameWeek as FANTASY_GAME_WEEK
 from api_engine.api_cons import API_ENDPOINTS, API, API_ERROR
 
 
@@ -329,7 +329,19 @@ class ApiInterfaceTest(unittest.TestCase):
                                                          PLAYER.NUMBER_OF_GOALS,
                                                          PLAYER.FANTASY_PHOTO_URL,
                                                          PLAYER.SHIRT_NUMBER,
-                                                         PLAYER.FANTASY_WEB_NAME)))
+                                                         PLAYER.FANTASY_WEB_NAME,
+                                                         PLAYER.WEEK_STATS)))
+
+        for stat in player_result[PLAYER.WEEK_STATS]:
+            self.assertTrue(all(k in stat for k in (PLAYER.FANTASY_SELECTION_COUNT,
+                                                    PLAYER.FANTASY_TRANSFERS_BALANCE,
+                                                    PLAYER.FANTASY_WEEK_TRANSFERS_IN,
+                                                    PLAYER.FANTASY_WEEK_TRANSFERS_OUT,
+                                                    PLAYER.FANTASY_WEEK_BONUS,
+                                                    PLAYER.FANTASY_WEEK_POINTS,
+                                                    FANTASY_GAME_WEEK.WEEK,
+                                                    FANTASY_GAME_WEEK.ID,
+                                                    PLAYER.FANTASY_SEASON_VALUE)))
 
         self.assertIsInstance(player_result, dict)
         self.assertTrue(player_result[PLAYER.FANTASY_ID] == 141)
@@ -337,6 +349,10 @@ class ApiInterfaceTest(unittest.TestCase):
         team_result = self.api.get('http://api.localhost:5000/v1/player?fantasy_team_id=1').get_json()
         for player_ in team_result:
             self.assertEqual(player_[PLAYER.FANTASY_TEAM_ID], 1)
+
+        player_stat_result = self.api.get('http://api.localhost:5000/v1/player?name=kane&game_week=1').get_json()
+        self.assertTrue(len(player_stat_result[PLAYER.WEEK_STATS]) == 1)
+        self.assertTrue(player_stat_result[PLAYER.WEEK_STATS][0][FANTASY_GAME_WEEK.WEEK] == 1)
 
         self.filter_test(PLAYER.FANTASY_FORM, 4, "player")
         self.filter_test(PLAYER.POSITION, "Goalkeeper", "player")

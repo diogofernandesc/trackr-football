@@ -52,12 +52,12 @@ def filter_parse(query_str, table, column):
     return table.c[column] == query_str
 
 
-def to_json(result_map, limit=10):
+def to_json(result_map, aggregator_name, limit=10):
     list_dict_result = []
     for k, v in result_map.items():
         dict_result = k.__dict__
         dict_result.pop(IGNORE.INSTANCE_STATE, None)
-        dict_result['table'] = clean_output(v, as_list=True)
+        dict_result[aggregator_name] = clean_output(v, as_list=True)
         list_dict_result.append(dict_result)
 
     if len(list_dict_result) == 1:
@@ -202,7 +202,10 @@ class DBInterface(object):
         """
 
         db_filters = []
-        player_query = self.db.session.query(Player)
+        player_query = self.db.session\
+            .query(Player, FantasyWeekStats)\
+            .join(FantasyWeekStats, Player.id == FantasyWeekStats.player_id)
+
         active_filters = [(f, v) for f, v in filters._asdict().items() if v]
 
         for filter_ in active_filters:
@@ -212,14 +215,30 @@ class DBInterface(object):
                     db_filters.append(Player.name.ilike(f"%{filter_val}%"))
 
                 else:
-                    db_filters.append(filter_parse(query_str=filter_val, table=Player.__table__, column=filter_[0]))
+                    active_table = Player.__table__
+                    if col_exists(table=Player, col=filter_[0]):
+                        active_table = Player.__table__
+
+                    elif col_exists(table=FantasyWeekStats, col=filter_[0]):
+                        active_table = FantasyWeekStats.__table__
+
+                    db_filters.append(filter_parse(query_str=filter_val, table=active_table, column=filter_[0]))
 
         if multi:
-            query_result = player_query.filter(or_(*db_filters))
+            query_result = player_query.filter(or_(*db_filters)).all()
         else:
-            query_result = player_query.filter(*db_filters)
+            query_result = player_query.filter(*db_filters).all()
 
-        return clean_output(query_result, limit=limit)
+        player_week_stat_map = {}
+        for player, week_stat in query_result:
+            if player not in player_week_stat_map:
+                player_week_stat_map[player] = [week_stat]
+
+            else:
+                player_week_stat_map[player].append(week_stat)
+
+        result = to_json(player_week_stat_map, aggregator_name=PLAYER.WEEK_STATS, limit=limit)
+        return result
 
     def insert_player(self, record: Union[list, dict]):
         """
@@ -303,8 +322,8 @@ class DBInterface(object):
                         fantasy_week_stats.fantasy_week_points = match[PLAYER.FANTASY_WEEK_POINTS]
                         fantasy_week_stats.fantasy_transfers_balance = match[PLAYER.FANTASY_TRANSFERS_BALANCE]
                         fantasy_week_stats.fantasy_selection_count = match[PLAYER.FANTASY_SELECTION_COUNT]
-                        fantasy_week_stats.fantasy_transfers_in = match[PLAYER.FANTASY_WEEK_TRANSFERS_IN]
-                        fantasy_week_stats.fantasy_transfers_out = match[PLAYER.FANTASY_WEEK_TRANSFERS_OUT]
+                        fantasy_week_stats.fantasy_week_transfers_in = match[PLAYER.FANTASY_WEEK_TRANSFERS_IN]
+                        fantasy_week_stats.fantasy_week_transfers_out = match[PLAYER.FANTASY_WEEK_TRANSFERS_OUT]
                         fantasy_week_stats.fantasy_week_bonus = match[PLAYER.FANTASY_WEEK_BONUS]
 
                     if not match_stat_query.count() and fantasy_stats:
@@ -371,7 +390,7 @@ class DBInterface(object):
             else:
                 standings_map[tpl[0]].append(tpl[1])
 
-        result = to_json(standings_map, limit=limit)
+        result = to_json(standings_map, aggregator_name='table', limit=limit)
         return result
 
     def get_match(self, limit: int = 10, multi: bool = False, filters=None) -> dict:

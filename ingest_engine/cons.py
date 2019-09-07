@@ -258,7 +258,7 @@ class Player:
     FANTASY_OVERALL_TRANSFERS_IN = 'fantasy_overall_transfers_in'
     FANTASY_WEEK_TRANSFERS_IN = 'fantasy_week_transfers_in'
     FANTASY_OVERALL_TRANSFERS_OUT = 'fantasy_overall_transfers_out'
-    FANTASY_WEEK_TRANSFERS_OUT = 'fantasy_transfers_out'
+    FANTASY_WEEK_TRANSFERS_OUT = 'fantasy_week_transfers_out'
     FANTASY_OVERALL_POINTS = 'fantasy_overall_points'
     FANTASY_WEEK_POINTS = 'fantasy_week_points'
     FANTASY_POINT_AVERAGE = 'fantasy_point_average'
@@ -307,6 +307,7 @@ class Player:
     DRIBBLES = 'dribbles'
     FANTASY_OPPONENT_TEAM_ID = 'fantasy_opponent_team_id'
     SEASON_SUMMARIES = 'season_summaries'
+    WEEK_STATS = 'week_stats'
 
 
 
