@@ -1,5 +1,5 @@
 from flask import request, jsonify, Blueprint, current_app, abort
-from api_engine.api_cons import API_ENDPOINTS, API, ENDPOINT_DESCRIPTION, API_ERROR
+from api_engine.api_cons import API_ENDPOINTS, API, ENDPOINT_DESCRIPTION, API_ERROR, DB_QUERY_FIELD
 from db_engine.db_filters import TeamFilters, StandingsFilters, CompFilters, MatchFilters, PlayerFilters, StatFilters
 from ingest_engine.ingest_driver import Driver
 from sqlalchemy import exc
@@ -220,7 +220,7 @@ def match():
     result = {}
     try:
         limit = int(limit)
-        match_filters = Matc(**{k: get_vals(v) for k, v in ra.items() if k != "limit"})
+        match_filters = MatchFilters(**{k: get_vals(v) for k, v in ra.items() if k != "limit"})
         result = jsonify(db_interface.get_match(limit=limit, multi=multi, filters=match_filters))
 
     except ValueError:
@@ -241,6 +241,7 @@ def match():
     else:
         raise InvalidUsage(API_ERROR.MATCH_404, status_code=404)
 
+
 @api_service.route('/stats', methods=['GET'])
 def stats():
     """
@@ -251,12 +252,15 @@ def stats():
         db_interface = current_app.config['db_interface']
 
     ra = request.args
+    if not ra or not any(f in ra for f in [DB_QUERY_FIELD.MATCH_ID, DB_QUERY_FIELD.PLAYER_ID]):
+        raise InvalidUsage(API_ERROR.MISSING_FILTER_400, status_code=400)
+
     limit = ra.get("limit", 10)
     result = {}
     try:
         limit = int(limit)
-        match_filters = StatFilters(**{k: get_vals(v) for k, v in ra.items() if k != "limit"})
-        result = jsonify(db_interface.get_stats(limit=limit, filters=match_filters))
+        stat_filters = StatFilters(**{k: get_vals(v) for k, v in ra.items() if k != "limit"})
+        result = jsonify(db_interface.get_stats(limit=limit, filters=stat_filters))
 
     except ValueError:
         raise InvalidUsage(API_ERROR.INTEGER_LIMIT_400, status_code=400)
@@ -267,16 +271,15 @@ def stats():
         else:
             abort(400)
 
-    except TypeError:
+    except TypeError as e:
+        logging.error(e)
         raise InvalidUsage(API_ERROR.RESOURCE_NOT_FOUND_404, status_code=404)
 
     if result.json:
         return result
 
     else:
-        raise InvalidUsage(API_ERROR.MATCH_404, status_code=404)
-
-
+        raise InvalidUsage(API_ERROR.STATS_404, status_code=404)
 
 
 @api_service.route('/player/all', methods=['GET'])
