@@ -116,6 +116,7 @@ class Match:
     HOME_TEAM_DIFFICULTY = 'home_team_difficulty'
     AWAY_TEAM_DIFFICULTY = 'away_team_difficulty'
     FANTASY_MATCH_CODE = 'fantasy_match_code'
+    FANTASY_MATCH_ID = 'fantasy_match_id'
     MINUTES = 'minutes'
     FANTASY_HOME_TEAM_CODE = 'f_home_team_code'
     FANTASY_AWAY_TEAM_CODE = 'f_away_team_code'
@@ -200,6 +201,7 @@ class Standings:
 
 
 class Player:
+    ID = 'id'
     NAME = 'name'
     FIRST_NAME = 'first_name'
     LAST_NAME = 'last_name'
@@ -215,6 +217,7 @@ class Player:
     GENDER = 'gender'
     HEIGHT = 'height'
     TEAM_FLS_ID = 'team_fls_id'
+    TEAM_FD_ID = 'team_fd_id'
     ASSISTS = 'assists'
     RED_CARDS = 'red_cards'
     COMPETITION_FLS_ID = 'competition_fls_id'
@@ -255,7 +258,7 @@ class Player:
     FANTASY_OVERALL_TRANSFERS_IN = 'fantasy_overall_transfers_in'
     FANTASY_WEEK_TRANSFERS_IN = 'fantasy_week_transfers_in'
     FANTASY_OVERALL_TRANSFERS_OUT = 'fantasy_overall_transfers_out'
-    FANTASY_WEEK_TRANSFERS_OUT = 'fantasy_transfers_out'
+    FANTASY_WEEK_TRANSFERS_OUT = 'fantasy_week_transfers_out'
     FANTASY_OVERALL_POINTS = 'fantasy_overall_points'
     FANTASY_WEEK_POINTS = 'fantasy_week_points'
     FANTASY_POINT_AVERAGE = 'fantasy_point_average'
@@ -276,6 +279,7 @@ class Player:
     FANTASY_THREAT = 'fantasy_threat'
     FANTASY_ICT_INDEX = 'fantasy_ict_index'  # Influence, creativity, threat index
     FANTASY_TEAM_ID = 'fantasy_team_id'
+    FANTASY_SELECTED = 'fantasy_selected'
 
     FANTASY_SEASON_START_PRICE = 'fantasy_season_start_price'
     FANTASY_SEASON_END_PRICE = 'fantasy_season_start_price'
@@ -303,6 +307,7 @@ class Player:
     DRIBBLES = 'dribbles'
     FANTASY_OPPONENT_TEAM_ID = 'fantasy_opponent_team_id'
     SEASON_SUMMARIES = 'season_summaries'
+    WEEK_STATS = 'week_stats'
 
 
 

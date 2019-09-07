@@ -1,11 +1,14 @@
 from flask import request, jsonify, Blueprint, current_app, abort
 from api_engine.api_cons import API_ENDPOINTS, API, ENDPOINT_DESCRIPTION, API_ERROR
-from db_engine.db_filters import TeamFilters, StandingsFilters, CompFilters, MatchFilters, StatFilters
+from db_engine.db_filters import TeamFilters, StandingsFilters, CompFilters, MatchFilters, PlayerFilters, StatFilters
 from ingest_engine.ingest_driver import Driver
 from sqlalchemy import exc
+import logging
 
-api_service = Blueprint('api_service', __name__, template_folder='templates', url_prefix='/v1')
+api_service = Blueprint('api_service', __name__, template_folder='templates', url_prefix='/v1', subdomain='api')
 api_ingest = Driver()
+
+logging.basicConfig(format='%(asctime)s - %(message)s', level=logging.INFO)
 
 # db = SQLAlchemy(app)
 # db_interface = DBInterface(db=db)
@@ -204,9 +207,9 @@ def standings():
 @api_service.route('/match', methods=['GET'])
 def match():
     """
-    /v1/matches OR type querying across ALL available matches
-    /v1/standings AND querying on matches
-    :return: Match data as JSOn (if available)
+    /v1/match/all OR type querying across ALL available matches
+    /v1/match AND querying on matches
+    :return: Match data as JSON (if available)
     """
     with current_app.app_context():
         db_interface = current_app.config['db_interface']
@@ -272,6 +275,56 @@ def stats():
 
     else:
         raise InvalidUsage(API_ERROR.MATCH_404, status_code=404)
+
+
+
+
+@api_service.route('/player/all', methods=['GET'])
+@api_service.route('player', methods=['GET'])
+def player():
+    """
+    /v1/player/all OR type querying across ALL available player info
+    /v1/player AND querying on players
+    :return: Player data as JSON (if available)
+    """
+    result = {}
+    with current_app.app_context():
+        db_interface = current_app.config['db_interface']
+
+    multi = 'player/all' in request.url_rule.rule
+    ra = request.args
+    if not ra:
+        raise InvalidUsage(API_ERROR.MISSING_FILTER_400, status_code=400)
+    limit = ra.get("limit", 10)
+    try:
+        limit = int(limit)
+        player_filters = PlayerFilters(**{k: get_vals(v) for k, v in ra.items() if k != "limit"})
+        result = db_interface.get_player(limit=limit, multi=multi, filters=player_filters)
+        if isinstance(result, dict):
+            result.pop('matches')
+        elif isinstance(result, list):
+            for player_ in result:
+                player_.pop('matches')
+        result = jsonify(result)
+
+    except ValueError:
+        raise InvalidUsage(API_ERROR.INTEGER_LIMIT_400, status_code=400)
+
+    except exc.DataError as e:
+        if "invalid input syntax" in e.args[0]:  # e.args[0] is the psycopg2 errors text field
+            raise InvalidUsage(API_ERROR.FILTER_PROBLEM_400, status_code=400)
+        else:
+            abort(400)
+
+    except TypeError as e:
+        logging.error(e)
+        raise InvalidUsage(API_ERROR.RESOURCE_NOT_FOUND_404, status_code=404)
+
+    if result.json:
+        return result
+
+    else:
+        raise InvalidUsage(API_ERROR.PLAYER_404, status_code=404)
 
 
 

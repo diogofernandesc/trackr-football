@@ -1,6 +1,12 @@
 from collections import namedtuple
-from ingest_engine.cons import Team as TEAM, Standings as STANDINGS, Competition as COMPETITION, Match as MATCH\
-    , MatchEvent as MATCH_EVENT, Player as PLAYER
+from ingest_engine.cons import\
+    Team as TEAM,\
+    Standings as STANDINGS, \
+    Competition as COMPETITION, \
+    Match as MATCH, \
+    Player as PLAYER, \
+    FantasyGameWeek as FANTASY_GAME_WEEK, \
+    MatchEvent as MATCH_EVENT
 
 from api_engine.api_cons import DB_QUERY_FIELD
 """
@@ -122,7 +128,6 @@ match_filter_field = [MATCH.ID,
 
 MatchFilters = namedtuple('match_filters', match_filter_field, defaults=(None,) * len(match_filter_field))
 
-
 stat_filter_field = [MATCH.GOALS_SCORED,
                      MATCH.GOALS_CONCEDED,
                      MATCH.ASSISTS,
@@ -145,4 +150,66 @@ stat_filter_field = [MATCH.GOALS_SCORED,
 
 StatFilters = namedtuple('stat_filters', stat_filter_field, defaults=(None,) * len(stat_filter_field))
 
+player_crud_filter_field = [
+    PLAYER.FOOTBALL_DATA_API_ID,
+    PLAYER.TEAM_FD_ID,
+    PLAYER.TEAM_FLS_ID,
+    PLAYER.FANTASY_TEAM_ID
+]
 
+PlayerCrudFilters = namedtuple('player_crud_filters', player_crud_filter_field,
+                               defaults=(None,) * len(player_crud_filter_field))
+
+player_filter_field = [PLAYER.ID,
+                       PLAYER.NAME,
+                       PLAYER.FIRST_NAME,
+                       PLAYER.LAST_NAME,
+                       PLAYER.DATE_OF_BIRTH,
+                       PLAYER.DATE_OF_BIRTH_EPOCH,
+                       PLAYER.NATIONALITY,
+                       PLAYER.POSITION,
+                       PLAYER.SHIRT_NUMBER,
+                       PLAYER.TEAM,
+                       PLAYER.NUMBER_OF_GOALS,
+                       PLAYER.WEIGHT,
+                       PLAYER.GENDER,
+                       PLAYER.HEIGHT,
+                       PLAYER.TEAM_FLS_ID,
+                       PLAYER.ASSISTS,
+                       PLAYER.RED_CARDS,
+                       PLAYER.COMPETITION_FLS_ID,
+                       PLAYER.YELLOW_CARDS,
+                       PLAYER.FOOTBALL_DATA_API_ID,
+                       PLAYER.FASTEST_LIVE_SCORES_API_ID,
+                       PLAYER.COMPETITION_STATS,
+                       PLAYER.PLAYED_AT_HOME,
+                       PLAYER.PLAYED,
+                       PLAYER.NOT_PLAYED,
+                       PLAYER.FANTASY_TEAM_CODE,
+                       PLAYER.FANTASY_TEAM_ID,
+                       PLAYER.FANTASY_ID,
+                       PLAYER.FANTASY_STATUS,
+                       PLAYER.FANTASY_CODE,
+                       PLAYER.FANTASY_PRICE,
+                       PLAYER.FANTASY_DREAM_TEAM_MEMBER,
+                       PLAYER.FANTASY_DREAM_TEAM_COUNT,
+                       PLAYER.FANTASY_SEASON_VALUE,
+                       PLAYER.FANTASY_WEEK_VALUE,
+                       PLAYER.FANTASY_WEEK_PRICE_RISE,
+                       PLAYER.FANTASY_WEEK_PRICE_FALL,
+                       PLAYER.FANTASY_OVERALL_PRICE_RISE,
+                       PLAYER.FANTASY_OVERALL_PRICE_FALL,
+                       PLAYER.FANTASY_OVERALL_TRANSFERS_IN,  # not finished
+                       PLAYER.FANTASY_OVERALL_TRANSFERS_OUT,
+                       PLAYER.FANTASY_OVERALL_POINTS,
+                       PLAYER.FANTASY_POINT_AVERAGE,
+                       PLAYER.FANTASY_TOTAL_BONUS,
+                       PLAYER.FANTASY_CHANCE_OF_PLAYING_THIS_WEEK,
+                       PLAYER.FANTASY_CHANCE_OF_PLAYING_NEXT_WEEK,
+                       PLAYER.FANTASY_SELECTION_PERCENTAGE,
+                       PLAYER.FANTASY_FORM,
+                       PLAYER.FANTASY_SPECIAL,
+                       FANTASY_GAME_WEEK.WEEK]
+
+
+PlayerFilters = namedtuple('player_filters', player_filter_field, defaults=(None,) * len(player_filter_field))

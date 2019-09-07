@@ -12,10 +12,12 @@ class API_ERROR:
     TEAM_404 = 'There is no team with those filters'
     MATCH_404 = 'There is no matches with those filters'
     STANDINGS_404 = 'There is no standings with those filters'
+    PLAYER_404 = 'There is no players with those filters'
     INTEGER_LIMIT_400 = 'Limit must be an integer'
     NO_COMPETITION_400 = 'You need to provide a competition id to query this endpoint'
     MISSING_COMPETITION_404 = 'No competition could be found'
     FILTER_PROBLEM_400 = 'Invalid filter applied'
+    MISSING_FILTER_400 = 'You have not specified a filter to this endpoint'
     RESOURCE_NOT_FOUND_404 = "The resource you're looking for could not be found"
 
 

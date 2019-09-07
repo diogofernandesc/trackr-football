@@ -59,17 +59,18 @@ class ApiTest(unittest.TestCase):
         match_constants = [s for s in list(Match.__dict__.values()) if isinstance(s, str)]
         for match in matches:
             if len(match) > 11:
-                self.assertTrue({Match.GOALS_SCORED,
-                                 Match.ASSISTS,
-                                 Match.OWN_GOALS,
-                                 Match.PENALTIES_SAVED,
-                                 Match.PENALTIES_MISSED,
-                                 Match.YELLOW_CARDS,
-                                 Match.RED_CARDS,
-                                 Match.SAVES,
-                                 Match.BONUS,
-                                 Match.BPS}
-                                <= set(match))
+                print(match)
+                self.assertTrue(all(k in match for k in [Match.START_TIME,
+                                                         Match.FINISHED,
+                                                         Match.FANTASY_GAME_WEEK,
+                                                         Match.HOME_TEAM_DIFFICULTY,
+                                                         Match.AWAY_TEAM_DIFFICULTY,
+                                                         Match.FANTASY_MATCH_CODE,
+                                                         Match.FANTASY_MATCH_ID,
+                                                         Match.FULL_TIME_HOME_SCORE,
+                                                         Match.FULL_TIME_AWAY_SCORE,
+                                                         Match.FANTASY_HOME_TEAM_ID,
+                                                         Match.FANTASY_AWAY_TEAM_ID]))
 
             self.assertTrue(len(set(match_constants) & set(match)) >= 11)
 
