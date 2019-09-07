@@ -1,8 +1,8 @@
 import unittest
 from flask_run import app
 from ingest_engine.cons import Competition as COMPETITION, Standings as STANDINGS, Match as MATCH, Team as TEAM,\
-    Player as PLAYER, FantasyGameWeek as FANTASY_GAME_WEEK
-from api_engine.api_cons import API_ENDPOINTS, API, API_ERROR
+    Player as PLAYER, FantasyGameWeek as FANTASY_GAME_WEEK, MatchEvent as MATCH_EVENT
+from api_engine.api_cons import API_ENDPOINTS, API, API_ERROR, DB_QUERY_FIELD
 
 
 class ApiInterfaceTest(unittest.TestCase):
@@ -378,6 +378,58 @@ class ApiInterfaceTest(unittest.TestCase):
         self.assertEqual(error_result[API.MESSAGE], API_ERROR.MISSING_FILTER_400)
         self.assertEqual(error_result[API.STATUS_CODE], 400)
 
+    def testDBStatsUrl(self):
+        # Whilst API is PL only
+        # comp_fd_id = 2021
+        # comp_fls_id = 2
+
+        stat_result = self.api.get('http://api.localhost:5000/v1/stats?player_id=1152&limit=2').get_json()
+        for stat in stat_result:
+            self.assertTrue(all(k in stat for k in (PLAYER.ASSISTS,
+                                                    MATCH.BONUS,
+                                                    MATCH_EVENT.CLEAN_SHEET,
+                                                    PLAYER.FANTASY_CREATIVITY,
+                                                    PLAYER.FANTASY_ICT_INDEX,
+                                                    PLAYER.FANTASY_INFLUENCE,
+                                                    MATCH.FANTASY_MATCH_ID,
+                                                    PLAYER.FANTASY_THREAT,
+                                                    PLAYER.GOALS_CONCEDED,
+                                                    MATCH.GOALS_SCORED,
+                                                    MATCH.ID,
+                                                    PLAYER.MINUTES_PLAYED,
+                                                    PLAYER.OWN_GOALS,
+                                                    PLAYER.PENALTIES_MISSED,
+                                                    PLAYER.PENALTIES_SAVED,
+                                                    PLAYER.PLAYED_AT_HOME,
+                                                    PLAYER.RED_CARDS,
+                                                    PLAYER.SAVES,
+                                                    PLAYER.YELLOW_CARDS)))
+
+            self.assertIsInstance(stat, dict)
+            self.assertTrue(stat[DB_QUERY_FIELD.PLAYER_ID] == 1152)
+            self.assertTrue(len(stat_result) == 2)
+
+        self.filter_test_adv(filter_str=PLAYER.ASSISTS, filter_val=1, op="lte", endpoint="stats")
+        self.filter_test_adv(filter_str=PLAYER.FANTASY_INFLUENCE, filter_val=10, op="gte", endpoint="stats")
+        self.filter_test_adv(filter_str=PLAYER.MINUTES_PLAYED, filter_val=25, op="gt", endpoint="stats")
+        self.filter_test_adv(filter_str=PLAYER.YELLOW_CARDS, filter_val=5, op="lt", endpoint="stats")
+
+        filter_result = self.api.get('http://api.localhost:5000/v1/stats?player_id=-1').get_json()
+        self.assertEqual(filter_result[API.MESSAGE], API_ERROR.STATS_404)
+        self.assertEqual(filter_result[API.STATUS_CODE], 404)
+
+        error_result = self.api.get('http://api.localhost:5000/v1/stats?player_id=$ltr:3').get_json()
+        self.assertEqual(error_result[API.MESSAGE], API_ERROR.FILTER_PROBLEM_400)
+        self.assertEqual(error_result[API.STATUS_CODE], 400)
+
+        error_result = self.api.get('http://api.localhost:5000/v1/stats?player_id=1152&hdas=1').get_json()
+        self.assertEqual(error_result[API.MESSAGE], API_ERROR.RESOURCE_NOT_FOUND_404)
+        self.assertEqual(error_result[API.STATUS_CODE], 404)
+
+        error_result = self.api.get('http://api.localhost:5000/v1/stats').get_json()
+        self.assertEqual(error_result[API.MESSAGE], API_ERROR.MISSING_FILTER_400)
+        self.assertEqual(error_result[API.STATUS_CODE], 400)
+
     def filter_test(self, filter_str, filter_val, endpoint):
         filter_result = self.api.get(f'http://api.localhost:5000/v1/{endpoint}?{filter_str}={filter_val}').get_json()
         if not isinstance(filter_result, list):
@@ -387,7 +439,12 @@ class ApiInterfaceTest(unittest.TestCase):
             self.assertTrue(result[filter_str], filter_val)
 
     def filter_test_adv(self, filter_str, filter_val, op, endpoint):
-        filter_result = self.api.get(f'http://api.localhost:5000//v1/{endpoint}/all?{filter_str}=${op}:{filter_val}').get_json()
+        filter_result = self.api.get(
+            f'http://api.localhost:5000/v1/{endpoint}/all?{filter_str}=${op}:{filter_val}').get_json()
+        if endpoint == "stats":
+            filter_result = self.api.get(
+                f'http://api.localhost:5000/v1/{endpoint}?player_id=1152&{filter_str}=${op}:{filter_val}').get_json()
+
         if not isinstance(filter_result, list):
             filter_result = [filter_result]  # Handle returns as dict or list
 
@@ -403,6 +460,9 @@ class ApiInterfaceTest(unittest.TestCase):
 
             elif op == "gte":
                 self.assertGreaterEqual(result[filter_str], filter_val)
+
+
+
 
 
 

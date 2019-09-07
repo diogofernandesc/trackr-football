@@ -188,7 +188,6 @@ class Player(db.Model):
     fantasy_form = db.Column(db.Integer, unique=False, nullable=True)
     fantasy_special = db.Column(db.Boolean, unique=False, nullable=True)
 
-
 class MatchStats(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     match_id = db.Column(db.Integer, db.ForeignKey('match.id'), nullable=True)

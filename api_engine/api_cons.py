@@ -13,6 +13,7 @@ class API_ERROR:
     MATCH_404 = 'There is no matches with those filters'
     STANDINGS_404 = 'There is no standings with those filters'
     PLAYER_404 = 'There is no players with those filters'
+    STATS_404 = 'There is no stats with those filters'
     INTEGER_LIMIT_400 = 'Limit must be an integer'
     NO_COMPETITION_400 = 'You need to provide a competition id to query this endpoint'
     MISSING_COMPETITION_404 = 'No competition could be found'
@@ -29,6 +30,9 @@ class API_ENDPOINTS:
     STANDINGS = 'standings'
     STATS = 'stats'
 
+class DB_QUERY_FIELD:
+    PLAYER_ID = 'player_id'
+    MATCH_ID = 'match_id'
 
 ENDPOINT_DESCRIPTION = {
     API_ENDPOINTS.TEAMS: "Details about each team",
