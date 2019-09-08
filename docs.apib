@@ -1,0 +1,402 @@
+FORMAT: 1A
+HOST: https://api.trackr.football
+
+# Trackr.football API documentation
+
+This API was designed as a way to provide compact general football information as well as fantasy data, parsed and cleaned directly from the official FPL fantasy API.
+
+
+## Quickstart
+
+
+### Example requests
+
+:::note
+Get information about Tottenham Hotspur
+```http
+https://api.trackr.football/v1/team?name=tottenham
+```
+Get standings for the Premier League
+```http
+https://api.trackr.football/v1/standings
+```
+Get match(es) for which Liverpool is the home team
+```http
+https://api.trackr.football/v1/match?home_team=liverpool
+```
+Get match stats for player with ID 1152
+```http
+https://api.trackr.football/v1/stats?player_id=1152
+```
+Get player info for Lucas Digne
+```http
+https://api.trackr.football/v1/player?name=digne
+```
+:::
+
+
+## Filtering
+The API supports filtering in two ways:
+1. Direct value filter using `?filter_name=filter_value`
+2. Value operators:
+  * `$lt` (less than)
+  * `$lte` (less than or equal to)
+  * `$gt` (greater than)
+  * `$gte` (greater than or equal to)
+  
+For example, `/v1/player?fantasy_price=$lt:65` will find players whose fantasy_price is **less than 65**.
+  
+  
+Most endpoints have a `/all` alternative which lets you query data from that endpoint in an OR fashion. Typically the API will filter results in an AND fashion.
+
+
+For example,
+ 
+`/v1/player?fantasy_price=65&fantasy_overall_price_fall=0` will perform a query in the form `fantasy_price=65 AND fantasy_overall_price_fall=0`
+
+
+Whereas, `/v1/player/all?fantasy_price=65&fantasy_overall_price_fall=0` will perform a query in the form `fantasy_price=65 OR fantasy_overall_price_fall=0`
+
+
+This can be particularly useful in making efficient use of the API calls made.
+<br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
+
+# Group Competition
+Group description
+ 
+## Competition List [/competition{?id,name,code,location}]
+A list of competitions
+
++ Parameters
+
+    + id: `1` (integer, optional) - Search for a competition by id
+    + name: `Premier League` (string, optional) - Search by name
+    + code: `PL` (string, optional) - Search by code
+    + location: `England` (string, optional) - Search by location
+        + Default: `name`
+        + Members
+            + `name`
+            + `joined`
+            + `-joined`
+            + `age`
+            + `-age`
+            + `location`
+            + `-location`
+            + `plan`
+            + `-plan`
+    + limit: `25` (integer, optional) - The maximum number of users to return, up to `50`
+      + Default: `10`
+
+### Get competitions [GET]
+Get a competition. Example:
+
+```no-highlight
+https://api.trackr.football/v1/competition?code=PL
+```
+
++ Response 200 (application/json)
+
+    + Body
+
+            {
+                "code": "PL",
+                "fd_api_id": 2021,
+                "fls_api_id": 2,
+                "id": 1,
+                "location": "England",
+                "name": "Premier League"
+            }
+
+    
+# Group Teams
+This endpoint is used to retrieve team information
+
+:::note
+You can apply a fantasy filter e.g, 
+```http
+https://api.trackr.football/v1/team?fantasy_overall_home_strength=$gt:100
+```
+To get teams with overall home strength greather than 100, see below for other possible fantasy filters
+:::
+
+## Team List [/team{?id,fantasy_id,name,year_founded,stadium_capacity,fantasy...}]
+A list of teams    
++ Parameters
+
+    + id: `1` (integer, optional) - Search for a team by id
+    + fantasy_id: `17` (integer, optional) - Search by fantasy id
+    + name: `Tottenham Hotspur` (string, optional) - Search by name
+    + year_founded: `1875` (integer, optional) - Search by year founded
+    + stadium_capacity: `30000` (integer, optional) - Search by stadium capacity
+    + fantasy_filters: (integer, optional) Search by one of the many possible fantasy filters 
+        + Members
+            + `fantasy_overall_home_strength` 
+            + `fantasy_overall_away_strength`
+            + `fantasy_attack_home_strength` 
+            + `fantasy_attack_away_strength` 
+            + `fantasy_defence_home_strength`
+            + `fantasy_defence_away_strength`   
+    + limit: `25` (integer, optional) - The maximum number of teams to return
+      + Default: `10`
+
+
+
+### Get teams [GET]
+Get a team. Example:
+
+```no-highlight
+https://api.trackr.football/v1/team?name=Tottenham
+```
+
++ Response 200 (application/json)
+
+    + Body
+
+            {
+                "acronym": "TOT",
+                "address": "Bill Nicholson Way, 748 High Road London N17 OAP",
+                "club_colours": "Navy Blue / White",
+                "competitions": [],
+                "country": "England",
+                "crest_url": "http://upload.wikimedia.org/wikipedia/de/b/b4/Tottenham_Hotspur.svg",
+                "email": "customer.care@tottenhamhotspur.com",
+                "fantasy_attack_away_strength": 1340,
+                "fantasy_attack_home_strength": 1270,
+                "fantasy_code": 6,
+                "fantasy_defence_away_strength": 1330,
+                "fantasy_defence_home_strength": 1320,
+                "fantasy_id": 17,
+                "fantasy_overall_away_strength": 1310,
+                "fantasy_overall_home_strength": 1320,
+                "fantasy_week_strength": 4,
+                "id": 149,
+                "name": "Tottenham Hotspur FC",
+                "phone": "+44 (0844) 4995000",
+                "short_name": "Tottenham",
+                "stadium": "Tottenham Hotspur Stadium",
+                "stadium_capacity": 36284,
+                "stadium_lat": 51.603333333333,
+                "stadium_long": -0.065833333333333,
+                "team_fd_id": 73,
+                "team_fls_id": 13,
+                "website": "http://www.tottenhamhotspur.com",
+                "year_founded": 1882
+            }
+    
+    
+# Group Competition
+Group description
+ 
+## Competition List [/competition{?id,name,code,location}]
+A list of competitions
+
++ Parameters
+
+    + id: `1` (integer, optional) - Search for a competition by id
+    + name: `Premier League` (string, optional) - Search by name
+    + code: `PL` (string, optional) - Search by code
+    + location: `England` (string, optional) - Search by location
+        + Default: `name`
+        + Members
+            + `name`
+            + `joined`
+            + `-joined`
+            + `age`
+            + `-age`
+            + `location`
+            + `-location`
+            + `plan`
+            + `-plan`
+    + limit: `25` (integer, optional) - The maximum number of users to return, up to `50`
+      + Default: `10`
+
+### Get competitions [GET]
+Get a competition. Example:
+
+```no-highlight
+https://api.trackr.football/v1/competition?code=PL
+```
+
++ Response 200 (application/json)
+
+    + Body
+
+            {
+                "code": "PL",
+                "fd_api_id": 2021,
+                "fls_api_id": 2,
+                "id": 1,
+                "location": "England",
+                "name": "Premier League"
+            }
+
+    + Schema
+
+
+
+# Data Structures
+
+
+## NoteData
++ id: 1 (required, number) - Unique identifier
++ title: Grocery list (required) - Single line description
++ body: Buy milk - Full description of the note which supports Markdown.
+
+## NoteList (array)
++ (NoteData)
+
+
+Group description (also with *Markdown*)
+
+## Important Info
+Descriptions may also contain sub-headings and **more Markdown**.
+f
+## Note List [/notes]
+Note list description
+
++ Even
++ More
++ Markdown
+
+### Get Notes [GET]
+Get a list of notes.
+
++ Response 200 (application/json)
+
+    + Headers
+
+            X-Request-ID: f72fc914
+            X-Response-Time: 4ms
+
+    + Attributes (NoteList)
+
+
+## Note [/notes/{id}{?body}]
+Note description
+
++ Parameters
+
+    + id: `68a5sdf67` (required, string) - The note ID
+
+### Get Note [GET]
+Get a single note.
+
++ Parameters
+
+    + body: `false` (boolean) - Set to `false` to exclude note body content.
+
++ Response 200 (application/json)
+
+    + Headers
+
+            X-Request-ID: f72fc914
+            X-Response-Time: 4ms
+
+    + Attributes (NoteData)
+
++ Response 404 (application/json)
+
+    + Headers
+
+            X-Request-ID: f72fc914
+            X-Response-Time: 4ms
+
+    + Body
+
+            {
+                "error": "Note not found"
+            }
+
+### Update a Note [PUT]
+Update a single note by setting the title and/or body.
+
+::: warning
+#### <i class="fa fa-warning"></i> Caution
+If the value for `title` or `body` is `null` or `undefined`, then the corresponding value is not modified on the server. However, if you send an empty string instead then it will **permanently overwrite** the original value.
+:::
+
++ Request (application/json)
+
+    + Body
+
+            {
+                "title": "Grocery List (Safeway)"
+            }
+
++ Response 200 (application/json)
+
+    + Headers
+
+            X-Request-ID: f72fc914
+            X-Response-Time: 4ms
+
+    + Attributes (NoteData)
+
++ Response 404 (application/json)
+
+    + Headers
+
+            X-Request-ID: f72fc914
+            X-Response-Time: 4ms
+
+    + Body
+
+            {
+                "error": "Note not found"
+            }
+
++ Request delete body (application/json)
+
+    + Body
+
+            {
+                "body": ""
+            }
+
++ Response 200 (application/json)
+
+    + Headers
+
+            X-Request-ID: f72fc914
+            X-Response-Time: 4ms
+
+    + Attributes (NoteData)
+
++ Response 404 (application/json)
+
+    + Headers
+
+            X-Request-ID: f72fc914
+            X-Response-Time: 4ms
+
+    + Body
+
+            {
+                "error": "Note not found"
+            }
+
+
+
+
+
+     
+
+# Group Tags and Tagging Long Title
+Get or set tags on notes
+
+## GET /tags
+Get a list of bars
+
++ Response 200 (application/json)
+
+        ["tag1", "tag2", "tag3"]
+
+## Get one tag [/tags/{id}]
+Get a single tag
+
++ Parameters
+    + id - Unique tag identifier
+
+### GET
+
++ Response 200
