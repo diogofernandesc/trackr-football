@@ -120,27 +120,7 @@ class ApiInterfaceTest(unittest.TestCase):
         all_result = self.api.get('http://api.localhost:5000/v1/standings').get_json()
         self.assertTrue(len(all_result), 10)
 
-        filter_result = self.api.get('http://api.localhost:5000/v1/standings?id=1').get_json()
-        self.assertFalse(isinstance(filter_result, list))
-        self.assertEqual(filter_result[STANDINGS.ID], 1)
-
-        filter_result = self.api.get('http://api.localhost:5000/v1/standings/all?id=1,2').get_json()
-        self.assertTrue(isinstance(filter_result, list))
-        for result in filter_result:
-            self.assertTrue(result[STANDINGS.ID] in [1, 2])
-
-        self.assertTrue(filter_result[0][STANDINGS.ID] != filter_result[1][STANDINGS.ID])
-
         filter_test(filter_str=STANDINGS.POSITION, filter_val=5)
-        filter_test(filter_str=STANDINGS.TEAM_NAME, filter_val="chapecoense")
-        filter_test(filter_str=STANDINGS.GAMES_PLAYED, filter_val=3)
-        filter_test(filter_str=STANDINGS.GAMES_WON, filter_val=1)
-        filter_test(filter_str=STANDINGS.GAMES_DRAWN, filter_val=2)
-        filter_test(filter_str=STANDINGS.GAMES_LOST, filter_val=5)
-        filter_test(filter_str=STANDINGS.POINTS, filter_val=20)
-        filter_test(filter_str=STANDINGS.GOALS_FOR, filter_val=15)
-        filter_test(filter_str=STANDINGS.GOALS_AGAINST, filter_val=5)
-        filter_test(filter_str=STANDINGS.GOAL_DIFFERENCE, filter_val=5)
 
         filter_test_adv(filter_str=STANDINGS.POSITION, filter_val=10, op="lt")
         filter_test_adv(filter_str=STANDINGS.GAMES_PLAYED, filter_val=3, op="lte")

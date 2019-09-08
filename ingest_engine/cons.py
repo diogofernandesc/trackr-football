@@ -310,7 +310,6 @@ class Player:
     WEEK_STATS = 'week_stats'
 
 
-
 class Competition:
     ID = 'id'
     NAME = 'name'

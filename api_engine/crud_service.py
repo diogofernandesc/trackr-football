@@ -28,8 +28,8 @@ def handle_invalid_usage(error):
     return response
 
 
-@crud_service.route('/insert/match')
-def insert_match():
+@crud_service.route('/standings')
+def get_standings():
     pass
 
 
