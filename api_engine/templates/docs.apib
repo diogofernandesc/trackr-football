@@ -528,77 +528,42 @@ https://api.trackr.football/v1/stats/all?player_id=1157&match_id=22,45
     + limit: `5` (integer, optional) - The maximum number of match stats to retrieve up to `10`
       + Default: `10`
 
-### Get player [GET]
+### Get player match stats [GET]
 Get data for Harry Kane. Example:
 
 ```http
-https://api.trackr.football/v1/player?name=Kane
+https://api.trackr.football/v1/stats?player_id=1430
 ```
 
 + Response 200 (application/json)
 
     + Body
 
-            {
-                "id": 1420,
-                "chance_of_playing_next_week": null,
-                "chance_of_playing_this_week": null,
-                "country_of_birth": "England",
-                "date_of_birth": "Wed, 28 Jul 1993 00:00:00 GMT",
-                "date_of_birth_epoch": null,
-                "fantasy_code": 78830,
-                "fantasy_dream_team_count": 1,
-                "fantasy_dream_team_member": false,
-                "fantasy_form": 6,
-                "fantasy_id": 338,
-                "fantasy_news": "",
-                "fantasy_news_timestamp": null,
-                "fantasy_overall_points": 23,
-                "fantasy_overall_price_fall": 0,
-                "fantasy_overall_price_rise": 0,
-                "fantasy_overall_transfers_in": 500152,
-                "fantasy_overall_transfers_out": 812240,
-                "fantasy_point_average": 5.8,
-                "fantasy_price": 110,
-                "fantasy_selection_percentage": 24,
-                "fantasy_special": false,
-                "fantasy_status": null,
-                "fantasy_team_code": 6,
-                "fantasy_team_id": 17,
-                "fantasy_total_bonus": 77,
-                "fantasy_week_price_fall": 1,
-                "fantasy_week_price_rise": -1,
-                "fd_id": 8004,
-                "first_name": "Harry",
-                "fls_id": null,
-                "gender": null,
-                "height": null,
-                "last_name": "Kane",
-                "name": "Harry Kane",
-                "nationality": "England",
-                "number_of_goals": 3,
-                "photo_url": "78830.jpg",
-                "position": "Attacker",
-                "shirt_number": 10,
-                "team": "Tottenham Hotspur FC",
-                "team_fd_id": 73,
-                "team_fls_id": null,
-                "team_id": null,
-                "web_name": null,
-                "week_stats": [
-                    {
-                    "fantasy_selection_count": 1591131,
-                    "fantasy_transfers_balance": 0,
-                    "fantasy_week_bonus": 50,
-                    "fantasy_week_points": 13,
-                    "fantasy_week_transfers_in": 0,
-                    "fantasy_week_transfers_out": 0,
-                    "game_week": 1,
-                    "id": 33,
-                    "player_id": 1420,
-                    "season_value": 110
+            [
+                {
+                    "assists": 0,
+                    "bonus": null,
+                    "clean_sheet": true,
+                    "fantasy_creativity": 0.4,
+                    "fantasy_ict_index": 1.7,
+                    "fantasy_influence": 9,
+                    "fantasy_match_id": 5,
+                    "fantasy_threat": 8,
+                    "goals_conceded": 0,
+                    "goals_scored": 0,
+                    "id": 311,
+                    "match_id": null,
+                    "minutes_played": 90,
+                    "own_goals": 0,
+                    "penalties_missed": 0,
+                    "penalties_saved": 0,
+                    "played_at_home": false,
+                    "player_id": 1430,
+                    "red_cards": 0,
+                    "saves": 0,
+                    "substitution": null,
+                    "yellow_cards": 0
                     },
                     ...
-                ],
-                "weight": null
-            }
+                }
+            ]
