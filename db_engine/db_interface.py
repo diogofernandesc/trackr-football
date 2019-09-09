@@ -113,9 +113,10 @@ class DBInterface(object):
 
         return bs_query.filter(*base_standings_filters).scalar()
 
-    def get_competition(self, multi=False, filters=None):
+    def get_competition(self, limit: int= 1, multi=False, filters=None):
         """
         Query DB for competition record
+        :param limit: Number of competitions to retrieve
         :param multi: Perform OR query on filters, SQL OR otherwise SQL AND
         :param filters: namedtuple with all available filter fields
         :return:  matched (if any) competition records
@@ -139,7 +140,7 @@ class DBInterface(object):
         else:
             query_result = comp_query.filter(*db_filters)
 
-        return clean_output(query_result)
+        return clean_output(query_result, limit=limit)
 
     def get_team(self, limit: int=10,  multi=False, filters=None):
         """
@@ -454,22 +455,27 @@ class DBInterface(object):
 
         self.db.session.commit()
 
-    def get_stats(self, limit: int = 10, filters=None) -> dict:
+    def get_stats(self, limit: int = 10, multi: bool = False, filters=None) -> dict:
         """
         Query DB for stats record
         :param filters: namedtuple with all available filter fields
+        :param multi: Whether to perform OR querying on filters
         :param limit: Result set size
         :return: matched (if any) match stats records
         """
         db_filters = []
-        match_query = self.db.session.query(MatchStats)
+        stat_query = self.db.session.query(MatchStats)
         active_filters = [(f, v) for f, v in filters._asdict().items() if v]
 
         for filter_ in active_filters:
             for filter_val in filter_[1]:
                 db_filters.append(filter_parse(query_str=filter_val, table=MatchStats.__table__, column=filter_[0]))
 
-        query_result = match_query.filter(*db_filters)
+        if multi:
+            query_result = stat_query.filter(or_(*db_filters))
+
+        else:
+            query_result = stat_query.filter(*db_filters)
 
         return clean_output(query_result, limit=limit)
 
