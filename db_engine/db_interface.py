@@ -376,8 +376,11 @@ class DBInterface(object):
 
                     db_filters.append(filter_parse(query_str=filter_val, table=active_table, column=column))
 
+        comp_filter = db_filters[0]
+        db_filters = db_filters[1:]
+
         if multi:
-            stan_query = stan_query.filter(or_(*db_filters)).limit(100).all()
+            stan_query = stan_query.filter(comp_filter).filter(or_(*db_filters)).limit(100).all()
         else:
             stan_query = stan_query.filter(*db_filters).limit(100).all()  # no standings will have more than 100 entries
         standings_map = {}

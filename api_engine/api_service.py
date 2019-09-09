@@ -2,6 +2,7 @@ from flask import request, jsonify, Blueprint, current_app, abort
 from api_engine.api_cons import API_ENDPOINTS, API, ENDPOINT_DESCRIPTION, API_ERROR, DB_QUERY_FIELD
 from db_engine.db_filters import TeamFilters, StandingsFilters, CompFilters, MatchFilters, PlayerFilters, StatFilters
 from ingest_engine.ingest_driver import Driver
+from ingest_engine.cons import Standings, Competition
 from sqlalchemy import exc
 import logging
 
@@ -184,7 +185,12 @@ def standings():
         raise InvalidUsage(API_ERROR.INTEGER_LIMIT_400, status_code=400)
 
     try:
-        standings_filters = StandingsFilters(**{k: get_vals(v) for k, v in ra.items() if k != "limit"})
+        comp_filters = CompFilters(**{k: get_vals(v) for k, v in
+                                        {Competition.FOOTBALL_DATA_API_ID: 2021}.items()})
+        premier_league = db_interface.get_competition(filters=comp_filters)
+        filter_dict = {Standings.COMPETITION_ID: premier_league[Competition.ID]}
+        filter_dict = {**filter_dict, **ra}
+        standings_filters = StandingsFilters(**{k: get_vals(v) for k, v in filter_dict.items() if k != "limit"})
         result = jsonify(db_interface.get_standings(limit=limit, multi=multi, filters=standings_filters))
 
     except exc.DataError as e:
@@ -193,7 +199,8 @@ def standings():
         else:
             abort(400)
 
-    except TypeError:
+    except TypeError as e:
+        logging.error(e)
         raise InvalidUsage(API_ERROR.RESOURCE_NOT_FOUND_404, status_code=404)
 
     if result.json:
