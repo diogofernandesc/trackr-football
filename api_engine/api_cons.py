@@ -40,5 +40,5 @@ ENDPOINT_DESCRIPTION = {
     API_ENDPOINTS.MATCH: "Details of a specific match",
     API_ENDPOINTS.PLAYER: "Retrieve specific player details",
     API_ENDPOINTS.STANDINGS: "Get standings for a specific competition",
-    API_ENDPOINTS.STATS: "Get different stats based on different things"
+    API_ENDPOINTS.STATS: "Get different match stats for different players"
 }
