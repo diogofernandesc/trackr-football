@@ -144,7 +144,7 @@ A list of teams
 ### Get teams [GET]
 Get a team. Example:
 
-```no-highlight
+```http
 https://api.trackr.football/v1/team?name=Tottenham
 ```
 
@@ -184,37 +184,38 @@ https://api.trackr.football/v1/team?name=Tottenham
             }
     
     
-# Group Competition
-Group description
+# Group Standings
+Standings description
  
-## Competition List [/competition{?id,name,code,location}]
-A list of competitions
+## Standing List [/standings{?id,position,team_name,type,games_played,games_won,games_drawn,games_lost,points,goals_for,goals_against,goal_difference,limit}]
+A list of standings
 
 + Parameters
 
-    + id: `1` (integer, optional) - Search for a competition by id
-    + name: `Premier League` (string, optional) - Search by name
-    + code: `PL` (string, optional) - Search by code
-    + location: `England` (string, optional) - Search by location
-        + Default: `name`
+    + id: `1` (integer, optional) - Search for standings by id
+    + position: `2` (integer, optional) - Search by position in the standings
+    + team_name: `Chelsea` (string, optional) - Search by team name
+    + type: `HOME` (string, optional) - Search by type of standings
         + Members
-            + `name`
-            + `joined`
-            + `-joined`
-            + `age`
-            + `-age`
-            + `location`
-            + `-location`
-            + `plan`
-            + `-plan`
-    + limit: `25` (integer, optional) - The maximum number of users to return, up to `50`
-      + Default: `10`
+            + `TOTAL`
+            + `HOME`
+            + `AWAY`
+    + games_played: `3` (integer, optional) - Search by number of games played
+    + games_won: `10` (integer, optional) - Search by number of games won
+    + games_drawn: `2` (integer, optional) - Search by number of games drawn
+    + games_lost: `4` (integer, optional) - Search by number of games lost
+    + points: `20` (integer, optional) - Search by number of league points
+    + goals_for: `7` (integer, optional) - Search by number of goals scored against opponents
+    + goals_against: `4` (integer, optional) - Search by number of goals conceded to opponents
+    + goal_difference: `10` (integer, optional) - Search by team goal difference
+    + limit: `25` (integer, optional) - The maximum number of standings to retrieve
+      + Default: `3`
 
-### Get competitions [GET]
-Get a competition. Example:
+### Get standings [GET]
+Get standings for teams with more than 10 points. Example:
 
-```no-highlight
-https://api.trackr.football/v1/competition?code=PL
+```http
+https://api.trackr.football/v1/standings?points=$gt:10
 ```
 
 + Response 200 (application/json)
@@ -222,181 +223,382 @@ https://api.trackr.football/v1/competition?code=PL
     + Body
 
             {
-                "code": "PL",
-                "fd_api_id": 2021,
-                "fls_api_id": 2,
+                "competition_id": 1,
+                "group": null,
                 "id": 1,
-                "location": "England",
-                "name": "Premier League"
+                "match_day": 5,
+                "season": "2019-2020",
+                "table": [{
+                    "fd_team_id": 64,
+                    "games_drawn": 0,
+                    "games_lost": 0,
+                    "games_played": 4,
+                    "games_won": 4,
+                    "goals_against": 3,
+                    "goals_difference": 9,
+                    "goals_for": 12,
+                    "id": 1,
+                    "points": 12,
+                    "position": 1,
+                    "standings_id": 1,
+                    "team_name": "Liverpool FC"}],
+                "type": "TOTAL"
             }
+            
+            
+# Group Match
+Match description
 
-    + Schema
-
-
-
-# Data Structures
-
-
-## NoteData
-+ id: 1 (required, number) - Unique identifier
-+ title: Grocery list (required) - Single line description
-+ body: Buy milk - Full description of the note which supports Markdown.
-
-## NoteList (array)
-+ (NoteData)
-
-
-Group description (also with *Markdown*)
-
-## Important Info
-Descriptions may also contain sub-headings and **more Markdown**.
-f
-## Note List [/notes]
-Note list description
-
-+ Even
-+ More
-+ Markdown
-
-### Get Notes [GET]
-Get a list of notes.
-
-+ Response 200 (application/json)
-
-    + Headers
-
-            X-Request-ID: f72fc914
-            X-Response-Time: 4ms
-
-    + Attributes (NoteList)
-
-
-## Note [/notes/{id}{?body}]
-Note description
+:::note
+You can apply a score filter e.g, 
+```http
+https://api.trackr.football/v1/match?full_time_home_score=3
+```
+To get matches where the full time score for the home team was 3, see the score parameter below for more options.
+:::
+ 
+## Match List [/match{?id,match_day,full_time_home_score,full_time_away_score,half_time_home_score,half_time_away_score,winner,home_team,away_team,limit}]
+A list of matches
 
 + Parameters
 
-    + id: `68a5sdf67` (required, string) - The note ID
+    + id: `1` (integer, optional) - Search for matches by id
+    + match_day: `2` (integer, optional) - Search by match day/game week of the match
+    + score: `3`
+        + Members
+            + full_time_home_score
+            + full_time_away_score
+            + half_time_home_score 
+            + half_time_away_score 
+    + winner `HOME_TEAM` (string, optional) - Search by which side won the match
+        + Members
+            + 'HOME_TEAM'
+            + 'AWAY_TEAM'
+    + home_team: `Norwich` (string, optional) - Search by name of home team
+    + away_team: `Arsenal` (string, optional) - Search by name of away team
+    + limit: `20` (integer, optional) - The maximum number of matches to retrieve
+      + Default: `10`
 
-### Get Note [GET]
-Get a single note.
+### Get match [GET]
+Get matches for match day 1. Example:
 
-+ Parameters
-
-    + body: `false` (boolean) - Set to `false` to exclude note body content.
+```http
+https://api.trackr.football/v1/match?match_day=1
+```
 
 + Response 200 (application/json)
 
-    + Headers
+    + Body
 
-            X-Request-ID: f72fc914
-            X-Response-Time: 4ms
+            [
+                {
+                    "id": 1,
+                    "away_concede_probability": 100,
+                    "away_form": [
+                        "loss",
+                        "win",
+                        "win",
+                        "draw",
+                        "draw"
+                    ],
+                    "away_o15_prob": 60,
+                    "away_o25_prob": 100,
+                    "away_o35_prob": null,
+                    "away_score_probability": 100,
+                    "away_team": "Norwich City",
+                    "away_team_difficulty": 5,
+                    "away_team_fls_id": 364,
+                    "away_u15_prob": 0,
+                    "away_u25_prob": 0,
+                    "away_u35_prob": 40,
+                    "competition": "Premier League",
+                    "et_away_score": null,
+                    "et_home_score": null,
+                    "f_away_team_code": null,
+                    "f_away_team_id": 14,
+                    "f_home_team_code": null,
+                    "f_home_team_id": 10,
+                    "fantasy_game_week": 1,
+                    "fantasy_match_code": 1059702,
+                    "fantasy_match_id": null,
+                    "finished": true,
+                    "fls_competition_id": 2,
+                    "fls_match_id": 717650,
+                    "ft_away_score": 1,
+                    "ft_home_score": 4,
+                    "home_concede_probability": 60,
+                    "home_form": [
+                        "draw",
+                        "draw",
+                        "loss",
+                        "win",
+                        "win"
+                    ],
+                    "home_o15_prob": 100,
+                    "home_o25_prob": 40,
+                    "home_o35_prob": 20,
+                    "home_score_probability": 100,
+                    "home_team": "Liverpool",
+                    "home_team_difficulty": 2,
+                    "home_team_fls_id": 1,
+                    "home_u15_prob": 0,
+                    "home_u25_prob": 60,
+                    "home_u35_prob": 80,
+                    "ht_away_score": 0,
+                    "ht_home_score": 4,
+                    "match_day": 1,
+                    "match_fd_id": 264341,
+                    "minutes": 90,
+                    "p_away_score": null,
+                    "p_home_score": null,
+                    "penalty_shootout_score": null,
+                    "referees": [
+                        "Michael Oliver",
+                        "Stuart Burt",
+                        "Simon Bennett",
+                        "Graham Scott",
+                        "Andre Marriner"
+                    ],
+                    "season_end_date": "Sun, 17 May 2020 00:00:00 GMT",
+                    "season_start_date": "Fri, 09 Aug 2019 00:00:00 GMT",
+                    "season_year": "2019/2020",
+                    "start_time": "Fri, 09 Aug 2019 19:00:00 GMT",
+                    "start_time_epoch": null,
+                    "status": "FINISHED",
+                    "utc_date": "Fri, 09 Aug 2019 00:00:00 GMT",
+                    "winner": "HOME_TEAM"
+                    },
+                    ...
+            ]
 
-    + Attributes (NoteData)
 
-+ Response 404 (application/json)
+# Group Player
+Player description
 
-    + Headers
+:::note
+You can apply a score filter e.g, 
+```http
+https://api.trackr.football/v1/match?full_time_home_score=3
+```
+To get matches where the full time score for the home team was 3, see the score parameter below for more options.
+:::
+ 
+## Player List [/v1/player]
 
-            X-Request-ID: f72fc914
-            X-Response-Time: 4ms
++ Parameters
+
+    + id: `1` (integer, optional) - Search for players by id
+    + name: `Kane` (string, optional) - Search by player name, fields `first_name` and `last_name` will also work
+    + nationality: `England` (string, optional) - Search by nationality
+    + position: `Attacker` (string, optional) - Search by position
+    + team: `Tottenham` (string, optional) - Search by the team the player plays for
+    + number_of_goals: `10` (integer, optional) - Search by number of goals scored by player
+    + assists: `10` (integer, optional) - Search by number of assists
+    + yellow_cards: `1` (integer, optional) - Search by number of yellow cards
+    + red_cards: `1` (integer, optional) - Search by number of red cards
+    + fantasy_fields: (optional) - Search by different fantasy fields
+        + Members
+            + fantasy_id
+            + fantasy_price
+            + fantasy_dream_team_count
+            + fantasy_season_value
+            + fantasy_overall_price_rise
+            + fantasy_overall_price_fall
+            + fantasy_overall_transfers_in
+            + fantasy_overall_transfers_out
+            + fantasy_overall_points
+            + fantasy_point_average
+    + limit: `5` (integer, optional) - The maximum number of players to retrieve up to `10`
+      + Default: `10`
+
+### Get player [GET]
+Get data for Harry Kane. Example:
+
+```http
+https://api.trackr.football/v1/player?name=Kane
+```
+
++ Response 200 (application/json)
 
     + Body
 
             {
-                "error": "Note not found"
+                "id": 1420,
+                "chance_of_playing_next_week": null,
+                "chance_of_playing_this_week": null,
+                "country_of_birth": "England",
+                "date_of_birth": "Wed, 28 Jul 1993 00:00:00 GMT",
+                "date_of_birth_epoch": null,
+                "fantasy_code": 78830,
+                "fantasy_dream_team_count": 1,
+                "fantasy_dream_team_member": false,
+                "fantasy_form": 6,
+                "fantasy_id": 338,
+                "fantasy_news": "",
+                "fantasy_news_timestamp": null,
+                "fantasy_overall_points": 23,
+                "fantasy_overall_price_fall": 0,
+                "fantasy_overall_price_rise": 0,
+                "fantasy_overall_transfers_in": 500152,
+                "fantasy_overall_transfers_out": 812240,
+                "fantasy_point_average": 5.8,
+                "fantasy_price": 110,
+                "fantasy_selection_percentage": 24,
+                "fantasy_special": false,
+                "fantasy_status": null,
+                "fantasy_team_code": 6,
+                "fantasy_team_id": 17,
+                "fantasy_total_bonus": 77,
+                "fantasy_week_price_fall": 1,
+                "fantasy_week_price_rise": -1,
+                "fd_id": 8004,
+                "first_name": "Harry",
+                "fls_id": null,
+                "gender": null,
+                "height": null,
+                "last_name": "Kane",
+                "name": "Harry Kane",
+                "nationality": "England",
+                "number_of_goals": 3,
+                "photo_url": "78830.jpg",
+                "position": "Attacker",
+                "shirt_number": 10,
+                "team": "Tottenham Hotspur FC",
+                "team_fd_id": 73,
+                "team_fls_id": null,
+                "team_id": null,
+                "web_name": null,
+                "week_stats": [
+                    {
+                    "fantasy_selection_count": 1591131,
+                    "fantasy_transfers_balance": 0,
+                    "fantasy_week_bonus": 50,
+                    "fantasy_week_points": 13,
+                    "fantasy_week_transfers_in": 0,
+                    "fantasy_week_transfers_out": 0,
+                    "game_week": 1,
+                    "id": 33,
+                    "player_id": 1420,
+                    "season_value": 110
+                    },
+                    ...
+                ],
+                "weight": null
             }
-
-### Update a Note [PUT]
-Update a single note by setting the title and/or body.
+            
+# Group Stats
+Player match stats description
 
 ::: warning
 #### <i class="fa fa-warning"></i> Caution
-If the value for `title` or `body` is `null` or `undefined`, then the corresponding value is not modified on the server. However, if you send an empty string instead then it will **permanently overwrite** the original value.
+Please ensure that you pass either a `player_id` OR `match_id` filter to this endpoint to get results.
+Calling with just `player_id` will retrieve data on random matches in which `player_id` played.
+Calling with just `match_id` will retrieve data for random players which played in this match. 
 :::
 
-+ Request (application/json)
+:::note
+To retrieve stats for multiple matches you can use: 
+```http
+https://api.trackr.football/v1/stats/all?player_id=1157&match_id=22,45
+```
+:::
 
-    + Body
-
-            {
-                "title": "Grocery List (Safeway)"
-            }
-
-+ Response 200 (application/json)
-
-    + Headers
-
-            X-Request-ID: f72fc914
-            X-Response-Time: 4ms
-
-    + Attributes (NoteData)
-
-+ Response 404 (application/json)
-
-    + Headers
-
-            X-Request-ID: f72fc914
-            X-Response-Time: 4ms
-
-    + Body
-
-            {
-                "error": "Note not found"
-            }
-
-+ Request delete body (application/json)
-
-    + Body
-
-            {
-                "body": ""
-            }
-
-+ Response 200 (application/json)
-
-    + Headers
-
-            X-Request-ID: f72fc914
-            X-Response-Time: 4ms
-
-    + Attributes (NoteData)
-
-+ Response 404 (application/json)
-
-    + Headers
-
-            X-Request-ID: f72fc914
-            X-Response-Time: 4ms
-
-    + Body
-
-            {
-                "error": "Note not found"
-            }
-
-
-
-
-
-     
-
-# Group Tags and Tagging Long Title
-Get or set tags on notes
-
-## GET /tags
-Get a list of bars
-
-+ Response 200 (application/json)
-
-        ["tag1", "tag2", "tag3"]
-
-## Get one tag [/tags/{id}]
-Get a single tag
+## Player match stats List [/v1/stats]
 
 + Parameters
-    + id - Unique tag identifier
 
-### GET
+    + player_id: `1` (integer, required) - Search for stats by player id
+    + match_id: `300` (integer, required) - Search for stats by match id
+    + goals_scored: `2` (integer, optional) - Search for goals scored in a single match
+    + goals_conceded: `2` (integer, optional) - Search for goals conceded in a single match
+    + assists: `2` (integer, optional) - Search for assists in a single match
+    + own_goals: `2` (integer, optional) - Search for own goals in a single match
+    + penalties_saved: `1` (integer, optional) - Search for penalties saved in a single match
+    + penalties_missed: `1` (integer, optional) - Search for penalties missed in a single match
+    + yellow_cards: `1` (integer, optional) - Search for yellow cards in a single match
+    + red_cards: `1` (integer, optional) - Search for red cards in a single match
+    + saves: `1` (integer, optional) - Search for number of saves in a single match
+    + minutes_played: `1` (integer, optional) - Search for number of saves in a single match
+    + fantasy_fields: (optional) - Search by different fantasy fields
+        + Members
+            + fantasy_influence
+            + fantasy_creativity
+            + fantasy_threat
+            + fantasy_ict_index
+    + limit: `5` (integer, optional) - The maximum number of match stats to retrieve up to `10`
+      + Default: `10`
 
-+ Response 200
+### Get player [GET]
+Get data for Harry Kane. Example:
+
+```http
+https://api.trackr.football/v1/player?name=Kane
+```
+
++ Response 200 (application/json)
+
+    + Body
+
+            {
+                "id": 1420,
+                "chance_of_playing_next_week": null,
+                "chance_of_playing_this_week": null,
+                "country_of_birth": "England",
+                "date_of_birth": "Wed, 28 Jul 1993 00:00:00 GMT",
+                "date_of_birth_epoch": null,
+                "fantasy_code": 78830,
+                "fantasy_dream_team_count": 1,
+                "fantasy_dream_team_member": false,
+                "fantasy_form": 6,
+                "fantasy_id": 338,
+                "fantasy_news": "",
+                "fantasy_news_timestamp": null,
+                "fantasy_overall_points": 23,
+                "fantasy_overall_price_fall": 0,
+                "fantasy_overall_price_rise": 0,
+                "fantasy_overall_transfers_in": 500152,
+                "fantasy_overall_transfers_out": 812240,
+                "fantasy_point_average": 5.8,
+                "fantasy_price": 110,
+                "fantasy_selection_percentage": 24,
+                "fantasy_special": false,
+                "fantasy_status": null,
+                "fantasy_team_code": 6,
+                "fantasy_team_id": 17,
+                "fantasy_total_bonus": 77,
+                "fantasy_week_price_fall": 1,
+                "fantasy_week_price_rise": -1,
+                "fd_id": 8004,
+                "first_name": "Harry",
+                "fls_id": null,
+                "gender": null,
+                "height": null,
+                "last_name": "Kane",
+                "name": "Harry Kane",
+                "nationality": "England",
+                "number_of_goals": 3,
+                "photo_url": "78830.jpg",
+                "position": "Attacker",
+                "shirt_number": 10,
+                "team": "Tottenham Hotspur FC",
+                "team_fd_id": 73,
+                "team_fls_id": null,
+                "team_id": null,
+                "web_name": null,
+                "week_stats": [
+                    {
+                    "fantasy_selection_count": 1591131,
+                    "fantasy_transfers_balance": 0,
+                    "fantasy_week_bonus": 50,
+                    "fantasy_week_points": 13,
+                    "fantasy_week_transfers_in": 0,
+                    "fantasy_week_transfers_out": 0,
+                    "game_week": 1,
+                    "id": 33,
+                    "player_id": 1420,
+                    "season_value": 110
+                    },
+                    ...
+                ],
+                "weight": null
+            }

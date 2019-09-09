@@ -200,7 +200,7 @@ player_filter_field = [PLAYER.ID,
                        PLAYER.FANTASY_WEEK_PRICE_FALL,
                        PLAYER.FANTASY_OVERALL_PRICE_RISE,
                        PLAYER.FANTASY_OVERALL_PRICE_FALL,
-                       PLAYER.FANTASY_OVERALL_TRANSFERS_IN,  # not finished
+                       PLAYER.FANTASY_OVERALL_TRANSFERS_IN,
                        PLAYER.FANTASY_OVERALL_TRANSFERS_OUT,
                        PLAYER.FANTASY_OVERALL_POINTS,
                        PLAYER.FANTASY_POINT_AVERAGE,
