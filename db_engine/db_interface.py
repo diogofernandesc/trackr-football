@@ -54,11 +54,12 @@ def filter_parse(query_str, table, column):
 
 def to_json(result_map, aggregator_name, limit=10):
     list_dict_result = []
-    for k, v in result_map.items():
-        dict_result = k.__dict__
-        dict_result.pop(IGNORE.INSTANCE_STATE, None)
-        dict_result[aggregator_name] = clean_output(v, as_list=True)
-        list_dict_result.append(dict_result)
+    if result_map:
+        for k, v in result_map.items():
+            dict_result = k.__dict__
+            dict_result.pop(IGNORE.INSTANCE_STATE, None)
+            dict_result[aggregator_name] = clean_output(v, as_list=True)
+            list_dict_result.append(dict_result)
 
     if len(list_dict_result) == 1:
         return list_dict_result[0]
@@ -233,9 +234,9 @@ class DBInterface(object):
         player_week_stat_map = {}
         for player, week_stat in query_result:
             if player not in player_week_stat_map:
-                player_week_stat_map[player] = [week_stat]
+                player_week_stat_map[player] = []
 
-            else:
+            if week_stat:
                 player_week_stat_map[player].append(week_stat)
 
         result = to_json(player_week_stat_map, aggregator_name=PLAYER.WEEK_STATS, limit=limit)
