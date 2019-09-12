@@ -205,7 +205,7 @@ class DBInterface(object):
         db_filters = []
         player_query = self.db.session\
             .query(Player, FantasyWeekStats)\
-            .join(FantasyWeekStats, Player.id == FantasyWeekStats.player_id)
+            .outerjoin(FantasyWeekStats, Player.id == FantasyWeekStats.player_id)
 
         active_filters = [(f, v) for f, v in filters._asdict().items() if v]
 
