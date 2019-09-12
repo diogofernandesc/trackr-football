@@ -18,9 +18,11 @@ app.config['db_interface'] = db_interface
 from api_engine.crud_service import crud_service
 from api_engine.api_service import api_service
 from api_engine.docs_service import docs_service
+from api_engine.ui_service import  ui_service
 app.register_blueprint(crud_service)  # Adds functionality for handling DB
 app.register_blueprint(api_service)
 app.register_blueprint(docs_service)
+app.register_blueprint(ui_service)
 
 if __name__ == '__main__':
     app.run()
