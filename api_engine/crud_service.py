@@ -1,6 +1,8 @@
 from threading import Thread
 
 from flask import Blueprint, request, jsonify, current_app
+
+from db_engine.db_driver import Competition, Standings, StandingsEntry
 from db_engine.db_filters import StandingsBaseFilters, CompFilters, MatchFilters, TeamFilters
 from api_engine.api_service import get_vals, InvalidUsage
 from api_engine.api_cons import API_ERROR
@@ -10,6 +12,7 @@ from ingest_engine.ingest_driver import Driver
 
 crud_service = Blueprint('crud_service', __name__, template_folder='templates', url_prefix='/v1/db', subdomain='api')
 api_ingest = Driver()
+
 
 class FilterException(Exception):
    """Raised when filter applied is incorrect"""
@@ -28,9 +31,42 @@ def handle_invalid_usage(error):
     return response
 
 
-@crud_service.route('/standings')
-def get_standings():
-    pass
+@crud_service.route('/competition', methods=['GET'])
+def get_competition_and_standings():
+    with current_app.app_context():
+        db_interface = current_app.config['db_interface']
+
+    competitions = api_ingest.request_competitions()
+    for comp in competitions:
+        if comp[COMPETITION.FOOTBALL_DATA_API_ID] == 2021:  # Premier league data only
+            comp_query = db_interface.db.session \
+                        .query(Competition) \
+                        .filter(Competition.code == comp[COMPETITION.CODE])
+            if not comp_query.count():
+                db_comp = Competition(**comp)
+                if comp[COMPETITION.FOOTBALL_DATA_API_ID] == 2021:  # Premier league data only
+                    standings = api_ingest.request_standings(competition_id=comp[COMPETITION.FOOTBALL_DATA_API_ID])
+                    if standings:
+                        for stan in standings['standings']:
+                            table = stan.pop(STANDINGS.TABLE, [])
+                            stan_query = db_interface.db.session \
+                                .query(Standings) \
+                                .filter(Standings.match_day == stan[STANDINGS.MATCH_DAY])
+
+                            if not stan_query.count():
+                                db_standing = Standings(**stan)
+
+                                for entry in table:
+                                    se = StandingsEntry(**entry)
+                                    db_standing.standings_entries.append(se)
+
+                                db_comp.standings.append(db_standing)
+
+                        db_interface.db.session.add(db_comp)
+                        db_interface.db.session.commit()
+                        return jsonify({"Message": "Update successful"})
+
+    return jsonify({"Message": "Nothing to update"})
 
 
 @crud_service.route('/matches', methods=['GET'])

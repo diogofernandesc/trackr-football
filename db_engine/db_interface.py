@@ -439,20 +439,22 @@ class DBInterface(object):
             record = [record]
 
         for match in record:
-            match.pop(MATCH.GOALS_SCORED, None)
-            match.pop(MATCH.EVENTS, None)
-            match.pop(MATCH.ASSISTS, None)
-            match.pop(MATCH.OWN_GOALS, None)
-            match.pop(MATCH.BPS, None)
-            match.pop(MATCH.BONUS, None)
-            match.pop(MATCH.BPS, None)
-            match.pop(MATCH.PENALTIES_SAVED, None)
-            match.pop(MATCH.PENALTIES_MISSED, None)
-            match.pop(MATCH.YELLOW_CARDS, None)
-            match.pop(MATCH.RED_CARDS, None)
-            match.pop(MATCH.SAVES, None)
-            match.pop(MATCH.PREVIOUS_ENCOUNTERS, None)
-            self.db.session.add(Match(**match))
+            match_query = self.db.session.query(Match).filter(Match.match_fd_id == match[MATCH.FOOTBALL_DATA_ID])
+            if not match_query.count():
+                match.pop(MATCH.GOALS_SCORED, None)
+                match.pop(MATCH.EVENTS, None)
+                match.pop(MATCH.ASSISTS, None)
+                match.pop(MATCH.OWN_GOALS, None)
+                match.pop(MATCH.BPS, None)
+                match.pop(MATCH.BONUS, None)
+                match.pop(MATCH.BPS, None)
+                match.pop(MATCH.PENALTIES_SAVED, None)
+                match.pop(MATCH.PENALTIES_MISSED, None)
+                match.pop(MATCH.YELLOW_CARDS, None)
+                match.pop(MATCH.RED_CARDS, None)
+                match.pop(MATCH.SAVES, None)
+                match.pop(MATCH.PREVIOUS_ENCOUNTERS, None)
+                self.db.session.add(Match(**match))
 
         self.db.session.commit()
 
