@@ -23,5 +23,7 @@ Get data for Harry Kane
 https://api.trackr.football/v1/player?name=Kane
 ```
 
+## Documentation
+Please visit https://docs.trackr.football for official API docs
 ## Contributing
 Feel free to open a pull request, or open an issue to be investigated
