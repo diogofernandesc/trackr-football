@@ -41,8 +41,7 @@ team_filter_fields = [TEAM.ID,
 TeamFilters = namedtuple('team_filters', team_filter_fields, defaults=(None,) * len(team_filter_fields))
 
 
-standings_base_filter_field = [STANDINGS.ID,
-                               STANDINGS.COMPETITION_ID,
+standings_base_filter_field = [STANDINGS.COMPETITION_ID,
                                STANDINGS.TYPE,
                                STANDINGS.SEASON,
                                STANDINGS.MATCH_DAY]
@@ -50,7 +49,7 @@ standings_base_filter_field = [STANDINGS.ID,
 StandingsBaseFilters = namedtuple('standings_base_filters',
                                   standings_base_filter_field, defaults=(None,) * len(standings_base_filter_field))
 
-standings_filter_field = [STANDINGS.ID,
+standings_filter_field = [STANDINGS.COMPETITION_ID,
                           STANDINGS.STANDINGS_ID,
                           STANDINGS.POSITION,
                           STANDINGS.TEAM_NAME,
@@ -177,9 +176,7 @@ player_filter_field = [PLAYER.ID,
                        PLAYER.HEIGHT,
                        PLAYER.TEAM_FLS_ID,
                        PLAYER.ASSISTS,
-                       PLAYER.RED_CARDS,
                        PLAYER.COMPETITION_FLS_ID,
-                       PLAYER.YELLOW_CARDS,
                        PLAYER.FOOTBALL_DATA_API_ID,
                        PLAYER.FASTEST_LIVE_SCORES_API_ID,
                        PLAYER.COMPETITION_STATS,

@@ -25,8 +25,8 @@ class ApiInterfaceTest(unittest.TestCase):
 
     def testCompetitionUrl(self):
         all_result = self.api.get('http://api.localhost:5000/v1/competitions').get_json()
-        for result in all_result:
-            self.assertTrue(all(k in result for k in (COMPETITION.ID,
+
+        self.assertTrue(all(k in all_result for k in (COMPETITION.ID,
                                                       COMPETITION.NAME,
                                                       COMPETITION.LOCATION,
                                                       COMPETITION.CODE,
@@ -35,31 +35,9 @@ class ApiInterfaceTest(unittest.TestCase):
 
         filter_result = self.api.get('http://api.localhost:5000/v1/competition?id=1').get_json()
         self.assertEqual(filter_result[COMPETITION.ID], 1)
-        filter_result = self.api.get('http://api.localhost:5000/v1/competitions?id=1,11').get_json()
-        for result in filter_result:
-            self.assertTrue(result[COMPETITION.ID] in [1, 11])
-
-        # AND query - no one competition with id 1 AND also id 2
-        filter_result = self.api.get('http://api.localhost:5000/v1/competition?id=1,2').get_json()
-        self.assertEqual(filter_result, {
-            'message': API_ERROR.COMPETITION_404,
-            'status_code': 404
-        })
-
-        filter_result = self.api.get('http://api.localhost:5000/v1/competition?name=La Liga').get_json()
-        self.assertEqual(filter_result[COMPETITION.NAME], "La Liga")
 
         filter_result = self.api.get('http://api.localhost:5000/v1/competition?code=PL').get_json()
         self.assertEqual(filter_result[COMPETITION.CODE], 'PL')
-
-        filter_result = self.api.get('http://api.localhost:5000/v1/competition?location=spain').get_json()
-        self.assertEqual(filter_result[COMPETITION.LOCATION], "Spain")
-
-        filter_result = self.api.get('http://api.localhost:5000/v1/competition?fd_api_id=2002').get_json()
-        self.assertEqual(filter_result[COMPETITION.FOOTBALL_DATA_API_ID], 2002)
-
-        filter_result = self.api.get('http://api.localhost:5000/v1/competition?fls_api_id=81').get_json()
-        self.assertEqual(filter_result[COMPETITION.FASTEST_LIVE_SCORES_API_ID], 81)
 
     def testStandingsUrl(self):
 
@@ -120,32 +98,12 @@ class ApiInterfaceTest(unittest.TestCase):
         all_result = self.api.get('http://api.localhost:5000/v1/standings').get_json()
         self.assertTrue(len(all_result), 10)
 
-        filter_result = self.api.get('http://api.localhost:5000/v1/standings?id=1').get_json()
-        self.assertFalse(isinstance(filter_result, list))
-        self.assertEqual(filter_result[STANDINGS.ID], 1)
-
-        filter_result = self.api.get('http://api.localhost:5000/v1/standings/all?id=1,2').get_json()
-        self.assertTrue(isinstance(filter_result, list))
-        for result in filter_result:
-            self.assertTrue(result[STANDINGS.ID] in [1, 2])
-
-        self.assertTrue(filter_result[0][STANDINGS.ID] != filter_result[1][STANDINGS.ID])
-
         filter_test(filter_str=STANDINGS.POSITION, filter_val=5)
-        filter_test(filter_str=STANDINGS.TEAM_NAME, filter_val="chapecoense")
-        filter_test(filter_str=STANDINGS.GAMES_PLAYED, filter_val=3)
-        filter_test(filter_str=STANDINGS.GAMES_WON, filter_val=1)
-        filter_test(filter_str=STANDINGS.GAMES_DRAWN, filter_val=2)
-        filter_test(filter_str=STANDINGS.GAMES_LOST, filter_val=5)
-        filter_test(filter_str=STANDINGS.POINTS, filter_val=20)
-        filter_test(filter_str=STANDINGS.GOALS_FOR, filter_val=15)
-        filter_test(filter_str=STANDINGS.GOALS_AGAINST, filter_val=5)
-        filter_test(filter_str=STANDINGS.GOAL_DIFFERENCE, filter_val=5)
 
         filter_test_adv(filter_str=STANDINGS.POSITION, filter_val=10, op="lt")
         filter_test_adv(filter_str=STANDINGS.GAMES_PLAYED, filter_val=3, op="lte")
-        filter_test_adv(filter_str=STANDINGS.GAMES_WON, filter_val=10, op="gte")
-        filter_test_adv(filter_str=STANDINGS.GAMES_DRAWN, filter_val=5, op="gt")
+        filter_test_adv(filter_str=STANDINGS.GAMES_WON, filter_val=1, op="gte")
+        filter_test_adv(filter_str=STANDINGS.GOAL_DIFFERENCE, filter_val=0, op="gt")
 
         filter_result = self.api.get('http://api.localhost:5000/v1/standings?points=$lt:0').get_json()
         self.assertEqual(filter_result[API.MESSAGE], API_ERROR.STANDINGS_404)

@@ -1,6 +1,8 @@
 from threading import Thread
 
 from flask import Blueprint, request, jsonify, current_app
+
+from db_engine.db_driver import Competition, Standings, StandingsEntry
 from db_engine.db_filters import StandingsBaseFilters, CompFilters, MatchFilters, TeamFilters
 from api_engine.api_service import get_vals, InvalidUsage
 from api_engine.api_cons import API_ERROR
@@ -10,6 +12,7 @@ from ingest_engine.ingest_driver import Driver
 
 crud_service = Blueprint('crud_service', __name__, template_folder='templates', url_prefix='/v1/db', subdomain='api')
 api_ingest = Driver()
+
 
 class FilterException(Exception):
    """Raised when filter applied is incorrect"""
@@ -28,9 +31,42 @@ def handle_invalid_usage(error):
     return response
 
 
-@crud_service.route('/insert/match')
-def insert_match():
-    pass
+@crud_service.route('/competition', methods=['GET'])
+def get_competition_and_standings():
+    with current_app.app_context():
+        db_interface = current_app.config['db_interface']
+
+    competitions = api_ingest.request_competitions()
+    for comp in competitions:
+        if comp[COMPETITION.FOOTBALL_DATA_API_ID] == 2021:  # Premier league data only
+            comp_query = db_interface.db.session \
+                        .query(Competition) \
+                        .filter(Competition.code == comp[COMPETITION.CODE])
+            if not comp_query.count():
+                db_comp = Competition(**comp)
+                if comp[COMPETITION.FOOTBALL_DATA_API_ID] == 2021:  # Premier league data only
+                    standings = api_ingest.request_standings(competition_id=comp[COMPETITION.FOOTBALL_DATA_API_ID])
+                    if standings:
+                        for stan in standings['standings']:
+                            table = stan.pop(STANDINGS.TABLE, [])
+                            stan_query = db_interface.db.session \
+                                .query(Standings) \
+                                .filter(Standings.match_day == stan[STANDINGS.MATCH_DAY])
+
+                            if not stan_query.count():
+                                db_standing = Standings(**stan)
+
+                                for entry in table:
+                                    se = StandingsEntry(**entry)
+                                    db_standing.standings_entries.append(se)
+
+                                db_comp.standings.append(db_standing)
+
+                        db_interface.db.session.add(db_comp)
+                        db_interface.db.session.commit()
+                        return jsonify({"Message": "Update successful"})
+
+    return jsonify({"Message": "Nothing to update"})
 
 
 @crud_service.route('/matches', methods=['GET'])
@@ -76,26 +112,21 @@ def get_match() -> dict:
     # To be used when API compatible with multiple leagues
     # comp_filters = CompFilters(**{k: get_vals(v) for k, v in ra.items()})
     # comp = db_interface.get_competition(multi=False, filters=comp_filters)
-    match_filters = MatchFilters(**{k: get_vals(v) for k, v in ra.items() if k != "limit"})
-    db_matches = db_interface.get_match(limit=limit, multi=False, filters=match_filters)
-    if db_matches:
-        matches = db_matches
 
-    else:
-        if not multi and MATCH.ID in ra:
-            raise InvalidUsage(API_ERROR.MATCH_404, status_code=404)
+    if not multi and MATCH.ID in ra:
+        raise InvalidUsage(API_ERROR.MATCH_404, status_code=404)
 
-        matches = api_ingest.request_match(fls_comp_id=comp_fls_id,
-                                           fd_comp_id=comp_fd_id,
-                                           game_week=match_day,
-                                           season=season,
-                                           limit=limit
-                                           )
+    matches = api_ingest.request_match(fls_comp_id=comp_fls_id,
+                                       fd_comp_id=comp_fd_id,
+                                       game_week=match_day,
+                                       season=season,
+                                       limit=limit
+                                       )
 
-        # Inserts record into the database in parallel
-        thread = Thread(target=lambda record: db_interface.insert_match(record), kwargs={'record': matches})
-        thread.start()
-        thread.join()
+    # Inserts record into the database in parallel
+    thread = Thread(target=lambda record: db_interface.insert_match(record), kwargs={'record': matches})
+    thread.start()
+    thread.join()
 
     if matches:
         return jsonify(matches)

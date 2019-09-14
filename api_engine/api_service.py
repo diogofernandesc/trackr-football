@@ -2,6 +2,7 @@ from flask import request, jsonify, Blueprint, current_app, abort
 from api_engine.api_cons import API_ENDPOINTS, API, ENDPOINT_DESCRIPTION, API_ERROR, DB_QUERY_FIELD
 from db_engine.db_filters import TeamFilters, StandingsFilters, CompFilters, MatchFilters, PlayerFilters, StatFilters
 from ingest_engine.ingest_driver import Driver
+from ingest_engine.cons import Standings, Competition
 from sqlalchemy import exc
 import logging
 
@@ -42,7 +43,13 @@ def get_vals(v):
     if v:
         # Perform type inference from the query string
         def type_eval(x):
-            if isint(x):
+            if x in ["True", "true"]:
+                return True
+
+            elif x in ["False", "false"]:
+                return False
+
+            elif isint(x):
                 return int(x)
             elif isfloat(x):
                 return float(x)
@@ -113,14 +120,35 @@ def competition():
     """
     with current_app.app_context():
         db_interface = current_app.config['db_interface']
-    multi = 'competitions' in request.url_rule.rule
+
     ra = request.args
-    comp_filters = CompFilters(**{k: get_vals(v) for k, v in ra.items()})
-    result = jsonify(db_interface.get_competition(multi=multi, filters=comp_filters))
+    multi = 'competitions' in request.url_rule.rule
+    limit = ra.get("limit", 11)
+    ra = request.args
+    result = {}
+    try:
+        limit = int(limit)
+    except ValueError:
+        raise InvalidUsage(API_ERROR.INTEGER_LIMIT_400, status_code=400)
+
+    try:
+        comp_filters = CompFilters(**{k: get_vals(v) for k, v in ra.items()})
+        result = jsonify(db_interface.get_competition(limit=limit, multi=multi, filters=comp_filters))
+
+    except exc.DataError as e:
+        if "invalid input syntax" in e.args[0]:  # e.args[0] is the psycopg2 errors text field
+            raise InvalidUsage(API_ERROR.FILTER_PROBLEM_400, status_code=400)
+        else:
+            logging.error(e)
+            abort(400)
+
+    except TypeError as e:
+        logging.error(e)
+        raise InvalidUsage(API_ERROR.RESOURCE_NOT_FOUND_404, status_code=404)
 
     if result.json:
         return result
-    #
+
     else:
         raise InvalidUsage(API_ERROR.COMPETITION_404, status_code=404)
 
@@ -152,9 +180,11 @@ def team():
         if "invalid input syntax" in e.args[0]:  # e.args[0] is the psycopg2 errors text field
             raise InvalidUsage(API_ERROR.FILTER_PROBLEM_400, status_code=400)
         else:
+            logging.error(e)
             abort(400)
 
-    except TypeError:
+    except TypeError as e:
+        logging.error(e)
         raise InvalidUsage(API_ERROR.RESOURCE_NOT_FOUND_404, status_code=404)
 
     if result.json:
@@ -184,16 +214,23 @@ def standings():
         raise InvalidUsage(API_ERROR.INTEGER_LIMIT_400, status_code=400)
 
     try:
-        standings_filters = StandingsFilters(**{k: get_vals(v) for k, v in ra.items() if k != "limit"})
+        comp_filters = CompFilters(**{k: get_vals(v) for k, v in
+                                        {Competition.FOOTBALL_DATA_API_ID: 2021}.items()})
+        premier_league = db_interface.get_competition(filters=comp_filters)
+        filter_dict = {Standings.COMPETITION_ID: premier_league[Competition.ID]}
+        filter_dict = {**filter_dict, **ra}
+        standings_filters = StandingsFilters(**{k: get_vals(v) for k, v in filter_dict.items() if k != "limit"})
         result = jsonify(db_interface.get_standings(limit=limit, multi=multi, filters=standings_filters))
 
     except exc.DataError as e:
         if "invalid input syntax" in e.args[0]:  # e.args[0] is the psycopg2 errors text field
             raise InvalidUsage(API_ERROR.FILTER_PROBLEM_400, status_code=400)
         else:
+            logging.error(e)
             abort(400)
 
-    except TypeError:
+    except TypeError as e:
+        logging.error(e)
         raise InvalidUsage(API_ERROR.RESOURCE_NOT_FOUND_404, status_code=404)
 
     if result.json:
@@ -230,9 +267,11 @@ def match():
         if "invalid input syntax" in e.args[0]:  # e.args[0] is the psycopg2 errors text field
             raise InvalidUsage(API_ERROR.FILTER_PROBLEM_400, status_code=400)
         else:
+            logging.error(e)
             abort(400)
 
-    except TypeError:
+    except TypeError as e:
+        logging.error(e)
         raise InvalidUsage(API_ERROR.RESOURCE_NOT_FOUND_404, status_code=404)
 
     if result.json:
@@ -242,6 +281,7 @@ def match():
         raise InvalidUsage(API_ERROR.MATCH_404, status_code=404)
 
 
+@api_service.route('/stats/all', methods=['GET'])
 @api_service.route('/stats', methods=['GET'])
 def stats():
     """
@@ -252,6 +292,7 @@ def stats():
         db_interface = current_app.config['db_interface']
 
     ra = request.args
+    multi = 'stats/all' in request.url_rule.rule
     if not ra or not any(f in ra for f in [DB_QUERY_FIELD.MATCH_ID, DB_QUERY_FIELD.PLAYER_ID]):
         raise InvalidUsage(API_ERROR.MISSING_FILTER_400, status_code=400)
 
@@ -260,7 +301,7 @@ def stats():
     try:
         limit = int(limit)
         stat_filters = StatFilters(**{k: get_vals(v) for k, v in ra.items() if k != "limit"})
-        result = jsonify(db_interface.get_stats(limit=limit, filters=stat_filters))
+        result = jsonify(db_interface.get_stats(limit=limit, multi=multi, filters=stat_filters))
 
     except ValueError:
         raise InvalidUsage(API_ERROR.INTEGER_LIMIT_400, status_code=400)
@@ -269,6 +310,7 @@ def stats():
         if "invalid input syntax" in e.args[0]:  # e.args[0] is the psycopg2 errors text field
             raise InvalidUsage(API_ERROR.FILTER_PROBLEM_400, status_code=400)
         else:
+            logging.error(e)
             abort(400)
 
     except TypeError as e:
@@ -317,6 +359,7 @@ def player():
         if "invalid input syntax" in e.args[0]:  # e.args[0] is the psycopg2 errors text field
             raise InvalidUsage(API_ERROR.FILTER_PROBLEM_400, status_code=400)
         else:
+            logging.error(e)
             abort(400)
 
     except TypeError as e:

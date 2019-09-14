@@ -270,26 +270,24 @@ def ingest_competitions():
     competitions = driver.request_competitions()
     for comp in competitions:
         db_comp = Competition(**comp)
-        # db_comp = Competition(name=comp[COMP.NAME],
-        #                       code=comp[COMP.CODE],
-        #                       location=comp[COMP.LOCATION],
-        #                       fd_api_id=comp[COMP.FOOTBALL_DATA_API_ID],
-        #                       fls_api_id=comp[COMP.FASTEST_LIVE_SCORES_API_ID]
-        #                       )
-        standings = driver.request_standings(competition_id=comp[COMP.FOOTBALL_DATA_API_ID])
-        if standings:
-            for stan in standings['standings']:
-                table = stan.pop(STANDINGS.TABLE, [])
-                db_standing = Standings(**stan)
+        if comp[COMP.FOOTBALL_DATA_API_ID] == 2021:  # Premier league data only
+            # comp_query = db.session.query(Player).filter(Player.name.ilike(player[PLAYER.NAME]))
+            # if not player_query.count():
+            #     player_query = self.db.session.query(Player).filter(Player.name.ilike(player[PLAYER.FANTASY_WEB_NAME]))
+            standings = driver.request_standings(competition_id=comp[COMP.FOOTBALL_DATA_API_ID])
+            if standings:
+                for stan in standings['standings']:
+                    table = stan.pop(STANDINGS.TABLE, [])
+                    db_standing = Standings(**stan)
 
-                for entry in table:
-                    se = StandingsEntry(**entry)
-                    db_standing.standings_entries.append(se)
+                    for entry in table:
+                        se = StandingsEntry(**entry)
+                        db_standing.standings_entries.append(se)
 
-                db_comp.standings.append(db_standing)
+                    db_comp.standings.append(db_standing)
 
-            db.session.add(db_comp)
-            db.session.commit()
+                db.session.add(db_comp)
+                db.session.commit()
 
 
 def ingest_players(team_fls_id):
@@ -505,7 +503,7 @@ def ingest_teams(fls_comp_id, fd_comp_id, season):
 
 if __name__ == "__main__":
     db.create_all()
-#     ingest_competitions()
+    ingest_competitions()
 
     # teams = db.session\
     #     .query(func.max(StandingsEntry.points),

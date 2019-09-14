@@ -54,11 +54,12 @@ def filter_parse(query_str, table, column):
 
 def to_json(result_map, aggregator_name, limit=10):
     list_dict_result = []
-    for k, v in result_map.items():
-        dict_result = k.__dict__
-        dict_result.pop(IGNORE.INSTANCE_STATE, None)
-        dict_result[aggregator_name] = clean_output(v, as_list=True)
-        list_dict_result.append(dict_result)
+    if result_map:
+        for k, v in result_map.items():
+            dict_result = k.__dict__
+            dict_result.pop(IGNORE.INSTANCE_STATE, None)
+            dict_result[aggregator_name] = clean_output(v, as_list=True)
+            list_dict_result.append(dict_result)
 
     if len(list_dict_result) == 1:
         return list_dict_result[0]
@@ -113,9 +114,10 @@ class DBInterface(object):
 
         return bs_query.filter(*base_standings_filters).scalar()
 
-    def get_competition(self, multi=False, filters=None):
+    def get_competition(self, limit: int= 1, multi=False, filters=None):
         """
         Query DB for competition record
+        :param limit: Number of competitions to retrieve
         :param multi: Perform OR query on filters, SQL OR otherwise SQL AND
         :param filters: namedtuple with all available filter fields
         :return:  matched (if any) competition records
@@ -139,7 +141,7 @@ class DBInterface(object):
         else:
             query_result = comp_query.filter(*db_filters)
 
-        return clean_output(query_result)
+        return clean_output(query_result, limit=limit)
 
     def get_team(self, limit: int=10,  multi=False, filters=None):
         """
@@ -204,7 +206,7 @@ class DBInterface(object):
         db_filters = []
         player_query = self.db.session\
             .query(Player, FantasyWeekStats)\
-            .join(FantasyWeekStats, Player.id == FantasyWeekStats.player_id)
+            .outerjoin(FantasyWeekStats, Player.id == FantasyWeekStats.player_id)
 
         active_filters = [(f, v) for f, v in filters._asdict().items() if v]
 
@@ -232,9 +234,9 @@ class DBInterface(object):
         player_week_stat_map = {}
         for player, week_stat in query_result:
             if player not in player_week_stat_map:
-                player_week_stat_map[player] = [week_stat]
+                player_week_stat_map[player] = []
 
-            else:
+            if week_stat:
                 player_week_stat_map[player].append(week_stat)
 
         result = to_json(player_week_stat_map, aggregator_name=PLAYER.WEEK_STATS, limit=limit)
@@ -376,8 +378,11 @@ class DBInterface(object):
 
                     db_filters.append(filter_parse(query_str=filter_val, table=active_table, column=column))
 
+        comp_filter = db_filters[0]
+        db_filters = db_filters[1:]
+
         if multi:
-            stan_query = stan_query.filter(or_(*db_filters)).limit(100).all()
+            stan_query = stan_query.filter(comp_filter).filter(or_(*db_filters)).limit(100).all()
         else:
             stan_query = stan_query.filter(*db_filters).limit(100).all()  # no standings will have more than 100 entries
         standings_map = {}
@@ -434,39 +439,46 @@ class DBInterface(object):
             record = [record]
 
         for match in record:
-            match.pop(MATCH.GOALS_SCORED, None)
-            match.pop(MATCH.EVENTS, None)
-            match.pop(MATCH.ASSISTS, None)
-            match.pop(MATCH.OWN_GOALS, None)
-            match.pop(MATCH.BPS, None)
-            match.pop(MATCH.BONUS, None)
-            match.pop(MATCH.BPS, None)
-            match.pop(MATCH.PENALTIES_SAVED, None)
-            match.pop(MATCH.PENALTIES_MISSED, None)
-            match.pop(MATCH.YELLOW_CARDS, None)
-            match.pop(MATCH.RED_CARDS, None)
-            match.pop(MATCH.SAVES, None)
-            match.pop(MATCH.PREVIOUS_ENCOUNTERS, None)
-            self.db.session.add(Match(**match))
+            match_query = self.db.session.query(Match).filter(Match.match_fd_id == match[MATCH.FOOTBALL_DATA_ID])
+            if not match_query.count():
+                match.pop(MATCH.GOALS_SCORED, None)
+                match.pop(MATCH.EVENTS, None)
+                match.pop(MATCH.ASSISTS, None)
+                match.pop(MATCH.OWN_GOALS, None)
+                match.pop(MATCH.BPS, None)
+                match.pop(MATCH.BONUS, None)
+                match.pop(MATCH.BPS, None)
+                match.pop(MATCH.PENALTIES_SAVED, None)
+                match.pop(MATCH.PENALTIES_MISSED, None)
+                match.pop(MATCH.YELLOW_CARDS, None)
+                match.pop(MATCH.RED_CARDS, None)
+                match.pop(MATCH.SAVES, None)
+                match.pop(MATCH.PREVIOUS_ENCOUNTERS, None)
+                self.db.session.add(Match(**match))
 
         self.db.session.commit()
 
-    def get_stats(self, limit: int = 10, filters=None) -> dict:
+    def get_stats(self, limit: int = 10, multi: bool = False, filters=None) -> dict:
         """
         Query DB for stats record
         :param filters: namedtuple with all available filter fields
+        :param multi: Whether to perform OR querying on filters
         :param limit: Result set size
         :return: matched (if any) match stats records
         """
         db_filters = []
-        match_query = self.db.session.query(MatchStats)
+        stat_query = self.db.session.query(MatchStats)
         active_filters = [(f, v) for f, v in filters._asdict().items() if v]
 
         for filter_ in active_filters:
             for filter_val in filter_[1]:
                 db_filters.append(filter_parse(query_str=filter_val, table=MatchStats.__table__, column=filter_[0]))
 
-        query_result = match_query.filter(*db_filters)
+        if multi:
+            query_result = stat_query.filter(or_(*db_filters))
+
+        else:
+            query_result = stat_query.filter(*db_filters)
 
         return clean_output(query_result, limit=limit)
 
