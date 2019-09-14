@@ -106,6 +106,16 @@ https://api.trackr.football/v1/competition?code=PL
                 "location": "England",
                 "name": "Premier League"
             }
+            
++ Response 404 (application/json)
+    + Body
+
+            {
+                "message:" "There is no competition with those filters",
+                "status_code": 404
+            }            
+            
+            
 
     
 # Group Teams
@@ -182,6 +192,44 @@ https://api.trackr.football/v1/team?name=Tottenham
                 "website": "http://www.tottenhamhotspur.com",
                 "year_founded": 1882
             }
+            
++ Response 400 (application/json)
+When specifying a non integer limit
+
+    + Body
+
+            {
+                "message:" "Limit must be an integer",
+                "status_code": 400
+            }
+            
++ Response 400 (application/json)
+
+    + Body
+
+            {
+                "message:" "Invalid filter applied",
+                "status_code": 400
+            }
+            
++ Response 404 (application/json)
+
+    + Body
+
+            {
+                "message:" "The resource you're looking for could not be found",
+                "status_code": 404
+            }
+            
++ Response 404 (application/json)
+    + Body
+
+            {
+                "message:" "There is no team with those filters",
+                "status_code": 404
+            }                                      
+            
+            
     
     
 # Group Standings
@@ -245,6 +293,41 @@ https://api.trackr.football/v1/standings?points=$gt:10
                 "type": "TOTAL"
             }
             
++ Response 400 (application/json)
+When specifying a non integer limit
+
+    + Body
+
+            {
+                "message:" "Limit must be an integer",
+                "status_code": 400
+            }
+
++ Response 400 (application/json)
+
+    + Body
+
+            {
+                "message:" "Invalid filter applied",
+                "status_code": 400
+            }
+
++ Response 404 (application/json)
+
+    + Body
+
+            {
+                "message:" "The resource you're looking for could not be found",
+                "status_code": 404
+            }
+            
++ Response 404 (application/json)
+    + Body
+
+            {
+                "message:" "There is no standings with those filters",
+                "status_code": 404
+            }                             
             
 # Group Match
 Match description
@@ -367,10 +450,46 @@ https://api.trackr.football/v1/match?match_day=1
                     "status": "FINISHED",
                     "utc_date": "Fri, 09 Aug 2019 00:00:00 GMT",
                     "winner": "HOME_TEAM"
-                    },
-                    ...
+                
+                },
+                ...
             ]
+            
++ Response 400 (application/json)
+When specifying a non integer limit
 
+    + Body
+
+            {
+                "message:" "Limit must be an integer",
+                "status_code": 400
+            }
+            
++ Response 400 (application/json)
+
+    + Body
+
+            {
+                "message:" "Invalid filter applied",
+                "status_code": 400
+            }            
+
++ Response 404 (application/json)
+
+    + Body
+
+            {
+                "message:" "The resource you're looking for could not be found",
+                "status_code": 404
+            }    
+
++ Response 404 (application/json)
+    + Body
+
+            {
+                "message:" "There is no matches with those filters",
+                "status_code": 404
+            } 
 
 # Group Player
 Player description
@@ -486,6 +605,41 @@ https://api.trackr.football/v1/player?name=Kane
                 "weight": null
             }
             
++ Response 400 (application/json)
+When specifying a non integer limit
+    + Body
+
+            {
+                "message:" "Limit must be an integer",
+                "status_code": 400
+            }
+            
++ Response 400 (application/json)
+
+    + Body
+
+            {
+                "message:" "Invalid filter applied",
+                "status_code": 400
+            }            
+            
++ Response 404 (application/json)
+
+    + Body
+
+            {
+                "message:" "The resource you're looking for could not be found",
+                "status_code": 404
+            }
+            
++ Response 404 (application/json)
+    + Body
+
+            {
+                "message:" "There is no players with those filters",
+                "status_code": 404
+            }                             
+            
 # Group Stats
 Player match stats description
 
@@ -552,7 +706,7 @@ https://api.trackr.football/v1/stats?player_id=1430
                     "goals_conceded": 0,
                     "goals_scored": 0,
                     "id": 311,
-                    "match_id": null,
+                    "match_id": 31,
                     "minutes_played": 90,
                     "own_goals": 0,
                     "penalties_missed": 0,
@@ -563,16 +717,41 @@ https://api.trackr.football/v1/stats?player_id=1430
                     "saves": 0,
                     "substitution": null,
                     "yellow_cards": 0
-                    },
-                    ...
-                }
+                },
+                ...
             ]
 
 + Response 400 (application/json)
-
+When specifying a non integer limit
     + Body
 
             {
                 "message:" "Limit must be an integer",
                 "status_code": 400
             }
+            
++ Response 400 (application/json)
+
+    + Body
+
+            {
+                "message:" "Invalid filter applied",
+                "status_code": 400
+            }            
+            
++ Response 404 (application/json)
+
+    + Body
+
+            {
+                "message:" "The resource you're looking for could not be found",
+                "status_code": 404
+            }
+            
++ Response 404 (application/json)
+    + Body
+
+            {
+                "message:" "There is no stats with those filters",
+                "status_code": 404
+            }                             

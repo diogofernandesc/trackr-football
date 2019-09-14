@@ -56,7 +56,10 @@
   "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-number">1</span></span>,
   "<span class="hljs-attribute">location</span>": <span class="hljs-value"><span class="hljs-string">"England"</span></span>,
   "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"Premier League"</span>
-</span>}</code></pre><div style="height: 1px;"></div></div></div></div></div></section><section id="teams" class="resource-group"><h2 class="group-heading">Teams <a href="#teams" class="permalink">&para;</a></h2><p>This endpoint is used to retrieve team information</p>
+</span>}</code></pre><div style="height: 1px;"></div></div></div><div class="title"><strong>Response&nbsp;&nbsp;<code>404</code></strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+    <span class="hljs-string">"message:"</span> <span class="hljs-string">"There is no competition with those filters"</span>,
+    <span class="hljs-string">"status_code"</span>: <span class="hljs-number">404</span>
+}</code></pre><div style="height: 1px;"></div></div></div></div></div></section><section id="teams" class="resource-group"><h2 class="group-heading">Teams <a href="#teams" class="permalink">&para;</a></h2><p>This endpoint is used to retrieve team information</p>
 <div class="note">
 <p>You can apply a fantasy filter e.g,</p>
 <pre><code class="language-http">https://api.trackr.football/v1/team?fantasy_overall_home_strength=$gt:100</code></pre>
@@ -100,7 +103,20 @@
   "<span class="hljs-attribute">team_fls_id</span>": <span class="hljs-value"><span class="hljs-number">13</span></span>,
   "<span class="hljs-attribute">website</span>": <span class="hljs-value"><span class="hljs-string">"http://www.tottenhamhotspur.com"</span></span>,
   "<span class="hljs-attribute">year_founded</span>": <span class="hljs-value"><span class="hljs-number">1882</span>
-</span>}</code></pre><div style="height: 1px;"></div></div></div></div></div></section><section id="standings" class="resource-group"><h2 class="group-heading">Standings <a href="#standings" class="permalink">&para;</a></h2><p>Standings description</p>
+</span>}</code></pre><div style="height: 1px;"></div></div></div><div class="title"><strong>Response&nbsp;&nbsp;<code>400</code></strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><div class="description"><p>When specifying a non integer limit</p>
+</div><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+    <span class="hljs-string">"message:"</span> <span class="hljs-string">"Limit must be an integer"</span>,
+    <span class="hljs-string">"status_code"</span>: <span class="hljs-number">400</span>
+}</code></pre><div style="height: 1px;"></div></div></div><div class="title"><strong>Response&nbsp;&nbsp;<code>400</code></strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+    <span class="hljs-string">"message:"</span> <span class="hljs-string">"Invalid filter applied"</span>,
+    <span class="hljs-string">"status_code"</span>: <span class="hljs-number">400</span>
+}</code></pre><div style="height: 1px;"></div></div></div><div class="title"><strong>Response&nbsp;&nbsp;<code>404</code></strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+    <span class="hljs-string">"message:"</span> <span class="hljs-string">"The resource you're looking for could not be found"</span>,
+    <span class="hljs-string">"status_code"</span>: <span class="hljs-number">404</span>
+}</code></pre><div style="height: 1px;"></div></div></div><div class="title"><strong>Response&nbsp;&nbsp;<code>404</code></strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+    <span class="hljs-string">"message:"</span> <span class="hljs-string">"There is no team with those filters"</span>,
+    <span class="hljs-string">"status_code"</span>: <span class="hljs-number">404</span>
+}</code></pre><div style="height: 1px;"></div></div></div></div></div></section><section id="standings" class="resource-group"><h2 class="group-heading">Standings <a href="#standings" class="permalink">&para;</a></h2><p>Standings description</p>
 <div id="standings-standing-list" class="resource"><h3 class="resource-heading">Standing List <a href="#standings-standing-list" class="permalink">&nbsp;&para;</a></h3><p>A list of standings</p>
 <div id="standings-standing-list-get" class="action get"><h4 class="action-heading"><div class="name">Get standings</div><a href="#standings-standing-list-get" class="method get">GET</a><code class="uri">/standings{?id,position,team_name,type,games_played,games_won,games_drawn,games_lost,points,goals_for,goals_against,goal_difference,limit}</code></h4><p>Get standings for teams with more than 10 points. Example:</p>
 <pre><code class="language-http">https://api.trackr.football/v1/standings?points=$gt:10</code></pre>
@@ -141,7 +157,20 @@
     </span>}
   ]</span>,
   "<span class="hljs-attribute">type</span>": <span class="hljs-value"><span class="hljs-string">"TOTAL"</span>
-</span>}</code></pre><div style="height: 1px;"></div></div></div></div></div></section><section id="match" class="resource-group"><h2 class="group-heading">Match <a href="#match" class="permalink">&para;</a></h2><p>Match description</p>
+</span>}</code></pre><div style="height: 1px;"></div></div></div><div class="title"><strong>Response&nbsp;&nbsp;<code>400</code></strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><div class="description"><p>When specifying a non integer limit</p>
+</div><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+    <span class="hljs-string">"message:"</span> <span class="hljs-string">"Limit must be an integer"</span>,
+    <span class="hljs-string">"status_code"</span>: <span class="hljs-number">400</span>
+}</code></pre><div style="height: 1px;"></div></div></div><div class="title"><strong>Response&nbsp;&nbsp;<code>400</code></strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+    <span class="hljs-string">"message:"</span> <span class="hljs-string">"Invalid filter applied"</span>,
+    <span class="hljs-string">"status_code"</span>: <span class="hljs-number">400</span>
+}</code></pre><div style="height: 1px;"></div></div></div><div class="title"><strong>Response&nbsp;&nbsp;<code>404</code></strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+    <span class="hljs-string">"message:"</span> <span class="hljs-string">"The resource you're looking for could not be found"</span>,
+    <span class="hljs-string">"status_code"</span>: <span class="hljs-number">404</span>
+}</code></pre><div style="height: 1px;"></div></div></div><div class="title"><strong>Response&nbsp;&nbsp;<code>404</code></strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+    <span class="hljs-string">"message:"</span> <span class="hljs-string">"There is no standings with those filters"</span>,
+    <span class="hljs-string">"status_code"</span>: <span class="hljs-number">404</span>
+}</code></pre><div style="height: 1px;"></div></div></div></div></div></section><section id="match" class="resource-group"><h2 class="group-heading">Match <a href="#match" class="permalink">&para;</a></h2><p>Match description</p>
 <div class="note">
 <p>You can apply a score filter e.g,</p>
 <pre><code class="language-http">https://api.trackr.football/v1/match?full_time_home_score=3</code></pre>
@@ -233,9 +262,23 @@
         "<span class="hljs-attribute">status</span>": <span class="hljs-value"><span class="hljs-string">"FINISHED"</span></span>,
         "<span class="hljs-attribute">utc_date</span>": <span class="hljs-value"><span class="hljs-string">"Fri, 09 Aug 2019 00:00:00 GMT"</span></span>,
         "<span class="hljs-attribute">winner</span>": <span class="hljs-value"><span class="hljs-string">"HOME_TEAM"</span>
-        </span>},
-        ...
-]</code></pre><div style="height: 1px;"></div></div></div></div></div></section><section id="player" class="resource-group"><h2 class="group-heading">Player <a href="#player" class="permalink">&para;</a></h2><p>Player description</p>
+
+    </span>},
+    ...
+]</code></pre><div style="height: 1px;"></div></div></div><div class="title"><strong>Response&nbsp;&nbsp;<code>400</code></strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><div class="description"><p>When specifying a non integer limit</p>
+</div><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+    <span class="hljs-string">"message:"</span> <span class="hljs-string">"Limit must be an integer"</span>,
+    <span class="hljs-string">"status_code"</span>: <span class="hljs-number">400</span>
+}</code></pre><div style="height: 1px;"></div></div></div><div class="title"><strong>Response&nbsp;&nbsp;<code>400</code></strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+    <span class="hljs-string">"message:"</span> <span class="hljs-string">"Invalid filter applied"</span>,
+    <span class="hljs-string">"status_code"</span>: <span class="hljs-number">400</span>
+}</code></pre><div style="height: 1px;"></div></div></div><div class="title"><strong>Response&nbsp;&nbsp;<code>404</code></strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+    <span class="hljs-string">"message:"</span> <span class="hljs-string">"The resource you're looking for could not be found"</span>,
+    <span class="hljs-string">"status_code"</span>: <span class="hljs-number">404</span>
+}</code></pre><div style="height: 1px;"></div></div></div><div class="title"><strong>Response&nbsp;&nbsp;<code>404</code></strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+    <span class="hljs-string">"message:"</span> <span class="hljs-string">"There is no matches with those filters"</span>,
+    <span class="hljs-string">"status_code"</span>: <span class="hljs-number">404</span>
+}</code></pre><div style="height: 1px;"></div></div></div></div></div></section><section id="player" class="resource-group"><h2 class="group-heading">Player <a href="#player" class="permalink">&para;</a></h2><p>Player description</p>
 <div class="note">
 <p>You can apply a score filter e.g,</p>
 <pre><code class="language-http">https://api.trackr.football/v1/match?full_time_home_score=3</code></pre>
@@ -316,7 +359,20 @@
         ...
     ]</span>,
     "<span class="hljs-attribute">weight</span>": <span class="hljs-value"><span class="hljs-literal">null</span>
-</span>}</code></pre><div style="height: 1px;"></div></div></div></div></div></section><section id="stats" class="resource-group"><h2 class="group-heading">Stats <a href="#stats" class="permalink">&para;</a></h2><p>Player match stats description</p>
+</span>}</code></pre><div style="height: 1px;"></div></div></div><div class="title"><strong>Response&nbsp;&nbsp;<code>400</code></strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><div class="description"><p>When specifying a non integer limit</p>
+</div><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+    <span class="hljs-string">"message:"</span> <span class="hljs-string">"Limit must be an integer"</span>,
+    <span class="hljs-string">"status_code"</span>: <span class="hljs-number">400</span>
+}</code></pre><div style="height: 1px;"></div></div></div><div class="title"><strong>Response&nbsp;&nbsp;<code>400</code></strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+    <span class="hljs-string">"message:"</span> <span class="hljs-string">"Invalid filter applied"</span>,
+    <span class="hljs-string">"status_code"</span>: <span class="hljs-number">400</span>
+}</code></pre><div style="height: 1px;"></div></div></div><div class="title"><strong>Response&nbsp;&nbsp;<code>404</code></strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+    <span class="hljs-string">"message:"</span> <span class="hljs-string">"The resource you're looking for could not be found"</span>,
+    <span class="hljs-string">"status_code"</span>: <span class="hljs-number">404</span>
+}</code></pre><div style="height: 1px;"></div></div></div><div class="title"><strong>Response&nbsp;&nbsp;<code>404</code></strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+    <span class="hljs-string">"message:"</span> <span class="hljs-string">"There is no players with those filters"</span>,
+    <span class="hljs-string">"status_code"</span>: <span class="hljs-number">404</span>
+}</code></pre><div style="height: 1px;"></div></div></div></div></div></section><section id="stats" class="resource-group"><h2 class="group-heading">Stats <a href="#stats" class="permalink">&para;</a></h2><p>Player match stats description</p>
 <div class="warning">
 <h4 id="header-caution"><i class="fa fa-warning"></i> Caution <a class="permalink" href="#header-caution" aria-hidden="true">¶</a></h4>
 <p>Please ensure that you pass either a <code>player_id</code> OR <code>match_id</code> filter to this endpoint to get results.
@@ -356,7 +412,7 @@ Calling with just <code>match_id</code> will retrieve data for random players wh
         "<span class="hljs-attribute">goals_conceded</span>": <span class="hljs-value"><span class="hljs-number">0</span></span>,
         "<span class="hljs-attribute">goals_scored</span>": <span class="hljs-value"><span class="hljs-number">0</span></span>,
         "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-number">311</span></span>,
-        "<span class="hljs-attribute">match_id</span>": <span class="hljs-value"><span class="hljs-literal">null</span></span>,
+        "<span class="hljs-attribute">match_id</span>": <span class="hljs-value"><span class="hljs-number">31</span></span>,
         "<span class="hljs-attribute">minutes_played</span>": <span class="hljs-value"><span class="hljs-number">90</span></span>,
         "<span class="hljs-attribute">own_goals</span>": <span class="hljs-value"><span class="hljs-number">0</span></span>,
         "<span class="hljs-attribute">penalties_missed</span>": <span class="hljs-value"><span class="hljs-number">0</span></span>,
@@ -367,10 +423,22 @@ Calling with just <code>match_id</code> will retrieve data for random players wh
         "<span class="hljs-attribute">saves</span>": <span class="hljs-value"><span class="hljs-number">0</span></span>,
         "<span class="hljs-attribute">substitution</span>": <span class="hljs-value"><span class="hljs-literal">null</span></span>,
         "<span class="hljs-attribute">yellow_cards</span>": <span class="hljs-value"><span class="hljs-number">0</span>
-        </span>},
-        ...
-    }
-]</code></pre><div style="height: 1px;"></div></div></div></div></div></section></div></div></div><p style="text-align: center;" class="text-muted">Generated by&nbsp;<a href="https://github.com/danielgtaylor/aglio" class="aglio">aglio</a>&nbsp;on 09 Sep 2019</p><script>/* eslint-env browser */
+    </span>},
+    ...
+]</code></pre><div style="height: 1px;"></div></div></div><div class="title"><strong>Response&nbsp;&nbsp;<code>400</code></strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><div class="description"><p>When specifying a non integer limit</p>
+</div><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+    <span class="hljs-string">"message:"</span> <span class="hljs-string">"Limit must be an integer"</span>,
+    <span class="hljs-string">"status_code"</span>: <span class="hljs-number">400</span>
+}</code></pre><div style="height: 1px;"></div></div></div><div class="title"><strong>Response&nbsp;&nbsp;<code>400</code></strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+    <span class="hljs-string">"message:"</span> <span class="hljs-string">"Invalid filter applied"</span>,
+    <span class="hljs-string">"status_code"</span>: <span class="hljs-number">400</span>
+}</code></pre><div style="height: 1px;"></div></div></div><div class="title"><strong>Response&nbsp;&nbsp;<code>404</code></strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+    <span class="hljs-string">"message:"</span> <span class="hljs-string">"The resource you're looking for could not be found"</span>,
+    <span class="hljs-string">"status_code"</span>: <span class="hljs-number">404</span>
+}</code></pre><div style="height: 1px;"></div></div></div><div class="title"><strong>Response&nbsp;&nbsp;<code>404</code></strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+    <span class="hljs-string">"message:"</span> <span class="hljs-string">"There is no stats with those filters"</span>,
+    <span class="hljs-string">"status_code"</span>: <span class="hljs-number">404</span>
+}</code></pre><div style="height: 1px;"></div></div></div></div></div></section></div></div></div><p style="text-align: center;" class="text-muted">Generated by&nbsp;<a href="https://github.com/danielgtaylor/aglio" class="aglio">aglio</a>&nbsp;on 14 Sep 2019</p><script>/* eslint-env browser */
 /* eslint quotes: [2, "single"] */
 'use strict';
 
