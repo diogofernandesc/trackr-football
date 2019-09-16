@@ -1,0 +1,664 @@
+<!DOCTYPE html><html><head><meta charset="utf-8"><title>Trackr.football API documentation</title><link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css"><style>@import url('https://fonts.googleapis.com/css?family=Roboto:400,700|Inconsolata|Raleway:200');.hljs-comment,.hljs-title{color:#8e908c}.hljs-variable,.hljs-attribute,.hljs-tag,.hljs-regexp,.ruby .hljs-constant,.xml .hljs-tag .hljs-title,.xml .hljs-pi,.xml .hljs-doctype,.html .hljs-doctype,.css .hljs-id,.css .hljs-class,.css .hljs-pseudo{color:#c82829}.hljs-number,.hljs-preprocessor,.hljs-pragma,.hljs-built_in,.hljs-literal,.hljs-params,.hljs-constant{color:#f5871f}.ruby .hljs-class .hljs-title,.css .hljs-rules .hljs-attribute{color:#eab700}.hljs-string,.hljs-value,.hljs-inheritance,.hljs-header,.ruby .hljs-symbol,.xml .hljs-cdata{color:#718c00}.css .hljs-hexcolor{color:#3e999f}.hljs-function,.python .hljs-decorator,.python .hljs-title,.ruby .hljs-function .hljs-title,.ruby .hljs-title .hljs-keyword,.perl .hljs-sub,.javascript .hljs-title,.coffeescript .hljs-title{color:#4271ae}.hljs-keyword,.javascript .hljs-function{color:#8959a8}.hljs{display:block;background:white;color:#4d4d4c;padding:.5em}.coffeescript .javascript,.javascript .xml,.tex .hljs-formula,.xml .javascript,.xml .vbscript,.xml .css,.xml .hljs-cdata{opacity:.5}.right .hljs-comment{color:#969896}.right .css .hljs-class,.right .css .hljs-id,.right .css .hljs-pseudo,.right .hljs-attribute,.right .hljs-regexp,.right .hljs-tag,.right .hljs-variable,.right .html .hljs-doctype,.right .ruby .hljs-constant,.right .xml .hljs-doctype,.right .xml .hljs-pi,.right .xml .hljs-tag .hljs-title{color:#c66}.right .hljs-built_in,.right .hljs-constant,.right .hljs-literal,.right .hljs-number,.right .hljs-params,.right .hljs-pragma,.right .hljs-preprocessor{color:#de935f}.right .css .hljs-rule .hljs-attribute,.right .ruby .hljs-class .hljs-title{color:#f0c674}.right .hljs-header,.right .hljs-inheritance,.right .hljs-name,.right .hljs-string,.right .hljs-value,.right .ruby .hljs-symbol,.right .xml .hljs-cdata{color:#b5bd68}.right .css .hljs-hexcolor,.right .hljs-title{color:#8abeb7}.right .coffeescript .hljs-title,.right .hljs-function,.right .javascript .hljs-title,.right .perl .hljs-sub,.right .python .hljs-decorator,.right .python .hljs-title,.right .ruby .hljs-function .hljs-title,.right .ruby .hljs-title .hljs-keyword{color:#81a2be}.right .hljs-keyword,.right .javascript .hljs-function{color:#b294bb}.right .hljs{display:block;overflow-x:auto;background:#1d1f21;color:#c5c8c6;padding:.5em;-webkit-text-size-adjust:none}.right .coffeescript .javascript,.right .javascript .xml,.right .tex .hljs-formula,.right .xml .css,.right .xml .hljs-cdata,.right .xml .javascript,.right .xml .vbscript{opacity:.5}body{color:black;background:white;font:400 14px / 1.42 'Roboto',Helvetica,sans-serif}header{border-bottom:1px solid #f2f2f2;margin-bottom:12px}h1,h2,h3,h4,h5{color:black;margin:12px 0}h1 .permalink,h2 .permalink,h3 .permalink,h4 .permalink,h5 .permalink{margin-left:0;opacity:0;transition:opacity .25s ease}h1:hover .permalink,h2:hover .permalink,h3:hover .permalink,h4:hover .permalink,h5:hover .permalink{opacity:1}.triple h1 .permalink,.triple h2 .permalink,.triple h3 .permalink,.triple h4 .permalink,.triple h5 .permalink{opacity:.15}.triple h1:hover .permalink,.triple h2:hover .permalink,.triple h3:hover .permalink,.triple h4:hover .permalink,.triple h5:hover .permalink{opacity:.15}h1{font:200 36px 'Raleway',Helvetica,sans-serif;font-size:36px}h2{font:200 36px 'Raleway',Helvetica,sans-serif;font-size:30px}h3{font-size:100%;text-transform:uppercase}h5{font-size:100%;font-weight:normal}p{margin:0 0 10px}p.choices{line-height:1.6}a{color:#428bca;text-decoration:none}li p{margin:0}hr.split{border:0;height:1px;width:100%;padding-left:6px;margin:12px auto;background-image:linear-gradient(to right, rgba(0,0,0,0) 20%, rgba(0,0,0,0.2) 51.4%, rgba(255,255,255,0.2) 51.4%, rgba(255,255,255,0) 80%)}dl dt{float:left;width:130px;clear:left;text-align:right;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:700}dl dd{margin-left:150px}blockquote{color:rgba(0,0,0,0.5);font-size:15.5px;padding:10px 20px;margin:12px 0;border-left:5px solid #e8e8e8}blockquote p:last-child{margin-bottom:0}pre{background-color:#f5f5f5;padding:12px;border:1px solid #cfcfcf;border-radius:6px;overflow:auto}pre code{color:black;background-color:transparent;padding:0;border:none}code{color:#444;background-color:#f5f5f5;font:'Inconsolata',monospace;padding:1px 4px;border:1px solid #cfcfcf;border-radius:3px}ul,ol{padding-left:2em}table{border-collapse:collapse;border-spacing:0;margin-bottom:12px}table tr:nth-child(2n){background-color:#fafafa}table th,table td{padding:6px 12px;border:1px solid #e6e6e6}.text-muted{opacity:.5}.note,.warning{padding:.3em 1em;margin:1em 0;border-radius:2px;font-size:90%}.note h1,.warning h1,.note h2,.warning h2,.note h3,.warning h3,.note h4,.warning h4,.note h5,.warning h5,.note h6,.warning h6{font-family:200 36px 'Raleway',Helvetica,sans-serif;font-size:135%;font-weight:500}.note p,.warning p{margin:.5em 0}.note{color:black;background-color:#f0f6fb;border-left:4px solid #428bca}.note h1,.note h2,.note h3,.note h4,.note h5,.note h6{color:#428bca}.warning{color:black;background-color:#fbf1f0;border-left:4px solid #c9302c}.warning h1,.warning h2,.warning h3,.warning h4,.warning h5,.warning h6{color:#c9302c}header{margin-top:24px}nav{position:fixed;top:24px;bottom:0;overflow-y:auto}nav .resource-group{padding:0}nav .resource-group .heading{position:relative}nav .resource-group .heading .chevron{position:absolute;top:12px;right:12px;opacity:.5}nav .resource-group .heading a{display:block;color:black;opacity:.7;border-left:2px solid transparent;margin:0}nav .resource-group .heading a:hover{text-decoration:none;background-color:bad-color;border-left:2px solid black}nav ul{list-style-type:none;padding-left:0}nav ul a{display:block;font-size:13px;color:rgba(0,0,0,0.7);padding:8px 12px;border-top:1px solid #d9d9d9;border-left:2px solid transparent;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}nav ul a:hover{text-decoration:none;background-color:bad-color;border-left:2px solid black}nav ul>li{margin:0}nav ul>li:first-child{margin-top:-12px}nav ul>li:last-child{margin-bottom:-12px}nav ul ul a{padding-left:24px}nav ul ul li{margin:0}nav ul ul li:first-child{margin-top:0}nav ul ul li:last-child{margin-bottom:0}nav>div>div>ul>li:first-child>a{border-top:none}.preload *{transition:none !important}.pull-left{float:left}.pull-right{float:right}.badge{display:inline-block;float:right;min-width:10px;min-height:14px;padding:3px 7px;font-size:12px;color:#000;background-color:#f2f2f2;border-radius:10px;margin:-2px 0}.badge.get{color:#70bbe1;background-color:#d9edf7}.badge.head{color:#70bbe1;background-color:#d9edf7}.badge.options{color:#70bbe1;background-color:#d9edf7}.badge.put{color:#f0db70;background-color:#fcf8e3}.badge.patch{color:#f0db70;background-color:#fcf8e3}.badge.post{color:#93cd7c;background-color:#dff0d8}.badge.delete{color:#ce8383;background-color:#f2dede}.collapse-button{float:right}.collapse-button .close{display:none;color:#428bca;cursor:pointer}.collapse-button .open{color:#428bca;cursor:pointer}.collapse-button.show .close{display:inline}.collapse-button.show .open{display:none}.collapse-content{max-height:0;overflow:hidden;transition:max-height .3s ease-in-out}nav{width:220px}.container{max-width:940px;margin-left:auto;margin-right:auto}.container .row .content{margin-left:244px;width:696px}.container .row:after{content:'';display:block;clear:both}.container-fluid nav{width:22%}.container-fluid .row .content{margin-left:24%}.container-fluid.triple nav{width:16.5%;padding-right:1px}.container-fluid.triple .row .content{position:relative;margin-left:16.5%;padding-left:24px}.middle:before,.middle:after{content:'';display:table}.middle:after{clear:both}.middle{box-sizing:border-box;width:51.5%;padding-right:12px}.right{box-sizing:border-box;float:right;width:48.5%;padding-left:12px}.right a{color:#428bca}.right h1,.right h2,.right h3,.right h4,.right h5,.right p,.right div{color:white}.right pre{background-color:#1d1f21;border:1px solid #1d1f21}.right pre code{color:#c5c8c6}.right .description{margin-top:12px}.triple .resource-heading{font-size:125%}.definition{margin-top:12px;margin-bottom:12px}.definition .method{font-weight:bold}.definition .method.get{color:#2e8ab8}.definition .method.head{color:#2e8ab8}.definition .method.options{color:#2e8ab8}.definition .method.post{color:#56b82e}.definition .method.put{color:#b8a22e}.definition .method.patch{color:#b8a22e}.definition .method.delete{color:#b82e2e}.definition .uri{word-break:break-all;word-wrap:break-word}.definition .hostname{opacity:.5}.example-names{background-color:#eee;padding:12px;border-radius:6px}.example-names .tab-button{cursor:pointer;color:black;border:1px solid #ddd;padding:6px;margin-left:12px}.example-names .tab-button.active{background-color:#d5d5d5}.right .example-names{background-color:#444}.right .example-names .tab-button{color:white;border:1px solid #666;border-radius:6px}.right .example-names .tab-button.active{background-color:#5e5e5e}#nav-background{position:fixed;left:0;top:0;bottom:0;width:16.5%;padding-right:14.4px;background-color:#fbfbfb;border-right:1px solid #f0f0f0;z-index:-1}#right-panel-background{position:absolute;right:-12px;top:-12px;bottom:-12px;width:48.6%;background-color:#333;z-index:-1}@media (max-width:1200px){nav{width:198px}.container{max-width:840px}.container .row .content{margin-left:224px;width:606px}}@media (max-width:992px){nav{width:169.4px}.container{max-width:720px}.container .row .content{margin-left:194px;width:526px}}@media (max-width:768px){nav{display:none}.container{width:95%;max-width:none}.container .row .content,.container-fluid .row .content,.container-fluid.triple .row .content{margin-left:auto;margin-right:auto;width:95%}#nav-background{display:none}#right-panel-background{width:48.6%}}.back-to-top{position:fixed;z-index:1;bottom:0;right:24px;padding:4px 8px;color:rgba(0,0,0,0.5);background-color:#f2f2f2;text-decoration:none !important;border-top:1px solid #d9d9d9;border-left:1px solid #d9d9d9;border-right:1px solid #d9d9d9;border-top-left-radius:3px;border-top-right-radius:3px}.resource-group{padding:12px;margin-bottom:12px;background-color:white;border:1px solid #d9d9d9;border-radius:6px}.resource-group h2.group-heading,.resource-group .heading a{padding:12px;margin:-12px -12px 12px -12px;background-color:#f2f2f2;border-bottom:1px solid #d9d9d9;border-top-left-radius:6px;border-top-right-radius:6px;white-space:nowrap;text-overflow:ellipsis;overflow:hidden}.triple .content .resource-group{padding:0;border:none}.triple .content .resource-group h2.group-heading,.triple .content .resource-group .heading a{margin:0 0 12px 0;border:1px solid #d9d9d9}nav .resource-group .heading a{padding:12px;margin-bottom:0}nav .resource-group .collapse-content{padding:0}.action{margin-bottom:12px;padding:12px 12px 0 12px;overflow:hidden;border:1px solid transparent;border-radius:6px}.action h4.action-heading{padding:6px 12px;margin:-12px -12px 12px -12px;border-bottom:1px solid transparent;border-top-left-radius:6px;border-top-right-radius:6px;overflow:hidden}.action h4.action-heading .name{float:right;font-weight:normal;padding:6px 0}.action h4.action-heading .method{padding:6px 12px;margin-right:12px;border-radius:3px;display:inline-block}.action h4.action-heading .method.get{color:#fff;background-color:#337ab7}.action h4.action-heading .method.head{color:#fff;background-color:#337ab7}.action h4.action-heading .method.options{color:#fff;background-color:#337ab7}.action h4.action-heading .method.put{color:#fff;background-color:#ed9c28}.action h4.action-heading .method.patch{color:#fff;background-color:#ed9c28}.action h4.action-heading .method.post{color:#fff;background-color:#5cb85c}.action h4.action-heading .method.delete{color:#fff;background-color:#d9534f}.action h4.action-heading code{color:#444;background-color:#f5f5f5;border-color:#cfcfcf;font-weight:normal;word-break:break-all;display:inline-block;margin-top:2px}.action dl.inner{padding-bottom:2px}.action .title{border-bottom:1px solid white;margin:0 -12px -1px -12px;padding:12px}.action.get{border-color:#bce8f1}.action.get h4.action-heading{color:#337ab7;background:#d9edf7;border-bottom-color:#bce8f1}.action.head{border-color:#bce8f1}.action.head h4.action-heading{color:#337ab7;background:#d9edf7;border-bottom-color:#bce8f1}.action.options{border-color:#bce8f1}.action.options h4.action-heading{color:#337ab7;background:#d9edf7;border-bottom-color:#bce8f1}.action.post{border-color:#d6e9c6}.action.post h4.action-heading{color:#5cb85c;background:#dff0d8;border-bottom-color:#d6e9c6}.action.put{border-color:#faebcc}.action.put h4.action-heading{color:#ed9c28;background:#fcf8e3;border-bottom-color:#faebcc}.action.patch{border-color:#faebcc}.action.patch h4.action-heading{color:#ed9c28;background:#fcf8e3;border-bottom-color:#faebcc}.action.delete{border-color:#ebccd1}.action.delete h4.action-heading{color:#d9534f;background:#f2dede;border-bottom-color:#ebccd1}</style></head><body class="preload"><a href="#top" class="text-muted back-to-top"><i class="fa fa-toggle-up"></i>&nbsp;Back to top</a><div class="container"><div class="row"><nav><div class="resource-group"><div class="heading"><div class="chevron"><i class="open fa fa-angle-down"></i></div><a href="#top">Overview</a></div><div class="collapse-content"><ul><li><a href="#header-quickstart">Quickstart</a></li><li><a href="#header-example-requests">Example requests</a></li><li><a href="#header-filtering">Filtering</a></li></ul></div></div><div class="resource-group"><div class="heading"><div class="chevron"><i class="open fa fa-angle-down"></i></div><a href="#competition">Competition</a></div><div class="collapse-content"><ul><li><a href="#competition-competition-list-get"><span class="badge get"><i class="fa fa-arrow-down"></i></span>Get competitions</a></li></ul></div></div><div class="resource-group"><div class="heading"><div class="chevron"><i class="open fa fa-angle-down"></i></div><a href="#teams">Teams</a></div><div class="collapse-content"><ul><li><a href="#teams-team-list-get"><span class="badge get"><i class="fa fa-arrow-down"></i></span>Get teams</a></li></ul></div></div><div class="resource-group"><div class="heading"><div class="chevron"><i class="open fa fa-angle-down"></i></div><a href="#standings">Standings</a></div><div class="collapse-content"><ul><li><a href="#standings-standing-list-get"><span class="badge get"><i class="fa fa-arrow-down"></i></span>Get standings</a></li></ul></div></div><div class="resource-group"><div class="heading"><div class="chevron"><i class="open fa fa-angle-down"></i></div><a href="#match">Match</a></div><div class="collapse-content"><ul><li><a href="#match-match-list-get"><span class="badge get"><i class="fa fa-arrow-down"></i></span>Get match</a></li></ul></div></div><div class="resource-group"><div class="heading"><div class="chevron"><i class="open fa fa-angle-down"></i></div><a href="#player">Player</a></div><div class="collapse-content"><ul><li><a href="#player-player-list-get"><span class="badge get"><i class="fa fa-arrow-down"></i></span>Get player</a></li></ul></div></div><div class="resource-group"><div class="heading"><div class="chevron"><i class="open fa fa-angle-down"></i></div><a href="#stats">Stats</a></div><div class="collapse-content"><ul><li><a href="#header-caution"> Caution</a></li><li><a href="#stats-player-match-stats-list-get"><span class="badge get"><i class="fa fa-arrow-down"></i></span>Get player match stats</a></li></ul></div></div><p style="text-align: center; word-wrap: break-word;"><a href="https://api.trackr.football">https://api.trackr.football</a></p></nav><div class="content"><header><h1 id="top">Trackr.football API documentation</h1></header><p>This API was designed as a way to provide compact general football information as well as fantasy data, parsed and cleaned directly from the official FPL fantasy API.</p>
+<h2 id="header-quickstart">Quickstart <a class="permalink" href="#header-quickstart" aria-hidden="true">¶</a></h2>
+<h3 id="header-example-requests">Example requests <a class="permalink" href="#header-example-requests" aria-hidden="true">¶</a></h3>
+<div class="note">
+<p>Get information about Tottenham Hotspur</p>
+<pre><code class="language-http">https://api.trackr.football/v1/team?name=tottenham</code></pre>
+<p>Get standings for the Premier League</p>
+<pre><code class="language-http">https://api.trackr.football/v1/standings</code></pre>
+<p>Get match(es) for which Liverpool is the home team</p>
+<pre><code class="language-http">https://api.trackr.football/v1/match?home_team=liverpool</code></pre>
+<p>Get match stats for player with ID 1152</p>
+<pre><code class="language-http">https://api.trackr.football/v1/stats?player_id=1152</code></pre>
+<p>Get player info for Lucas Digne</p>
+<pre><code class="language-http">https://api.trackr.football/v1/player?name=digne</code></pre>
+</div>
+<h2 id="header-filtering">Filtering <a class="permalink" href="#header-filtering" aria-hidden="true">¶</a></h2>
+<p>The API supports filtering in two ways:</p>
+<ol>
+<li>Direct value filter using <code>?filter_name=filter_value</code></li>
+<li>Value operators:</li>
+</ol>
+<ul>
+<li>
+<p><code>$lt</code> (less than)</p>
+</li>
+<li>
+<p><code>$lte</code> (less than or equal to)</p>
+</li>
+<li>
+<p><code>$gt</code> (greater than)</p>
+</li>
+<li>
+<p><code>$gte</code> (greater than or equal to)</p>
+</li>
+</ul>
+<p>For example, <code>/v1/player?fantasy_price=$lt:65</code> will find players whose fantasy_price is <strong>less than 65</strong>.</p>
+<p>Most endpoints have a <code>/all</code> alternative which lets you query data from that endpoint in an OR fashion. Typically the API will filter results in an AND fashion.</p>
+<p>For example,</p>
+<p><code>/v1/player?fantasy_price=65&amp;fantasy_overall_price_fall=0</code> will perform a query in the form <code>fantasy_price=65 AND fantasy_overall_price_fall=0</code></p>
+<p>Whereas, <code>/v1/player/all?fantasy_price=65&amp;fantasy_overall_price_fall=0</code> will perform a query in the form <code>fantasy_price=65 OR fantasy_overall_price_fall=0</code></p>
+<p>This can be particularly useful in making efficient use of the API calls made.
+<br/><br/><br/><br/><br/><br/><br/><br/><br/><br/></p>
+<section id="competition" class="resource-group"><h2 class="group-heading">Competition <a href="#competition" class="permalink">&para;</a></h2><p>Group description</p>
+<div id="competition-competition-list" class="resource"><h3 class="resource-heading">Competition List <a href="#competition-competition-list" class="permalink">&nbsp;&para;</a></h3><p>A list of competitions</p>
+<div id="competition-competition-list-get" class="action get"><h4 class="action-heading"><div class="name">Get competitions</div><a href="#competition-competition-list-get" class="method get">GET</a><code class="uri">/competition{?id,name,code,location}</code></h4><p>Get a competition. Example:</p>
+<pre><code class="language-no-highlight">https://api.trackr.football/v1/competition?code=PL</code></pre>
+<h4>Example URI</h4><div class="definition"><span class="method get">GET</span>&nbsp;<span class="uri"><span class="hostname">https://api.trackr.football</span>/competition?<span class="hljs-attribute">id=</span><span class="hljs-literal">1</span>&<span class="hljs-attribute">name=</span><span class="hljs-literal">Premier League</span>&<span class="hljs-attribute">code=</span><span class="hljs-literal">PL</span>&<span class="hljs-attribute">location=</span><span class="hljs-literal">England</span></span></div><div class="title"><strong>URI Parameters</strong><div class="collapse-button show"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><dl class="inner"><dt>id</dt><dd><code>integer</code>&nbsp;<span>(optional)</span>&nbsp;<span class="text-muted example"><strong>Example:&nbsp;</strong><span>1</span></span><p>Search for a competition by id</p>
+</dd><dt>name</dt><dd><code>string</code>&nbsp;<span>(optional)</span>&nbsp;<span class="text-muted example"><strong>Example:&nbsp;</strong><span>Premier League</span></span><p>Search by name</p>
+</dd><dt>code</dt><dd><code>string</code>&nbsp;<span>(optional)</span>&nbsp;<span class="text-muted example"><strong>Example:&nbsp;</strong><span>PL</span></span><p>Search by code</p>
+</dd><dt>location</dt><dd><code>string</code>&nbsp;<span>(optional)</span>&nbsp;<span class="text-info default"><strong>Default:&nbsp;</strong><span>name</span></span>&nbsp;<span class="text-muted example"><strong>Example:&nbsp;</strong><span>England</span></span><p>Search by location</p>
+<p class="choices"><strong>Choices:&nbsp;</strong><code>name</code> <code>joined</code> <code>-joined</code> <code>age</code> <code>-age</code> <code>location</code> <code>-location</code> <code>plan</code> <code>-plan</code> </p></dd><dt>limit</dt><dd><code>integer</code>&nbsp;<span>(optional)</span>&nbsp;<span class="text-info default"><strong>Default:&nbsp;</strong><span>10</span></span>&nbsp;<span class="text-muted example"><strong>Example:&nbsp;</strong><span>25</span></span><p>The maximum number of users to return, up to <code>50</code></p>
+</dd></dl></div><div class="title"><strong>Response&nbsp;&nbsp;<code>200</code></strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+  "<span class="hljs-attribute">code</span>": <span class="hljs-value"><span class="hljs-string">"PL"</span></span>,
+  "<span class="hljs-attribute">fd_api_id</span>": <span class="hljs-value"><span class="hljs-number">2021</span></span>,
+  "<span class="hljs-attribute">fls_api_id</span>": <span class="hljs-value"><span class="hljs-number">2</span></span>,
+  "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-number">1</span></span>,
+  "<span class="hljs-attribute">location</span>": <span class="hljs-value"><span class="hljs-string">"England"</span></span>,
+  "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"Premier League"</span>
+</span>}</code></pre><div style="height: 1px;"></div></div></div><div class="title"><strong>Response&nbsp;&nbsp;<code>404</code></strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+    <span class="hljs-string">"message:"</span> <span class="hljs-string">"There is no competition with those filters"</span>,
+    <span class="hljs-string">"status_code"</span>: <span class="hljs-number">404</span>
+}</code></pre><div style="height: 1px;"></div></div></div></div></div></section><section id="teams" class="resource-group"><h2 class="group-heading">Teams <a href="#teams" class="permalink">&para;</a></h2><p>This endpoint is used to retrieve team information</p>
+<div class="note">
+<p>You can apply a fantasy filter e.g,</p>
+<pre><code class="language-http">https://api.trackr.football/v1/team?fantasy_overall_home_strength=$gt:100</code></pre>
+<p>To get teams with overall home strength greather than 100, see below for other possible fantasy filters</p>
+</div>
+<div id="teams-team-list" class="resource"><h3 class="resource-heading">Team List <a href="#teams-team-list" class="permalink">&nbsp;&para;</a></h3><p>A list of teams</p>
+<div id="teams-team-list-get" class="action get"><h4 class="action-heading"><div class="name">Get teams</div><a href="#teams-team-list-get" class="method get">GET</a><code class="uri">/team{?id,fantasy_id,name,year_founded,stadium_capacity}</code></h4><p>Get a team. Example:</p>
+<pre><code class="language-http">https://api.trackr.football/v1/team?name=Tottenham</code></pre>
+<h4>Example URI</h4><div class="definition"><span class="method get">GET</span>&nbsp;<span class="uri"><span class="hostname">https://api.trackr.football</span>/team?<span class="hljs-attribute">id=</span><span class="hljs-literal">1</span>&<span class="hljs-attribute">fantasy_id=</span><span class="hljs-literal">17</span>&<span class="hljs-attribute">name=</span><span class="hljs-literal">Tottenham Hotspur</span>&<span class="hljs-attribute">year_founded=</span><span class="hljs-literal">1875</span>&<span class="hljs-attribute">stadium_capacity=</span><span class="hljs-literal">30000</span></span></div><div class="title"><strong>URI Parameters</strong><div class="collapse-button show"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><dl class="inner"><dt>id</dt><dd><code>integer</code>&nbsp;<span>(optional)</span>&nbsp;<span class="text-muted example"><strong>Example:&nbsp;</strong><span>1</span></span><p>Search for a team by id</p>
+</dd><dt>fantasy_id</dt><dd><code>integer</code>&nbsp;<span>(optional)</span>&nbsp;<span class="text-muted example"><strong>Example:&nbsp;</strong><span>17</span></span><p>Search by fantasy id</p>
+</dd><dt>name</dt><dd><code>string</code>&nbsp;<span>(optional)</span>&nbsp;<span class="text-muted example"><strong>Example:&nbsp;</strong><span>Tottenham Hotspur</span></span><p>Search by name</p>
+</dd><dt>year_founded</dt><dd><code>integer</code>&nbsp;<span>(optional)</span>&nbsp;<span class="text-muted example"><strong>Example:&nbsp;</strong><span>1875</span></span><p>Search by year founded</p>
+</dd><dt>stadium_capacity</dt><dd><code>integer</code>&nbsp;<span>(optional)</span>&nbsp;<span class="text-muted example"><strong>Example:&nbsp;</strong><span>30000</span></span><p>Search by stadium capacity</p>
+</dd><dt>fantasy_filters</dt><dd><code>integer</code>&nbsp;<span>(optional)</span>&nbsp;<p class="choices"><strong>Choices:&nbsp;</strong><code>fantasy_overall_home_strength</code> <code>fantasy_overall_away_strength</code> <code>fantasy_attack_home_strength</code> <code>fantasy_attack_away_strength</code> <code>fantasy_defence_home_strength</code> <code>fantasy_defence_away_strength</code> </p></dd><dt>limit</dt><dd><code>integer</code>&nbsp;<span>(optional)</span>&nbsp;<span class="text-info default"><strong>Default:&nbsp;</strong><span>10</span></span>&nbsp;<span class="text-muted example"><strong>Example:&nbsp;</strong><span>25</span></span><p>The maximum number of teams to return</p>
+</dd></dl></div><div class="title"><strong>Response&nbsp;&nbsp;<code>200</code></strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+  "<span class="hljs-attribute">acronym</span>": <span class="hljs-value"><span class="hljs-string">"TOT"</span></span>,
+  "<span class="hljs-attribute">address</span>": <span class="hljs-value"><span class="hljs-string">"Bill Nicholson Way, 748 High Road London N17 OAP"</span></span>,
+  "<span class="hljs-attribute">club_colours</span>": <span class="hljs-value"><span class="hljs-string">"Navy Blue / White"</span></span>,
+  "<span class="hljs-attribute">competitions</span>": <span class="hljs-value">[]</span>,
+  "<span class="hljs-attribute">country</span>": <span class="hljs-value"><span class="hljs-string">"England"</span></span>,
+  "<span class="hljs-attribute">crest_url</span>": <span class="hljs-value"><span class="hljs-string">"http://upload.wikimedia.org/wikipedia/de/b/b4/Tottenham_Hotspur.svg"</span></span>,
+  "<span class="hljs-attribute">email</span>": <span class="hljs-value"><span class="hljs-string">"customer.care@tottenhamhotspur.com"</span></span>,
+  "<span class="hljs-attribute">fantasy_attack_away_strength</span>": <span class="hljs-value"><span class="hljs-number">1340</span></span>,
+  "<span class="hljs-attribute">fantasy_attack_home_strength</span>": <span class="hljs-value"><span class="hljs-number">1270</span></span>,
+  "<span class="hljs-attribute">fantasy_code</span>": <span class="hljs-value"><span class="hljs-number">6</span></span>,
+  "<span class="hljs-attribute">fantasy_defence_away_strength</span>": <span class="hljs-value"><span class="hljs-number">1330</span></span>,
+  "<span class="hljs-attribute">fantasy_defence_home_strength</span>": <span class="hljs-value"><span class="hljs-number">1320</span></span>,
+  "<span class="hljs-attribute">fantasy_id</span>": <span class="hljs-value"><span class="hljs-number">17</span></span>,
+  "<span class="hljs-attribute">fantasy_overall_away_strength</span>": <span class="hljs-value"><span class="hljs-number">1310</span></span>,
+  "<span class="hljs-attribute">fantasy_overall_home_strength</span>": <span class="hljs-value"><span class="hljs-number">1320</span></span>,
+  "<span class="hljs-attribute">fantasy_week_strength</span>": <span class="hljs-value"><span class="hljs-number">4</span></span>,
+  "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-number">149</span></span>,
+  "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"Tottenham Hotspur FC"</span></span>,
+  "<span class="hljs-attribute">phone</span>": <span class="hljs-value"><span class="hljs-string">"+44 (0844) 4995000"</span></span>,
+  "<span class="hljs-attribute">short_name</span>": <span class="hljs-value"><span class="hljs-string">"Tottenham"</span></span>,
+  "<span class="hljs-attribute">stadium</span>": <span class="hljs-value"><span class="hljs-string">"Tottenham Hotspur Stadium"</span></span>,
+  "<span class="hljs-attribute">stadium_capacity</span>": <span class="hljs-value"><span class="hljs-number">36284</span></span>,
+  "<span class="hljs-attribute">stadium_lat</span>": <span class="hljs-value"><span class="hljs-number">51.603333333333</span></span>,
+  "<span class="hljs-attribute">stadium_long</span>": <span class="hljs-value">-<span class="hljs-number">0.065833333333333</span></span>,
+  "<span class="hljs-attribute">team_fd_id</span>": <span class="hljs-value"><span class="hljs-number">73</span></span>,
+  "<span class="hljs-attribute">team_fls_id</span>": <span class="hljs-value"><span class="hljs-number">13</span></span>,
+  "<span class="hljs-attribute">website</span>": <span class="hljs-value"><span class="hljs-string">"http://www.tottenhamhotspur.com"</span></span>,
+  "<span class="hljs-attribute">year_founded</span>": <span class="hljs-value"><span class="hljs-number">1882</span>
+</span>}</code></pre><div style="height: 1px;"></div></div></div><div class="title"><strong>Response&nbsp;&nbsp;<code>400</code></strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><div class="description"><p>When specifying a non integer limit</p>
+</div><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+    <span class="hljs-string">"message:"</span> <span class="hljs-string">"Limit must be an integer"</span>,
+    <span class="hljs-string">"status_code"</span>: <span class="hljs-number">400</span>
+}</code></pre><div style="height: 1px;"></div></div></div><div class="title"><strong>Response&nbsp;&nbsp;<code>400</code></strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+    <span class="hljs-string">"message:"</span> <span class="hljs-string">"Invalid filter applied"</span>,
+    <span class="hljs-string">"status_code"</span>: <span class="hljs-number">400</span>
+}</code></pre><div style="height: 1px;"></div></div></div><div class="title"><strong>Response&nbsp;&nbsp;<code>404</code></strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+    <span class="hljs-string">"message:"</span> <span class="hljs-string">"The resource you're looking for could not be found"</span>,
+    <span class="hljs-string">"status_code"</span>: <span class="hljs-number">404</span>
+}</code></pre><div style="height: 1px;"></div></div></div><div class="title"><strong>Response&nbsp;&nbsp;<code>404</code></strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+    <span class="hljs-string">"message:"</span> <span class="hljs-string">"There is no team with those filters"</span>,
+    <span class="hljs-string">"status_code"</span>: <span class="hljs-number">404</span>
+}</code></pre><div style="height: 1px;"></div></div></div></div></div></section><section id="standings" class="resource-group"><h2 class="group-heading">Standings <a href="#standings" class="permalink">&para;</a></h2><p>Standings description</p>
+<div id="standings-standing-list" class="resource"><h3 class="resource-heading">Standing List <a href="#standings-standing-list" class="permalink">&nbsp;&para;</a></h3><p>A list of standings</p>
+<div id="standings-standing-list-get" class="action get"><h4 class="action-heading"><div class="name">Get standings</div><a href="#standings-standing-list-get" class="method get">GET</a><code class="uri">/standings{?id,position,team_name,type,games_played,games_won,games_drawn,games_lost,points,goals_for,goals_against,goal_difference,limit}</code></h4><p>Get standings for teams with more than 10 points. Example:</p>
+<pre><code class="language-http">https://api.trackr.football/v1/standings?points=$gt:10</code></pre>
+<h4>Example URI</h4><div class="definition"><span class="method get">GET</span>&nbsp;<span class="uri"><span class="hostname">https://api.trackr.football</span>/standings?<span class="hljs-attribute">id=</span><span class="hljs-literal">1</span>&<span class="hljs-attribute">position=</span><span class="hljs-literal">2</span>&<span class="hljs-attribute">team_name=</span><span class="hljs-literal">Chelsea</span>&<span class="hljs-attribute">type=</span><span class="hljs-literal">HOME</span>&<span class="hljs-attribute">games_played=</span><span class="hljs-literal">3</span>&<span class="hljs-attribute">games_won=</span><span class="hljs-literal">10</span>&<span class="hljs-attribute">games_drawn=</span><span class="hljs-literal">2</span>&<span class="hljs-attribute">games_lost=</span><span class="hljs-literal">4</span>&<span class="hljs-attribute">points=</span><span class="hljs-literal">20</span>&<span class="hljs-attribute">goals_for=</span><span class="hljs-literal">7</span>&<span class="hljs-attribute">goals_against=</span><span class="hljs-literal">4</span>&<span class="hljs-attribute">goal_difference=</span><span class="hljs-literal">10</span>&<span class="hljs-attribute">limit=</span><span class="hljs-literal">25</span></span></div><div class="title"><strong>URI Parameters</strong><div class="collapse-button show"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><dl class="inner"><dt>id</dt><dd><code>integer</code>&nbsp;<span>(optional)</span>&nbsp;<span class="text-muted example"><strong>Example:&nbsp;</strong><span>1</span></span><p>Search for standings by id</p>
+</dd><dt>position</dt><dd><code>integer</code>&nbsp;<span>(optional)</span>&nbsp;<span class="text-muted example"><strong>Example:&nbsp;</strong><span>2</span></span><p>Search by position in the standings</p>
+</dd><dt>team_name</dt><dd><code>string</code>&nbsp;<span>(optional)</span>&nbsp;<span class="text-muted example"><strong>Example:&nbsp;</strong><span>Chelsea</span></span><p>Search by team name</p>
+</dd><dt>type</dt><dd><code>string</code>&nbsp;<span>(optional)</span>&nbsp;<span class="text-muted example"><strong>Example:&nbsp;</strong><span>HOME</span></span><p>Search by type of standings</p>
+<p class="choices"><strong>Choices:&nbsp;</strong><code>TOTAL</code> <code>HOME</code> <code>AWAY</code> </p></dd><dt>games_played</dt><dd><code>integer</code>&nbsp;<span>(optional)</span>&nbsp;<span class="text-muted example"><strong>Example:&nbsp;</strong><span>3</span></span><p>Search by number of games played</p>
+</dd><dt>games_won</dt><dd><code>integer</code>&nbsp;<span>(optional)</span>&nbsp;<span class="text-muted example"><strong>Example:&nbsp;</strong><span>10</span></span><p>Search by number of games won</p>
+</dd><dt>games_drawn</dt><dd><code>integer</code>&nbsp;<span>(optional)</span>&nbsp;<span class="text-muted example"><strong>Example:&nbsp;</strong><span>2</span></span><p>Search by number of games drawn</p>
+</dd><dt>games_lost</dt><dd><code>integer</code>&nbsp;<span>(optional)</span>&nbsp;<span class="text-muted example"><strong>Example:&nbsp;</strong><span>4</span></span><p>Search by number of games lost</p>
+</dd><dt>points</dt><dd><code>integer</code>&nbsp;<span>(optional)</span>&nbsp;<span class="text-muted example"><strong>Example:&nbsp;</strong><span>20</span></span><p>Search by number of league points</p>
+</dd><dt>goals_for</dt><dd><code>integer</code>&nbsp;<span>(optional)</span>&nbsp;<span class="text-muted example"><strong>Example:&nbsp;</strong><span>7</span></span><p>Search by number of goals scored against opponents</p>
+</dd><dt>goals_against</dt><dd><code>integer</code>&nbsp;<span>(optional)</span>&nbsp;<span class="text-muted example"><strong>Example:&nbsp;</strong><span>4</span></span><p>Search by number of goals conceded to opponents</p>
+</dd><dt>goal_difference</dt><dd><code>integer</code>&nbsp;<span>(optional)</span>&nbsp;<span class="text-muted example"><strong>Example:&nbsp;</strong><span>10</span></span><p>Search by team goal difference</p>
+</dd><dt>limit</dt><dd><code>integer</code>&nbsp;<span>(optional)</span>&nbsp;<span class="text-info default"><strong>Default:&nbsp;</strong><span>3</span></span>&nbsp;<span class="text-muted example"><strong>Example:&nbsp;</strong><span>25</span></span><p>The maximum number of standings to retrieve</p>
+</dd></dl></div><div class="title"><strong>Response&nbsp;&nbsp;<code>200</code></strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+  "<span class="hljs-attribute">competition_id</span>": <span class="hljs-value"><span class="hljs-number">1</span></span>,
+  "<span class="hljs-attribute">group</span>": <span class="hljs-value"><span class="hljs-literal">null</span></span>,
+  "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-number">1</span></span>,
+  "<span class="hljs-attribute">match_day</span>": <span class="hljs-value"><span class="hljs-number">5</span></span>,
+  "<span class="hljs-attribute">season</span>": <span class="hljs-value"><span class="hljs-string">"2019-2020"</span></span>,
+  "<span class="hljs-attribute">table</span>": <span class="hljs-value">[
+    {
+      "<span class="hljs-attribute">fd_team_id</span>": <span class="hljs-value"><span class="hljs-number">64</span></span>,
+      "<span class="hljs-attribute">games_drawn</span>": <span class="hljs-value"><span class="hljs-number">0</span></span>,
+      "<span class="hljs-attribute">games_lost</span>": <span class="hljs-value"><span class="hljs-number">0</span></span>,
+      "<span class="hljs-attribute">games_played</span>": <span class="hljs-value"><span class="hljs-number">4</span></span>,
+      "<span class="hljs-attribute">games_won</span>": <span class="hljs-value"><span class="hljs-number">4</span></span>,
+      "<span class="hljs-attribute">goals_against</span>": <span class="hljs-value"><span class="hljs-number">3</span></span>,
+      "<span class="hljs-attribute">goals_difference</span>": <span class="hljs-value"><span class="hljs-number">9</span></span>,
+      "<span class="hljs-attribute">goals_for</span>": <span class="hljs-value"><span class="hljs-number">12</span></span>,
+      "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-number">1</span></span>,
+      "<span class="hljs-attribute">points</span>": <span class="hljs-value"><span class="hljs-number">12</span></span>,
+      "<span class="hljs-attribute">position</span>": <span class="hljs-value"><span class="hljs-number">1</span></span>,
+      "<span class="hljs-attribute">standings_id</span>": <span class="hljs-value"><span class="hljs-number">1</span></span>,
+      "<span class="hljs-attribute">team_name</span>": <span class="hljs-value"><span class="hljs-string">"Liverpool FC"</span>
+    </span>}
+  ]</span>,
+  "<span class="hljs-attribute">type</span>": <span class="hljs-value"><span class="hljs-string">"TOTAL"</span>
+</span>}</code></pre><div style="height: 1px;"></div></div></div><div class="title"><strong>Response&nbsp;&nbsp;<code>400</code></strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><div class="description"><p>When specifying a non integer limit</p>
+</div><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+    <span class="hljs-string">"message:"</span> <span class="hljs-string">"Limit must be an integer"</span>,
+    <span class="hljs-string">"status_code"</span>: <span class="hljs-number">400</span>
+}</code></pre><div style="height: 1px;"></div></div></div><div class="title"><strong>Response&nbsp;&nbsp;<code>400</code></strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+    <span class="hljs-string">"message:"</span> <span class="hljs-string">"Invalid filter applied"</span>,
+    <span class="hljs-string">"status_code"</span>: <span class="hljs-number">400</span>
+}</code></pre><div style="height: 1px;"></div></div></div><div class="title"><strong>Response&nbsp;&nbsp;<code>404</code></strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+    <span class="hljs-string">"message:"</span> <span class="hljs-string">"The resource you're looking for could not be found"</span>,
+    <span class="hljs-string">"status_code"</span>: <span class="hljs-number">404</span>
+}</code></pre><div style="height: 1px;"></div></div></div><div class="title"><strong>Response&nbsp;&nbsp;<code>404</code></strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+    <span class="hljs-string">"message:"</span> <span class="hljs-string">"There is no standings with those filters"</span>,
+    <span class="hljs-string">"status_code"</span>: <span class="hljs-number">404</span>
+}</code></pre><div style="height: 1px;"></div></div></div></div></div></section><section id="match" class="resource-group"><h2 class="group-heading">Match <a href="#match" class="permalink">&para;</a></h2><p>Match description</p>
+<div class="note">
+<p>You can apply a score filter e.g,</p>
+<pre><code class="language-http">https://api.trackr.football/v1/match?full_time_home_score=3</code></pre>
+<p>To get matches where the full time score for the home team was 3, see the score parameter below for more options.</p>
+</div>
+<div id="match-match-list" class="resource"><h3 class="resource-heading">Match List <a href="#match-match-list" class="permalink">&nbsp;&para;</a></h3><p>A list of matches</p>
+<div id="match-match-list-get" class="action get"><h4 class="action-heading"><div class="name">Get match</div><a href="#match-match-list-get" class="method get">GET</a><code class="uri">/match{?id,match_day,home_team,away_team,limit}</code></h4><p>Get matches for match day 1. Example:</p>
+<pre><code class="language-http">https://api.trackr.football/v1/match?match_day=1</code></pre>
+<h4>Example URI</h4><div class="definition"><span class="method get">GET</span>&nbsp;<span class="uri"><span class="hostname">https://api.trackr.football</span>/match?<span class="hljs-attribute">id=</span><span class="hljs-literal">1</span>&<span class="hljs-attribute">match_day=</span><span class="hljs-literal">2</span>&<span class="hljs-attribute">home_team=</span><span class="hljs-literal">Norwich</span>&<span class="hljs-attribute">away_team=</span><span class="hljs-literal">Arsenal</span>&<span class="hljs-attribute">limit=</span><span class="hljs-literal">20</span></span></div><div class="title"><strong>URI Parameters</strong><div class="collapse-button show"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><dl class="inner"><dt>id</dt><dd><code>integer</code>&nbsp;<span>(optional)</span>&nbsp;<span class="text-muted example"><strong>Example:&nbsp;</strong><span>1</span></span><p>Search for matches by id</p>
+</dd><dt>match_day</dt><dd><code>integer</code>&nbsp;<span>(optional)</span>&nbsp;<span class="text-muted example"><strong>Example:&nbsp;</strong><span>2</span></span><p>Search by match day/game week of the match</p>
+</dd><dt>score</dt><dd><code>string</code>&nbsp;<span class="required">(required)</span>&nbsp;<span class="text-muted example"><strong>Example:&nbsp;</strong><span>3</span></span><p class="choices"><strong>Choices:&nbsp;</strong><code>full_time_home_score</code> <code>full_time_away_score</code> <code>half_time_home_score</code> <code>half_time_away_score</code> </p></dd><dt>winner `HOME_TEAM`</dt><dd><code>string</code>&nbsp;<span>(optional)</span>&nbsp;<p>Search by which side won the match</p>
+<p class="choices"><strong>Choices:&nbsp;</strong><code>'HOME_TEAM'</code> <code>'AWAY_TEAM'</code> </p></dd><dt>home_team</dt><dd><code>string</code>&nbsp;<span>(optional)</span>&nbsp;<span class="text-muted example"><strong>Example:&nbsp;</strong><span>Norwich</span></span><p>Search by name of home team</p>
+</dd><dt>away_team</dt><dd><code>string</code>&nbsp;<span>(optional)</span>&nbsp;<span class="text-muted example"><strong>Example:&nbsp;</strong><span>Arsenal</span></span><p>Search by name of away team</p>
+</dd><dt>limit</dt><dd><code>integer</code>&nbsp;<span>(optional)</span>&nbsp;<span class="text-info default"><strong>Default:&nbsp;</strong><span>10</span></span>&nbsp;<span class="text-muted example"><strong>Example:&nbsp;</strong><span>20</span></span><p>The maximum number of matches to retrieve</p>
+</dd></dl></div><div class="title"><strong>Response&nbsp;&nbsp;<code>200</code></strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>[
+    {
+        "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-number">1</span></span>,
+        "<span class="hljs-attribute">away_concede_probability</span>": <span class="hljs-value"><span class="hljs-number">100</span></span>,
+        "<span class="hljs-attribute">away_form</span>": <span class="hljs-value">[
+            <span class="hljs-string">"loss"</span>,
+            <span class="hljs-string">"win"</span>,
+            <span class="hljs-string">"win"</span>,
+            <span class="hljs-string">"draw"</span>,
+            <span class="hljs-string">"draw"</span>
+        ]</span>,
+        "<span class="hljs-attribute">away_o15_prob</span>": <span class="hljs-value"><span class="hljs-number">60</span></span>,
+        "<span class="hljs-attribute">away_o25_prob</span>": <span class="hljs-value"><span class="hljs-number">100</span></span>,
+        "<span class="hljs-attribute">away_o35_prob</span>": <span class="hljs-value"><span class="hljs-literal">null</span></span>,
+        "<span class="hljs-attribute">away_score_probability</span>": <span class="hljs-value"><span class="hljs-number">100</span></span>,
+        "<span class="hljs-attribute">away_team</span>": <span class="hljs-value"><span class="hljs-string">"Norwich City"</span></span>,
+        "<span class="hljs-attribute">away_team_difficulty</span>": <span class="hljs-value"><span class="hljs-number">5</span></span>,
+        "<span class="hljs-attribute">away_team_fls_id</span>": <span class="hljs-value"><span class="hljs-number">364</span></span>,
+        "<span class="hljs-attribute">away_u15_prob</span>": <span class="hljs-value"><span class="hljs-number">0</span></span>,
+        "<span class="hljs-attribute">away_u25_prob</span>": <span class="hljs-value"><span class="hljs-number">0</span></span>,
+        "<span class="hljs-attribute">away_u35_prob</span>": <span class="hljs-value"><span class="hljs-number">40</span></span>,
+        "<span class="hljs-attribute">competition</span>": <span class="hljs-value"><span class="hljs-string">"Premier League"</span></span>,
+        "<span class="hljs-attribute">et_away_score</span>": <span class="hljs-value"><span class="hljs-literal">null</span></span>,
+        "<span class="hljs-attribute">et_home_score</span>": <span class="hljs-value"><span class="hljs-literal">null</span></span>,
+        "<span class="hljs-attribute">f_away_team_code</span>": <span class="hljs-value"><span class="hljs-literal">null</span></span>,
+        "<span class="hljs-attribute">f_away_team_id</span>": <span class="hljs-value"><span class="hljs-number">14</span></span>,
+        "<span class="hljs-attribute">f_home_team_code</span>": <span class="hljs-value"><span class="hljs-literal">null</span></span>,
+        "<span class="hljs-attribute">f_home_team_id</span>": <span class="hljs-value"><span class="hljs-number">10</span></span>,
+        "<span class="hljs-attribute">fantasy_game_week</span>": <span class="hljs-value"><span class="hljs-number">1</span></span>,
+        "<span class="hljs-attribute">fantasy_match_code</span>": <span class="hljs-value"><span class="hljs-number">1059702</span></span>,
+        "<span class="hljs-attribute">fantasy_match_id</span>": <span class="hljs-value"><span class="hljs-literal">null</span></span>,
+        "<span class="hljs-attribute">finished</span>": <span class="hljs-value"><span class="hljs-literal">true</span></span>,
+        "<span class="hljs-attribute">fls_competition_id</span>": <span class="hljs-value"><span class="hljs-number">2</span></span>,
+        "<span class="hljs-attribute">fls_match_id</span>": <span class="hljs-value"><span class="hljs-number">717650</span></span>,
+        "<span class="hljs-attribute">ft_away_score</span>": <span class="hljs-value"><span class="hljs-number">1</span></span>,
+        "<span class="hljs-attribute">ft_home_score</span>": <span class="hljs-value"><span class="hljs-number">4</span></span>,
+        "<span class="hljs-attribute">home_concede_probability</span>": <span class="hljs-value"><span class="hljs-number">60</span></span>,
+        "<span class="hljs-attribute">home_form</span>": <span class="hljs-value">[
+            <span class="hljs-string">"draw"</span>,
+            <span class="hljs-string">"draw"</span>,
+            <span class="hljs-string">"loss"</span>,
+            <span class="hljs-string">"win"</span>,
+            <span class="hljs-string">"win"</span>
+        ]</span>,
+        "<span class="hljs-attribute">home_o15_prob</span>": <span class="hljs-value"><span class="hljs-number">100</span></span>,
+        "<span class="hljs-attribute">home_o25_prob</span>": <span class="hljs-value"><span class="hljs-number">40</span></span>,
+        "<span class="hljs-attribute">home_o35_prob</span>": <span class="hljs-value"><span class="hljs-number">20</span></span>,
+        "<span class="hljs-attribute">home_score_probability</span>": <span class="hljs-value"><span class="hljs-number">100</span></span>,
+        "<span class="hljs-attribute">home_team</span>": <span class="hljs-value"><span class="hljs-string">"Liverpool"</span></span>,
+        "<span class="hljs-attribute">home_team_difficulty</span>": <span class="hljs-value"><span class="hljs-number">2</span></span>,
+        "<span class="hljs-attribute">home_team_fls_id</span>": <span class="hljs-value"><span class="hljs-number">1</span></span>,
+        "<span class="hljs-attribute">home_u15_prob</span>": <span class="hljs-value"><span class="hljs-number">0</span></span>,
+        "<span class="hljs-attribute">home_u25_prob</span>": <span class="hljs-value"><span class="hljs-number">60</span></span>,
+        "<span class="hljs-attribute">home_u35_prob</span>": <span class="hljs-value"><span class="hljs-number">80</span></span>,
+        "<span class="hljs-attribute">ht_away_score</span>": <span class="hljs-value"><span class="hljs-number">0</span></span>,
+        "<span class="hljs-attribute">ht_home_score</span>": <span class="hljs-value"><span class="hljs-number">4</span></span>,
+        "<span class="hljs-attribute">match_day</span>": <span class="hljs-value"><span class="hljs-number">1</span></span>,
+        "<span class="hljs-attribute">match_fd_id</span>": <span class="hljs-value"><span class="hljs-number">264341</span></span>,
+        "<span class="hljs-attribute">minutes</span>": <span class="hljs-value"><span class="hljs-number">90</span></span>,
+        "<span class="hljs-attribute">p_away_score</span>": <span class="hljs-value"><span class="hljs-literal">null</span></span>,
+        "<span class="hljs-attribute">p_home_score</span>": <span class="hljs-value"><span class="hljs-literal">null</span></span>,
+        "<span class="hljs-attribute">penalty_shootout_score</span>": <span class="hljs-value"><span class="hljs-literal">null</span></span>,
+        "<span class="hljs-attribute">referees</span>": <span class="hljs-value">[
+            <span class="hljs-string">"Michael Oliver"</span>,
+            <span class="hljs-string">"Stuart Burt"</span>,
+            <span class="hljs-string">"Simon Bennett"</span>,
+            <span class="hljs-string">"Graham Scott"</span>,
+            <span class="hljs-string">"Andre Marriner"</span>
+        ]</span>,
+        "<span class="hljs-attribute">season_end_date</span>": <span class="hljs-value"><span class="hljs-string">"Sun, 17 May 2020 00:00:00 GMT"</span></span>,
+        "<span class="hljs-attribute">season_start_date</span>": <span class="hljs-value"><span class="hljs-string">"Fri, 09 Aug 2019 00:00:00 GMT"</span></span>,
+        "<span class="hljs-attribute">season_year</span>": <span class="hljs-value"><span class="hljs-string">"2019/2020"</span></span>,
+        "<span class="hljs-attribute">start_time</span>": <span class="hljs-value"><span class="hljs-string">"Fri, 09 Aug 2019 19:00:00 GMT"</span></span>,
+        "<span class="hljs-attribute">start_time_epoch</span>": <span class="hljs-value"><span class="hljs-literal">null</span></span>,
+        "<span class="hljs-attribute">status</span>": <span class="hljs-value"><span class="hljs-string">"FINISHED"</span></span>,
+        "<span class="hljs-attribute">utc_date</span>": <span class="hljs-value"><span class="hljs-string">"Fri, 09 Aug 2019 00:00:00 GMT"</span></span>,
+        "<span class="hljs-attribute">winner</span>": <span class="hljs-value"><span class="hljs-string">"HOME_TEAM"</span>
+
+    </span>},
+    ...
+]</code></pre><div style="height: 1px;"></div></div></div><div class="title"><strong>Response&nbsp;&nbsp;<code>400</code></strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><div class="description"><p>When specifying a non integer limit</p>
+</div><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+    <span class="hljs-string">"message:"</span> <span class="hljs-string">"Limit must be an integer"</span>,
+    <span class="hljs-string">"status_code"</span>: <span class="hljs-number">400</span>
+}</code></pre><div style="height: 1px;"></div></div></div><div class="title"><strong>Response&nbsp;&nbsp;<code>400</code></strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+    <span class="hljs-string">"message:"</span> <span class="hljs-string">"Invalid filter applied"</span>,
+    <span class="hljs-string">"status_code"</span>: <span class="hljs-number">400</span>
+}</code></pre><div style="height: 1px;"></div></div></div><div class="title"><strong>Response&nbsp;&nbsp;<code>404</code></strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+    <span class="hljs-string">"message:"</span> <span class="hljs-string">"The resource you're looking for could not be found"</span>,
+    <span class="hljs-string">"status_code"</span>: <span class="hljs-number">404</span>
+}</code></pre><div style="height: 1px;"></div></div></div><div class="title"><strong>Response&nbsp;&nbsp;<code>404</code></strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+    <span class="hljs-string">"message:"</span> <span class="hljs-string">"There is no matches with those filters"</span>,
+    <span class="hljs-string">"status_code"</span>: <span class="hljs-number">404</span>
+}</code></pre><div style="height: 1px;"></div></div></div></div></div></section><section id="player" class="resource-group"><h2 class="group-heading">Player <a href="#player" class="permalink">&para;</a></h2><p>Player description</p>
+<div class="note">
+<p>You can apply a score filter e.g,</p>
+<pre><code class="language-http">https://api.trackr.football/v1/match?full_time_home_score=3</code></pre>
+<p>To get matches where the full time score for the home team was 3, see the score parameter below for more options.</p>
+</div>
+<div id="player-player-list" class="resource"><h3 class="resource-heading">Player List <a href="#player-player-list" class="permalink">&nbsp;&para;</a></h3><div id="player-player-list-get" class="action get"><h4 class="action-heading"><div class="name">Get player</div><a href="#player-player-list-get" class="method get">GET</a><code class="uri">/v1/player</code></h4><p>Get data for Harry Kane. Example:</p>
+<pre><code class="language-http">https://api.trackr.football/v1/player?name=Kane</code></pre>
+<h4>Example URI</h4><div class="definition"><span class="method get">GET</span>&nbsp;<span class="uri"><span class="hostname">https://api.trackr.football</span>/v1/player</span></div><div class="title"><strong>URI Parameters</strong><div class="collapse-button show"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><dl class="inner"><dt>id</dt><dd><code>integer</code>&nbsp;<span>(optional)</span>&nbsp;<span class="text-muted example"><strong>Example:&nbsp;</strong><span>1</span></span><p>Search for players by id</p>
+</dd><dt>name</dt><dd><code>string</code>&nbsp;<span>(optional)</span>&nbsp;<span class="text-muted example"><strong>Example:&nbsp;</strong><span>Kane</span></span><p>Search by player name, fields <code>first_name</code> and <code>last_name</code> will also work</p>
+</dd><dt>nationality</dt><dd><code>string</code>&nbsp;<span>(optional)</span>&nbsp;<span class="text-muted example"><strong>Example:&nbsp;</strong><span>England</span></span><p>Search by nationality</p>
+</dd><dt>position</dt><dd><code>string</code>&nbsp;<span>(optional)</span>&nbsp;<span class="text-muted example"><strong>Example:&nbsp;</strong><span>Attacker</span></span><p>Search by position</p>
+</dd><dt>team</dt><dd><code>string</code>&nbsp;<span>(optional)</span>&nbsp;<span class="text-muted example"><strong>Example:&nbsp;</strong><span>Tottenham</span></span><p>Search by the team the player plays for</p>
+</dd><dt>number_of_goals</dt><dd><code>integer</code>&nbsp;<span>(optional)</span>&nbsp;<span class="text-muted example"><strong>Example:&nbsp;</strong><span>10</span></span><p>Search by number of goals scored by player</p>
+</dd><dt>assists</dt><dd><code>integer</code>&nbsp;<span>(optional)</span>&nbsp;<span class="text-muted example"><strong>Example:&nbsp;</strong><span>10</span></span><p>Search by number of assists</p>
+</dd><dt>yellow_cards</dt><dd><code>integer</code>&nbsp;<span>(optional)</span>&nbsp;<span class="text-muted example"><strong>Example:&nbsp;</strong><span>1</span></span><p>Search by number of yellow cards</p>
+</dd><dt>red_cards</dt><dd><code>integer</code>&nbsp;<span>(optional)</span>&nbsp;<span class="text-muted example"><strong>Example:&nbsp;</strong><span>1</span></span><p>Search by number of red cards</p>
+</dd><dt>fantasy_fields</dt><dd><code>string</code>&nbsp;<span>(optional)</span>&nbsp;<p>Search by different fantasy fields</p>
+<p class="choices"><strong>Choices:&nbsp;</strong><code>fantasy_id</code> <code>fantasy_price</code> <code>fantasy_dream_team_count</code> <code>fantasy_season_value</code> <code>fantasy_overall_price_rise</code> <code>fantasy_overall_price_fall</code> <code>fantasy_overall_transfers_in</code> <code>fantasy_overall_transfers_out</code> <code>fantasy_overall_points</code> <code>fantasy_point_average</code> </p></dd><dt>limit</dt><dd><code>integer</code>&nbsp;<span>(optional)</span>&nbsp;<span class="text-info default"><strong>Default:&nbsp;</strong><span>10</span></span>&nbsp;<span class="text-muted example"><strong>Example:&nbsp;</strong><span>5</span></span><p>The maximum number of players to retrieve up to <code>10</code></p>
+</dd></dl></div><div class="title"><strong>Response&nbsp;&nbsp;<code>200</code></strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+    "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-number">1420</span></span>,
+    "<span class="hljs-attribute">chance_of_playing_next_week</span>": <span class="hljs-value"><span class="hljs-literal">null</span></span>,
+    "<span class="hljs-attribute">chance_of_playing_this_week</span>": <span class="hljs-value"><span class="hljs-literal">null</span></span>,
+    "<span class="hljs-attribute">country_of_birth</span>": <span class="hljs-value"><span class="hljs-string">"England"</span></span>,
+    "<span class="hljs-attribute">date_of_birth</span>": <span class="hljs-value"><span class="hljs-string">"Wed, 28 Jul 1993 00:00:00 GMT"</span></span>,
+    "<span class="hljs-attribute">date_of_birth_epoch</span>": <span class="hljs-value"><span class="hljs-literal">null</span></span>,
+    "<span class="hljs-attribute">fantasy_code</span>": <span class="hljs-value"><span class="hljs-number">78830</span></span>,
+    "<span class="hljs-attribute">fantasy_dream_team_count</span>": <span class="hljs-value"><span class="hljs-number">1</span></span>,
+    "<span class="hljs-attribute">fantasy_dream_team_member</span>": <span class="hljs-value"><span class="hljs-literal">false</span></span>,
+    "<span class="hljs-attribute">fantasy_form</span>": <span class="hljs-value"><span class="hljs-number">6</span></span>,
+    "<span class="hljs-attribute">fantasy_id</span>": <span class="hljs-value"><span class="hljs-number">338</span></span>,
+    "<span class="hljs-attribute">fantasy_news</span>": <span class="hljs-value"><span class="hljs-string">""</span></span>,
+    "<span class="hljs-attribute">fantasy_news_timestamp</span>": <span class="hljs-value"><span class="hljs-literal">null</span></span>,
+    "<span class="hljs-attribute">fantasy_overall_points</span>": <span class="hljs-value"><span class="hljs-number">23</span></span>,
+    "<span class="hljs-attribute">fantasy_overall_price_fall</span>": <span class="hljs-value"><span class="hljs-number">0</span></span>,
+    "<span class="hljs-attribute">fantasy_overall_price_rise</span>": <span class="hljs-value"><span class="hljs-number">0</span></span>,
+    "<span class="hljs-attribute">fantasy_overall_transfers_in</span>": <span class="hljs-value"><span class="hljs-number">500152</span></span>,
+    "<span class="hljs-attribute">fantasy_overall_transfers_out</span>": <span class="hljs-value"><span class="hljs-number">812240</span></span>,
+    "<span class="hljs-attribute">fantasy_point_average</span>": <span class="hljs-value"><span class="hljs-number">5.8</span></span>,
+    "<span class="hljs-attribute">fantasy_price</span>": <span class="hljs-value"><span class="hljs-number">110</span></span>,
+    "<span class="hljs-attribute">fantasy_selection_percentage</span>": <span class="hljs-value"><span class="hljs-number">24</span></span>,
+    "<span class="hljs-attribute">fantasy_special</span>": <span class="hljs-value"><span class="hljs-literal">false</span></span>,
+    "<span class="hljs-attribute">fantasy_status</span>": <span class="hljs-value"><span class="hljs-literal">null</span></span>,
+    "<span class="hljs-attribute">fantasy_team_code</span>": <span class="hljs-value"><span class="hljs-number">6</span></span>,
+    "<span class="hljs-attribute">fantasy_team_id</span>": <span class="hljs-value"><span class="hljs-number">17</span></span>,
+    "<span class="hljs-attribute">fantasy_total_bonus</span>": <span class="hljs-value"><span class="hljs-number">77</span></span>,
+    "<span class="hljs-attribute">fantasy_week_price_fall</span>": <span class="hljs-value"><span class="hljs-number">1</span></span>,
+    "<span class="hljs-attribute">fantasy_week_price_rise</span>": <span class="hljs-value">-<span class="hljs-number">1</span></span>,
+    "<span class="hljs-attribute">fd_id</span>": <span class="hljs-value"><span class="hljs-number">8004</span></span>,
+    "<span class="hljs-attribute">first_name</span>": <span class="hljs-value"><span class="hljs-string">"Harry"</span></span>,
+    "<span class="hljs-attribute">fls_id</span>": <span class="hljs-value"><span class="hljs-literal">null</span></span>,
+    "<span class="hljs-attribute">gender</span>": <span class="hljs-value"><span class="hljs-literal">null</span></span>,
+    "<span class="hljs-attribute">height</span>": <span class="hljs-value"><span class="hljs-literal">null</span></span>,
+    "<span class="hljs-attribute">last_name</span>": <span class="hljs-value"><span class="hljs-string">"Kane"</span></span>,
+    "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"Harry Kane"</span></span>,
+    "<span class="hljs-attribute">nationality</span>": <span class="hljs-value"><span class="hljs-string">"England"</span></span>,
+    "<span class="hljs-attribute">number_of_goals</span>": <span class="hljs-value"><span class="hljs-number">3</span></span>,
+    "<span class="hljs-attribute">photo_url</span>": <span class="hljs-value"><span class="hljs-string">"78830.jpg"</span></span>,
+    "<span class="hljs-attribute">position</span>": <span class="hljs-value"><span class="hljs-string">"Attacker"</span></span>,
+    "<span class="hljs-attribute">shirt_number</span>": <span class="hljs-value"><span class="hljs-number">10</span></span>,
+    "<span class="hljs-attribute">team</span>": <span class="hljs-value"><span class="hljs-string">"Tottenham Hotspur FC"</span></span>,
+    "<span class="hljs-attribute">team_fd_id</span>": <span class="hljs-value"><span class="hljs-number">73</span></span>,
+    "<span class="hljs-attribute">team_fls_id</span>": <span class="hljs-value"><span class="hljs-literal">null</span></span>,
+    "<span class="hljs-attribute">team_id</span>": <span class="hljs-value"><span class="hljs-literal">null</span></span>,
+    "<span class="hljs-attribute">web_name</span>": <span class="hljs-value"><span class="hljs-literal">null</span></span>,
+    "<span class="hljs-attribute">week_stats</span>": <span class="hljs-value">[
+        {
+        "<span class="hljs-attribute">fantasy_selection_count</span>": <span class="hljs-value"><span class="hljs-number">1591131</span></span>,
+        "<span class="hljs-attribute">fantasy_transfers_balance</span>": <span class="hljs-value"><span class="hljs-number">0</span></span>,
+        "<span class="hljs-attribute">fantasy_week_bonus</span>": <span class="hljs-value"><span class="hljs-number">50</span></span>,
+        "<span class="hljs-attribute">fantasy_week_points</span>": <span class="hljs-value"><span class="hljs-number">13</span></span>,
+        "<span class="hljs-attribute">fantasy_week_transfers_in</span>": <span class="hljs-value"><span class="hljs-number">0</span></span>,
+        "<span class="hljs-attribute">fantasy_week_transfers_out</span>": <span class="hljs-value"><span class="hljs-number">0</span></span>,
+        "<span class="hljs-attribute">game_week</span>": <span class="hljs-value"><span class="hljs-number">1</span></span>,
+        "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-number">33</span></span>,
+        "<span class="hljs-attribute">player_id</span>": <span class="hljs-value"><span class="hljs-number">1420</span></span>,
+        "<span class="hljs-attribute">season_value</span>": <span class="hljs-value"><span class="hljs-number">110</span>
+        </span>},
+        ...
+    ]</span>,
+    "<span class="hljs-attribute">weight</span>": <span class="hljs-value"><span class="hljs-literal">null</span>
+</span>}</code></pre><div style="height: 1px;"></div></div></div><div class="title"><strong>Response&nbsp;&nbsp;<code>400</code></strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><div class="description"><p>When specifying a non integer limit</p>
+</div><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+    <span class="hljs-string">"message:"</span> <span class="hljs-string">"Limit must be an integer"</span>,
+    <span class="hljs-string">"status_code"</span>: <span class="hljs-number">400</span>
+}</code></pre><div style="height: 1px;"></div></div></div><div class="title"><strong>Response&nbsp;&nbsp;<code>400</code></strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+    <span class="hljs-string">"message:"</span> <span class="hljs-string">"Invalid filter applied"</span>,
+    <span class="hljs-string">"status_code"</span>: <span class="hljs-number">400</span>
+}</code></pre><div style="height: 1px;"></div></div></div><div class="title"><strong>Response&nbsp;&nbsp;<code>404</code></strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+    <span class="hljs-string">"message:"</span> <span class="hljs-string">"The resource you're looking for could not be found"</span>,
+    <span class="hljs-string">"status_code"</span>: <span class="hljs-number">404</span>
+}</code></pre><div style="height: 1px;"></div></div></div><div class="title"><strong>Response&nbsp;&nbsp;<code>404</code></strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+    <span class="hljs-string">"message:"</span> <span class="hljs-string">"There is no players with those filters"</span>,
+    <span class="hljs-string">"status_code"</span>: <span class="hljs-number">404</span>
+}</code></pre><div style="height: 1px;"></div></div></div></div></div></section><section id="stats" class="resource-group"><h2 class="group-heading">Stats <a href="#stats" class="permalink">&para;</a></h2><p>Player match stats description</p>
+<div class="warning">
+<h4 id="header-caution"><i class="fa fa-warning"></i> Caution <a class="permalink" href="#header-caution" aria-hidden="true">¶</a></h4>
+<p>Please ensure that you pass either a <code>player_id</code> OR <code>match_id</code> filter to this endpoint to get results.
+Calling with just <code>player_id</code> will retrieve data on random matches in which <code>player_id</code> played.
+Calling with just <code>match_id</code> will retrieve data for random players which played in this match.</p>
+</div>
+<div class="note">
+<p>To retrieve stats for multiple matches you can use:</p>
+<pre><code class="language-http">https://api.trackr.football/v1/stats/all?player_id=1157&amp;match_id=22,45</code></pre>
+</div>
+<div id="stats-player-match-stats-list" class="resource"><h3 class="resource-heading">Player match stats List <a href="#stats-player-match-stats-list" class="permalink">&nbsp;&para;</a></h3><div id="stats-player-match-stats-list-get" class="action get"><h4 class="action-heading"><div class="name">Get player match stats</div><a href="#stats-player-match-stats-list-get" class="method get">GET</a><code class="uri">/v1/stats</code></h4><p>Get data for Harry Kane. Example:</p>
+<pre><code class="language-http">https://api.trackr.football/v1/stats?player_id=1430</code></pre>
+<h4>Example URI</h4><div class="definition"><span class="method get">GET</span>&nbsp;<span class="uri"><span class="hostname">https://api.trackr.football</span>/v1/stats</span></div><div class="title"><strong>URI Parameters</strong><div class="collapse-button show"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><dl class="inner"><dt>player_id</dt><dd><code>integer</code>&nbsp;<span class="required">(required)</span>&nbsp;<span class="text-muted example"><strong>Example:&nbsp;</strong><span>1</span></span><p>Search for stats by player id</p>
+</dd><dt>match_id</dt><dd><code>integer</code>&nbsp;<span class="required">(required)</span>&nbsp;<span class="text-muted example"><strong>Example:&nbsp;</strong><span>300</span></span><p>Search for stats by match id</p>
+</dd><dt>goals_scored</dt><dd><code>integer</code>&nbsp;<span>(optional)</span>&nbsp;<span class="text-muted example"><strong>Example:&nbsp;</strong><span>2</span></span><p>Search for goals scored in a single match</p>
+</dd><dt>goals_conceded</dt><dd><code>integer</code>&nbsp;<span>(optional)</span>&nbsp;<span class="text-muted example"><strong>Example:&nbsp;</strong><span>2</span></span><p>Search for goals conceded in a single match</p>
+</dd><dt>assists</dt><dd><code>integer</code>&nbsp;<span>(optional)</span>&nbsp;<span class="text-muted example"><strong>Example:&nbsp;</strong><span>2</span></span><p>Search for assists in a single match</p>
+</dd><dt>own_goals</dt><dd><code>integer</code>&nbsp;<span>(optional)</span>&nbsp;<span class="text-muted example"><strong>Example:&nbsp;</strong><span>2</span></span><p>Search for own goals in a single match</p>
+</dd><dt>penalties_saved</dt><dd><code>integer</code>&nbsp;<span>(optional)</span>&nbsp;<span class="text-muted example"><strong>Example:&nbsp;</strong><span>1</span></span><p>Search for penalties saved in a single match</p>
+</dd><dt>penalties_missed</dt><dd><code>integer</code>&nbsp;<span>(optional)</span>&nbsp;<span class="text-muted example"><strong>Example:&nbsp;</strong><span>1</span></span><p>Search for penalties missed in a single match</p>
+</dd><dt>yellow_cards</dt><dd><code>integer</code>&nbsp;<span>(optional)</span>&nbsp;<span class="text-muted example"><strong>Example:&nbsp;</strong><span>1</span></span><p>Search for yellow cards in a single match</p>
+</dd><dt>red_cards</dt><dd><code>integer</code>&nbsp;<span>(optional)</span>&nbsp;<span class="text-muted example"><strong>Example:&nbsp;</strong><span>1</span></span><p>Search for red cards in a single match</p>
+</dd><dt>saves</dt><dd><code>integer</code>&nbsp;<span>(optional)</span>&nbsp;<span class="text-muted example"><strong>Example:&nbsp;</strong><span>1</span></span><p>Search for number of saves in a single match</p>
+</dd><dt>minutes_played</dt><dd><code>integer</code>&nbsp;<span>(optional)</span>&nbsp;<span class="text-muted example"><strong>Example:&nbsp;</strong><span>1</span></span><p>Search for number of saves in a single match</p>
+</dd><dt>fantasy_fields</dt><dd><code>string</code>&nbsp;<span>(optional)</span>&nbsp;<p>Search by different fantasy fields</p>
+<p class="choices"><strong>Choices:&nbsp;</strong><code>fantasy_influence</code> <code>fantasy_creativity</code> <code>fantasy_threat</code> <code>fantasy_ict_index</code> </p></dd><dt>limit</dt><dd><code>integer</code>&nbsp;<span>(optional)</span>&nbsp;<span class="text-info default"><strong>Default:&nbsp;</strong><span>10</span></span>&nbsp;<span class="text-muted example"><strong>Example:&nbsp;</strong><span>5</span></span><p>The maximum number of match stats to retrieve up to <code>10</code></p>
+</dd></dl></div><div class="title"><strong>Response&nbsp;&nbsp;<code>200</code></strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>[
+    {
+        "<span class="hljs-attribute">assists</span>": <span class="hljs-value"><span class="hljs-number">0</span></span>,
+        "<span class="hljs-attribute">bonus</span>": <span class="hljs-value"><span class="hljs-literal">null</span></span>,
+        "<span class="hljs-attribute">clean_sheet</span>": <span class="hljs-value"><span class="hljs-literal">true</span></span>,
+        "<span class="hljs-attribute">fantasy_creativity</span>": <span class="hljs-value"><span class="hljs-number">0.4</span></span>,
+        "<span class="hljs-attribute">fantasy_ict_index</span>": <span class="hljs-value"><span class="hljs-number">1.7</span></span>,
+        "<span class="hljs-attribute">fantasy_influence</span>": <span class="hljs-value"><span class="hljs-number">9</span></span>,
+        "<span class="hljs-attribute">fantasy_match_id</span>": <span class="hljs-value"><span class="hljs-number">5</span></span>,
+        "<span class="hljs-attribute">fantasy_threat</span>": <span class="hljs-value"><span class="hljs-number">8</span></span>,
+        "<span class="hljs-attribute">goals_conceded</span>": <span class="hljs-value"><span class="hljs-number">0</span></span>,
+        "<span class="hljs-attribute">goals_scored</span>": <span class="hljs-value"><span class="hljs-number">0</span></span>,
+        "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-number">311</span></span>,
+        "<span class="hljs-attribute">match_id</span>": <span class="hljs-value"><span class="hljs-number">31</span></span>,
+        "<span class="hljs-attribute">minutes_played</span>": <span class="hljs-value"><span class="hljs-number">90</span></span>,
+        "<span class="hljs-attribute">own_goals</span>": <span class="hljs-value"><span class="hljs-number">0</span></span>,
+        "<span class="hljs-attribute">penalties_missed</span>": <span class="hljs-value"><span class="hljs-number">0</span></span>,
+        "<span class="hljs-attribute">penalties_saved</span>": <span class="hljs-value"><span class="hljs-number">0</span></span>,
+        "<span class="hljs-attribute">played_at_home</span>": <span class="hljs-value"><span class="hljs-literal">false</span></span>,
+        "<span class="hljs-attribute">player_id</span>": <span class="hljs-value"><span class="hljs-number">1430</span></span>,
+        "<span class="hljs-attribute">red_cards</span>": <span class="hljs-value"><span class="hljs-number">0</span></span>,
+        "<span class="hljs-attribute">saves</span>": <span class="hljs-value"><span class="hljs-number">0</span></span>,
+        "<span class="hljs-attribute">substitution</span>": <span class="hljs-value"><span class="hljs-literal">null</span></span>,
+        "<span class="hljs-attribute">yellow_cards</span>": <span class="hljs-value"><span class="hljs-number">0</span>
+    </span>},
+    ...
+]</code></pre><div style="height: 1px;"></div></div></div><div class="title"><strong>Response&nbsp;&nbsp;<code>400</code></strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><div class="description"><p>When specifying a non integer limit</p>
+</div><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+    <span class="hljs-string">"message:"</span> <span class="hljs-string">"Limit must be an integer"</span>,
+    <span class="hljs-string">"status_code"</span>: <span class="hljs-number">400</span>
+}</code></pre><div style="height: 1px;"></div></div></div><div class="title"><strong>Response&nbsp;&nbsp;<code>400</code></strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+    <span class="hljs-string">"message:"</span> <span class="hljs-string">"Invalid filter applied"</span>,
+    <span class="hljs-string">"status_code"</span>: <span class="hljs-number">400</span>
+}</code></pre><div style="height: 1px;"></div></div></div><div class="title"><strong>Response&nbsp;&nbsp;<code>404</code></strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+    <span class="hljs-string">"message:"</span> <span class="hljs-string">"The resource you're looking for could not be found"</span>,
+    <span class="hljs-string">"status_code"</span>: <span class="hljs-number">404</span>
+}</code></pre><div style="height: 1px;"></div></div></div><div class="title"><strong>Response&nbsp;&nbsp;<code>404</code></strong><div class="collapse-button"><span class="close">Hide</span><span class="open">Show</span></div></div><div class="collapse-content"><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+    <span class="hljs-string">"message:"</span> <span class="hljs-string">"There is no stats with those filters"</span>,
+    <span class="hljs-string">"status_code"</span>: <span class="hljs-number">404</span>
+}</code></pre><div style="height: 1px;"></div></div></div></div></div></section></div></div></div><p style="text-align: center;" class="text-muted">Generated by&nbsp;<a href="https://github.com/danielgtaylor/aglio" class="aglio">aglio</a>&nbsp;on 14 Sep 2019</p><script>/* eslint-env browser */
+/* eslint quotes: [2, "single"] */
+'use strict';
+
+/*
+  Determine if a string ends with another string.
+*/
+function endsWith(str, suffix) {
+    return str.indexOf(suffix, str.length - suffix.length) !== -1;
+}
+
+/*
+  Get a list of direct child elements by class name.
+*/
+function childrenByClass(element, name) {
+  var filtered = [];
+
+  for (var i = 0; i < element.children.length; i++) {
+    var child = element.children[i];
+    var classNames = child.className.split(' ');
+    if (classNames.indexOf(name) !== -1) {
+      filtered.push(child);
+    }
+  }
+
+  return filtered;
+}
+
+/*
+  Get an array [width, height] of the window.
+*/
+function getWindowDimensions() {
+  var w = window,
+      d = document,
+      e = d.documentElement,
+      g = d.body,
+      x = w.innerWidth || e.clientWidth || g.clientWidth,
+      y = w.innerHeight || e.clientHeight || g.clientHeight;
+
+  return [x, y];
+}
+
+/*
+  Collapse or show a request/response example.
+*/
+function toggleCollapseButton(event) {
+    var button = event.target.parentNode;
+    var content = button.parentNode.nextSibling;
+    var inner = content.children[0];
+
+    if (button.className.indexOf('collapse-button') === -1) {
+      // Clicked without hitting the right element?
+      return;
+    }
+
+    if (content.style.maxHeight && content.style.maxHeight !== '0px') {
+        // Currently showing, so let's hide it
+        button.className = 'collapse-button';
+        content.style.maxHeight = '0px';
+    } else {
+        // Currently hidden, so let's show it
+        button.className = 'collapse-button show';
+        content.style.maxHeight = inner.offsetHeight + 12 + 'px';
+    }
+}
+
+function toggleTabButton(event) {
+    var i, index;
+    var button = event.target;
+
+    // Get index of the current button.
+    var buttons = childrenByClass(button.parentNode, 'tab-button');
+    for (i = 0; i < buttons.length; i++) {
+        if (buttons[i] === button) {
+            index = i;
+            button.className = 'tab-button active';
+        } else {
+            buttons[i].className = 'tab-button';
+        }
+    }
+
+    // Hide other tabs and show this one.
+    var tabs = childrenByClass(button.parentNode.parentNode, 'tab');
+    for (i = 0; i < tabs.length; i++) {
+        if (i === index) {
+            tabs[i].style.display = 'block';
+        } else {
+            tabs[i].style.display = 'none';
+        }
+    }
+}
+
+/*
+  Collapse or show a navigation menu. It will not be hidden unless it
+  is currently selected or `force` has been passed.
+*/
+function toggleCollapseNav(event, force) {
+    var heading = event.target.parentNode;
+    var content = heading.nextSibling;
+    var inner = content.children[0];
+
+    if (heading.className.indexOf('heading') === -1) {
+      // Clicked without hitting the right element?
+      return;
+    }
+
+    if (content.style.maxHeight && content.style.maxHeight !== '0px') {
+      // Currently showing, so let's hide it, but only if this nav item
+      // is already selected. This prevents newly selected items from
+      // collapsing in an annoying fashion.
+      if (force || window.location.hash && endsWith(event.target.href, window.location.hash)) {
+        content.style.maxHeight = '0px';
+      }
+    } else {
+      // Currently hidden, so let's show it
+      content.style.maxHeight = inner.offsetHeight + 12 + 'px';
+    }
+}
+
+/*
+  Refresh the page after a live update from the server. This only
+  works in live preview mode (using the `--server` parameter).
+*/
+function refresh(body) {
+    document.querySelector('body').className = 'preload';
+    document.body.innerHTML = body;
+
+    // Re-initialize the page
+    init();
+    autoCollapse();
+
+    document.querySelector('body').className = '';
+}
+
+/*
+  Determine which navigation items should be auto-collapsed to show as many
+  as possible on the screen, based on the current window height. This also
+  collapses them.
+*/
+function autoCollapse() {
+  var windowHeight = getWindowDimensions()[1];
+  var itemsHeight = 64; /* Account for some padding */
+  var itemsArray = Array.prototype.slice.call(
+    document.querySelectorAll('nav .resource-group .heading'));
+
+  // Get the total height of the navigation items
+  itemsArray.forEach(function (item) {
+    itemsHeight += item.parentNode.offsetHeight;
+  });
+
+  // Should we auto-collapse any nav items? Try to find the smallest item
+  // that can be collapsed to show all items on the screen. If not possible,
+  // then collapse the largest item and do it again. First, sort the items
+  // by height from smallest to largest.
+  var sortedItems = itemsArray.sort(function (a, b) {
+    return a.parentNode.offsetHeight - b.parentNode.offsetHeight;
+  });
+
+  while (sortedItems.length && itemsHeight > windowHeight) {
+    for (var i = 0; i < sortedItems.length; i++) {
+      // Will collapsing this item help?
+      var itemHeight = sortedItems[i].nextSibling.offsetHeight;
+      if ((itemsHeight - itemHeight <= windowHeight) || i === sortedItems.length - 1) {
+        // It will, so let's collapse it, remove its content height from
+        // our total and then remove it from our list of candidates
+        // that can be collapsed.
+        itemsHeight -= itemHeight;
+        toggleCollapseNav({target: sortedItems[i].children[0]}, true);
+        sortedItems.splice(i, 1);
+        break;
+      }
+    }
+  }
+}
+
+/*
+  Initialize the interactive functionality of the page.
+*/
+function init() {
+    var i, j;
+
+    // Make collapse buttons clickable
+    var buttons = document.querySelectorAll('.collapse-button');
+    for (i = 0; i < buttons.length; i++) {
+        buttons[i].onclick = toggleCollapseButton;
+
+        // Show by default? Then toggle now.
+        if (buttons[i].className.indexOf('show') !== -1) {
+            toggleCollapseButton({target: buttons[i].children[0]});
+        }
+    }
+
+    var responseCodes = document.querySelectorAll('.example-names');
+    for (i = 0; i < responseCodes.length; i++) {
+        var tabButtons = childrenByClass(responseCodes[i], 'tab-button');
+        for (j = 0; j < tabButtons.length; j++) {
+            tabButtons[j].onclick = toggleTabButton;
+
+            // Show by default?
+            if (j === 0) {
+                toggleTabButton({target: tabButtons[j]});
+            }
+        }
+    }
+
+    // Make nav items clickable to collapse/expand their content.
+    var navItems = document.querySelectorAll('nav .resource-group .heading');
+    for (i = 0; i < navItems.length; i++) {
+        navItems[i].onclick = toggleCollapseNav;
+
+        // Show all by default
+        toggleCollapseNav({target: navItems[i].children[0]});
+    }
+}
+
+// Initial call to set up buttons
+init();
+
+window.onload = function () {
+    autoCollapse();
+    // Remove the `preload` class to enable animations
+    document.querySelector('body').className = '';
+};
+</script></body></html>
