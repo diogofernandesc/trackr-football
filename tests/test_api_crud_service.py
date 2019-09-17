@@ -1,13 +1,13 @@
 import unittest
-from flask_run import app
+from flask_run import application
 from ingest_engine.cons import Match as MATCH, Team as TEAM, Player as PLAYER
 from api_engine.api_cons import API, API_ERROR
 
 
 class ApiInterfaceTest(unittest.TestCase):
     def setUp(self):
-        app.config["SERVER_NAME"] = "localhost:5000"
-        self.api = app.test_client()
+        application.config["SERVER_NAME"] = "localhost:5000"
+        self.api = application.test_client()
         self.api.allow_subdomain_redirects = True
         self.api.testing = True
 

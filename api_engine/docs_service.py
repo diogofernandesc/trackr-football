@@ -1,8 +1,9 @@
 from flask import Blueprint, request, jsonify, current_app, render_template
 
-docs_service = Blueprint('docs_service', __name__, template_folder='templates', url_prefix='/', subdomain='docs')
+docs_service = Blueprint('docs_service', __name__, subdomain='docs', template_folder='templates',
+                         static_url_path='', static_folder='static', url_prefix='/')
 
 
 @docs_service.route('/', methods=['GET'])
 def docs():
-    return render_template('output.html')
+    return docs_service.send_static_file('output.html')
