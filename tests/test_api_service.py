@@ -1,5 +1,5 @@
 import unittest
-from flask_run import app
+from flask_run import application
 from ingest_engine.cons import Competition as COMPETITION, Standings as STANDINGS, Match as MATCH, Team as TEAM,\
     Player as PLAYER, FantasyGameWeek as FANTASY_GAME_WEEK, MatchEvent as MATCH_EVENT
 from api_engine.api_cons import API_ENDPOINTS, API, API_ERROR, DB_QUERY_FIELD
@@ -7,8 +7,8 @@ from api_engine.api_cons import API_ENDPOINTS, API, API_ERROR, DB_QUERY_FIELD
 
 class ApiInterfaceTest(unittest.TestCase):
     def setUp(self):
-        app.config["SERVER_NAME"] = "localhost:5000"
-        self.api = app.test_client()
+        application.config["SERVER_NAME"] = "localhost:5000"
+        self.api = application.test_client()
         self.api.testing = True
 
     def tearDown(self):
