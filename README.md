@@ -15,7 +15,7 @@ https://api.trackr.football/v1/standings?points=$gt:10
 
 Get matches where the home team scored 3 goals
 ```
-https://api.trackr.football/v1/match?full_time_home_score=3
+https://api.trackr.football/v1/match?ft_home_score=3
 ```
 
 Get data for Harry Kane
