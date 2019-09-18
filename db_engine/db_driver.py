@@ -76,7 +76,7 @@ class StandingsEntry(db.Model):
 
 class Match(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    stats = db.relationship('MatchStats', uselist=False, backref='match')
+    stats = db.relationship('MatchStats', backref='match')
     match_fd_id = db.Column(db.Integer, unique=True, nullable=False)
     season_start_date = db.Column(db.Date, unique=False, nullable=True)
     season_end_date = db.Column(db.Date, unique=False, nullable=True)

@@ -143,9 +143,6 @@ class ApiInterfaceTest(unittest.TestCase):
 
         single_result = self.api.get('http://api.localhost:5000/v1/match?id=1').get_json()
         self.assertIsInstance(single_result, dict)
-
-        self.filter_test(MATCH.ID, 1, "match")
-
         self.filter_test_adv(filter_str=MATCH.HOME_SCORE_PROBABILITY, filter_val=100, op="lt", endpoint="match")
         self.filter_test_adv(filter_str=MATCH.AWAY_SCORE_PROBABILITY, filter_val=20, op="gt", endpoint="match")
         self.filter_test_adv(filter_str=MATCH.HOME_SCORE_PROBABILITY_OVER_1_5,
