@@ -3,7 +3,7 @@ from threading import Thread
 from flask import Blueprint, request, jsonify, current_app
 
 from db_engine.db_driver import Competition, Standings, StandingsEntry
-from db_engine.db_filters import StandingsBaseFilters, CompFilters, MatchFilters, TeamFilters
+from db_engine.db_filters import StandingsBaseFilters, CompFilters, TeamFilters
 from api_engine.api_service import get_vals, InvalidUsage
 from api_engine.api_cons import API_ERROR
 from ingest_engine.cons import  Standings as STANDINGS, Competition as COMPETITION, Match as MATCH, Player as PLAYER\

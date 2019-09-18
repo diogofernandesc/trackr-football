@@ -1,4 +1,4 @@
-from flask import Blueprint, request, jsonify, current_app, render_template
+from flask import Blueprint
 
 docs_service = Blueprint('docs_service', __name__, subdomain='docs', template_folder='templates',
                          static_url_path='', static_folder='static', url_prefix='/')

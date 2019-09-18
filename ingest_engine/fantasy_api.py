@@ -3,7 +3,6 @@ from datetime import datetime
 from ingest_engine.cons import *
 from ingest_engine.cons import FANTASY_STATUS_MAPPER as st_mapper
 from ingest_engine.api_integration import ApiIntegration
-import os
 import pandas as pd
 
 

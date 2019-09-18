@@ -25,7 +25,7 @@ def get_vals(v):
     """
     def isfloat(x):
         try:
-            a = float(x)
+            float(x)
         except ValueError:
             return False
         else:
