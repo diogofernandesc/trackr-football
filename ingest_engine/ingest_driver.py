@@ -183,7 +183,7 @@ class Driver(object):
             fd_teams[idx] = {**team, **fd_team_extra}
 
         fls_teams = self.fls.request_teams(**{flsf.COMPETITION_ID: fls_comp_id})
-        f_teams = self.fantasy.request_base_information()['teams']
+        f_teams = self.fantasy.request_base_information()
 
         for fd_team in fd_teams:
             temp_dict = {}
@@ -254,8 +254,8 @@ class Driver(object):
         return f_players_base
 
 
-# if __name__ == "__main__":
-#     driver = Driver()
+if __name__ == "__main__":
+    driver = Driver()
     # print(driver.request_standings(competition_id=2021))
     # print(driver.request_player_details(team_fls_id=1))
     # print(driver.request_player_details(team_name="Liverpool", competition_name="test"))
