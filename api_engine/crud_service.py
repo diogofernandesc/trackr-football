@@ -69,6 +69,76 @@ def get_competition_and_standings():
     return jsonify({"Message": "Nothing to update"})
 
 
+
+@crud_service.route('/players', methods=['GET'])
+@crud_service.route('/player', methods=['GET'])
+@crud_service.route('/player/all', methods=['GET'])
+def get_player() -> dict:
+    """
+    CRUD endpoint for inserting players into DB
+    :return: Result that is also inserted into DB
+    """
+    with current_app.app_context():
+        db_interface = current_app.config['db_interface']
+
+    ra = request.args
+    limit = ra.get("limit", 20)
+    multi = 'player/all' in request.url_rule.rule
+    try:
+        limit = int(limit)
+    except ValueError:
+        raise InvalidUsage(API_ERROR.INTEGER_LIMIT_400, status_code=400)
+
+    # season = '2019-2020'
+    # comp_fd_id = 2021
+    # comp_fls_id = 2
+    #
+    # # player_fd_id = None
+    # team_fls_id = None
+    try:
+        if PLAYER.FANTASY_TEAM_ID not in ra and not multi:
+            raise FilterException
+        if not multi:
+            f_team_id = int(ra[PLAYER.FANTASY_TEAM_ID])
+
+    except (FilterException, ValueError):
+        raise InvalidUsage(API_ERROR.FILTER_PROBLEM_400, status_code=400)
+
+    # Retrieve the player's team
+    if not multi:
+        temp_filters = {TEAM.FANTASY_ID: f_team_id}
+        team_filters = TeamFilters(**{k: get_vals(v) for k, v in temp_filters.items() if k != "limit"})
+        player_team = db_interface.get_team(limit=1, multi=False, filters=team_filters)
+        if not player_team:
+            raise InvalidUsage(API_ERROR.TEAM_404, status_code=404)
+
+        # player_filters = PlayerCrudFilters(**{k: get_vals(v) for k, v in ra.items() if k != "limit"})
+        # db_players = db_interface.get_player(limit=limit, multi=multi, filters=player_filters)
+
+        # if db_players:
+        #     players = db_players
+
+        # else:
+
+    if multi:
+        players = []
+        for f_id in list(range(1, 21)):
+            players += api_ingest.request_player_details(f_team_id=f_id)
+    else:
+        players = api_ingest.request_player_details(f_team_id=f_team_id)
+
+    # Inserts record into the database in parallel
+    thread = Thread(target=lambda record: db_interface.insert_player(record), kwargs={'record': players})
+    thread.start()
+    thread.join()
+
+    if players:
+        return jsonify(players)
+
+    else:
+        raise InvalidUsage(API_ERROR.PLAYER_404, status_code=404)
+
+
 @crud_service.route('/matches', methods=['GET'])
 @crud_service.route('/match', methods=['GET'])
 def get_match() -> dict:
@@ -177,63 +247,4 @@ def get_team() -> dict:
 
     else:
         raise InvalidUsage(API_ERROR.TEAM_404, status_code=404)
-
-
-@crud_service.route('/players', methods=['GET'])
-@crud_service.route('/player', methods=['GET'])
-def get_player() -> dict:
-    """
-    CRUD endpoint for inserting players into DB
-    :return: Result that is also inserted into DB
-    """
-    with current_app.app_context():
-        db_interface = current_app.config['db_interface']
-
-    ra = request.args
-    limit = ra.get("limit", 20)
-    try:
-        limit = int(limit)
-    except ValueError:
-        raise InvalidUsage(API_ERROR.INTEGER_LIMIT_400, status_code=400)
-
-    # season = '2019-2020'
-    # comp_fd_id = 2021
-    # comp_fls_id = 2
-    #
-    # # player_fd_id = None
-    # team_fls_id = None
-    try:
-        if PLAYER.FANTASY_TEAM_ID not in ra:
-            raise FilterException
-        f_team_id = int(ra[PLAYER.FANTASY_TEAM_ID])
-
-    except (FilterException, ValueError):
-        raise InvalidUsage(API_ERROR.FILTER_PROBLEM_400, status_code=400)
-
-    # Retrieve the player's team
-    temp_filters = {TEAM.FANTASY_ID: f_team_id}
-    team_filters = TeamFilters(**{k: get_vals(v) for k, v in temp_filters.items() if k != "limit"})
-    player_team = db_interface.get_team(limit=1, multi=False, filters=team_filters)
-    if not player_team:
-        raise InvalidUsage(API_ERROR.TEAM_404, status_code=404)
-
-    # player_filters = PlayerCrudFilters(**{k: get_vals(v) for k, v in ra.items() if k != "limit"})
-    # db_players = db_interface.get_player(limit=limit, multi=multi, filters=player_filters)
-
-    # if db_players:
-    #     players = db_players
-
-    # else:
-    players = api_ingest.request_player_details(f_team_id=f_team_id)
-
-    # Inserts record into the database in parallel
-    thread = Thread(target=lambda record: db_interface.insert_player(record), kwargs={'record': players})
-    thread.start()
-    thread.join()
-
-    if players:
-        return jsonify(players)
-
-    else:
-        raise InvalidUsage(API_ERROR.PLAYER_404, status_code=404)
 

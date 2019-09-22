@@ -1,5 +1,5 @@
 FORMAT: 1A
-HOST: https://api.trackr.football
+HOST: https://api.trackr.football/v1
 
 # Trackr.football API documentation
 
@@ -62,9 +62,9 @@ This can be particularly useful in making efficient use of the API calls made.
 <br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
 
 # Group Competition
-Group description
- 
-## Competition List [/competition{?id,name,code,location}]
+Get data on the Premier League
+
+## Competition List [/v1/competition]
 A list of competitions
 
 + Parameters
@@ -129,7 +129,7 @@ https://api.trackr.football/v1/team?fantasy_overall_home_strength=$gt:100
 To get teams with overall home strength greather than 100, see below for other possible fantasy filters
 :::
 
-## Team List [/team{?id,fantasy_id,name,year_founded,stadium_capacity,fantasy...}]
+## Team List [/v1/team]
 A list of teams    
 + Parameters
 
@@ -233,9 +233,9 @@ When specifying a non integer limit
     
     
 # Group Standings
-Standings description
+Get the league standings
  
-## Standing List [/standings{?id,position,team_name,type,games_played,games_won,games_drawn,games_lost,points,goals_for,goals_against,goal_difference,limit}]
+## Standing List [/v1/standings]
 A list of standings
 
 + Parameters
@@ -330,7 +330,7 @@ When specifying a non integer limit
             }                             
             
 # Group Match
-Match description
+Get data for matches played
 
 :::note
 You can apply a score filter e.g, 
@@ -340,7 +340,7 @@ https://api.trackr.football/v1/match?full_time_home_score=3
 To get matches where the full time score for the home team was 3, see the score parameter below for more options.
 :::
  
-## Match List [/match{?id,match_day,full_time_home_score,full_time_away_score,half_time_home_score,half_time_away_score,winner,home_team,away_team,limit}]
+## Match List [/v1/match]
 A list of matches
 
 + Parameters
@@ -349,10 +349,10 @@ A list of matches
     + match_day: `2` (integer, optional) - Search by match day/game week of the match
     + score: `3`
         + Members
-            + full_time_home_score
-            + full_time_away_score
-            + half_time_home_score 
-            + half_time_away_score 
+            + ft_home_score
+            + ft_away_score
+            + ht_home_score 
+            + ht_away_score
     + winner `HOME_TEAM` (string, optional) - Search by which side won the match
         + Members
             + 'HOME_TEAM'
@@ -492,7 +492,7 @@ When specifying a non integer limit
             } 
 
 # Group Player
-Player description
+Get data for different players
 
 :::note
 You can apply a score filter e.g, 
@@ -641,7 +641,7 @@ When specifying a non integer limit
             }                             
             
 # Group Stats
-Player match stats description
+Get match stats for players
 
 ::: warning
 #### <i class="fa fa-warning"></i> Caution
