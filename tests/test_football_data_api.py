@@ -20,11 +20,6 @@ class ApiTest(unittest.TestCase):
         self.assertEqual(req['errorCode'], 400)
         self.test_fd.session.close()
 
-    def testPerformGet(self):
-        comps_locked = self.fd.request_competitions(2004)
-        self.assertEqual(self.test_fd.request_competitions(), [])
-        self.assertEqual(comps_locked, [])
-
     def testCompetitionEndPoint(self):
         comps = self.fd.request_competitions(competition_id=2002)
         all_comps = self.fd.request_competitions()
@@ -39,15 +34,11 @@ class ApiTest(unittest.TestCase):
 
     def testCompetitionTeamEndpoint(self):
         comp_teams = self.fd.request_competition_team(competition_id=2002)
-        comp_season = self.fd.request_competition_team(competition_id=2002, season=2017)
-        self.assertEqual(comp_season[0][Team.FOOTBALL_DATA_ID], 1)
         self.assertEqual(self.test_fd.request_competition_team(competition_id=2002), [])
         self.assertEqual(comp_teams[0][Team.FOOTBALL_DATA_ID], 1)
 
     def testCompetitionStandingsEndpoint(self):
         comp_standings_league = self.fd.request_competition_standings(competition_id=2002)
-        comp_standing_type = self.fd.request_competition_standings(competition_id=2002, standing_type=fda.STANDING_HOME)
-        self.assertTrue(len(comp_standing_type['standings'][0]) >= 5)
         self.assertEqual(self.test_fd.request_competition_standings(competition_id=2002), [])
         self.assertIsNone(comp_standings_league['standings'][0]['group'])
 
