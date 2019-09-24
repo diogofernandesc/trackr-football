@@ -1,10 +1,12 @@
 from typing import Union
-
+import logging
+import unidecode as unidecode
 from sqlalchemy import or_, func
 from db_engine.db_driver import Competition, Team, Standings, StandingsEntry, Match, Player, MatchStats, FantasyWeekStats
 from ingest_engine.cons import IGNORE, Team as TEAM, Standings as STANDINGS, Competition as COMPETITION, Match as MATCH,\
     Player as PLAYER, MatchEvent as MATCH_EVENT
 
+logging.basicConfig(format='%(asctime)s - %(message)s', level=logging.INFO)
 
 def col_exists(table, col):
     """
@@ -94,6 +96,22 @@ class DBInterface(object):
 
     def __init__(self, db):
         self.db = db
+
+    def update_names(self):
+        """
+        Remove characters from player names
+        :return: Rows updated without characters
+        """
+        for player in self.db.session.query(Player).all():
+            if player.name:
+                player.name = unidecode.unidecode(player.name)
+            if player.first_name:
+                player.first_name = unidecode.unidecode(player.first_name)
+
+            if player.last_name:
+                player.last_name = unidecode.unidecode(player.last_name)
+
+            self.db.session.commit()
 
     def get_last_game_week(self, filters) -> int:
         """
@@ -256,6 +274,46 @@ class DBInterface(object):
             player_query = self.db.session.query(Player).filter(Player.name.ilike(player[PLAYER.NAME]))
             if not player_query.count():
                 player_query = self.db.session.query(Player).filter(Player.name.ilike(player[PLAYER.FANTASY_WEB_NAME]))
+
+            if not player_query.count():
+                player_query = self.db.session.query(Player)\
+                    .filter(Player.name.ilike(f"{player[PLAYER.FANTASY_WEB_NAME]} {player[PLAYER.LAST_NAME]}"))
+
+            if not player_query.count():  # Try to match with just first and last name
+                player_query = self.db.session\
+                    .query(Player) \
+                    .filter(Player.name.ilike(
+                     f"{player[PLAYER.FIRST_NAME].split(' ')[0]} {player[PLAYER.LAST_NAME].split(' ')[-1]}"))
+
+            if not player_query.count():  # Try to match with (first) first name and (first) last name
+                player_query = self.db.session\
+                    .query(Player) \
+                    .filter(Player.name.ilike(
+                     f"{player[PLAYER.FIRST_NAME].split(' ')[0]} {player[PLAYER.LAST_NAME].split(' ')[0]}"))
+
+            if not player_query.count():  # Try to match with (last) first name and (first) last name
+                player_query = self.db.session \
+                    .query(Player) \
+                    .filter(Player.name.ilike(
+                    f"{player[PLAYER.FIRST_NAME].split(' ')[-1]} {player[PLAYER.LAST_NAME].split(' ')[0]}"))
+
+            if not player_query.count():  # Try to match with just web_name and (last) last name
+                player_query = self.db.session\
+                    .query(Player) \
+                    .filter(Player.name.ilike(
+                     f"{player[PLAYER.FANTASY_WEB_NAME]} {player[PLAYER.LAST_NAME].split(' ')[-1]}"))
+
+            if not player_query.count():  # Try to match with first_name and (first) last name
+                player_query = self.db.session\
+                    .query(Player) \
+                    .filter(Player.name.ilike(
+                     f"{player[PLAYER.FIRST_NAME]} {player[PLAYER.LAST_NAME].split(' ')[0]}"))
+
+            if not player_query.count():  # Try to match with just web_name and (first) last name
+                player_query = self.db.session\
+                    .query(Player) \
+                    .filter(Player.name.ilike(
+                     f"{player[PLAYER.FANTASY_WEB_NAME]} {player[PLAYER.LAST_NAME].split(' ')[0]}"))
 
             if player_query.count():
                 player_record = player_query.first()
@@ -495,6 +553,10 @@ class DBInterface(object):
             self.db.session.add(Player(**record))
 
         self.db.session.commit()
+
+if __name__ == "__main__":
+    db = DBInterface()
+    db.update_names()
 
 
 

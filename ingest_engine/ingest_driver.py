@@ -1,6 +1,8 @@
 from datetime import datetime, timedelta
 from itertools import filterfalse
 
+import unidecode
+
 from ingest_engine.football_data import FootballData
 from ingest_engine.fastest_live_scores_api import FastestLiveScores
 from ingest_engine.fantasy_api import Fantasy, ingest_historical_base_csv, ingest_historical_gameweek_csv
@@ -252,6 +254,11 @@ class Driver(object):
             extra_player_data = self.fantasy.request_player_data(player_id=player[Player.FANTASY_ID])
             f_players_base[idx] = {**extra_player_data, **player}
 
+        for player in f_players_base:
+            player[Player.NAME] = unidecode.unidecode(player[Player.NAME])
+            player[Player.FIRST_NAME] = unidecode.unidecode(player[Player.FIRST_NAME])
+            player[Player.LAST_NAME] = unidecode.unidecode(player[Player.LAST_NAME])
+            player[Player.FANTASY_WEB_NAME] = unidecode.unidecode(player[Player.FANTASY_WEB_NAME])
         return f_players_base
 
 

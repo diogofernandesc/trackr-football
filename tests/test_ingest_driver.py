@@ -1,3 +1,4 @@
+import re
 import unittest
 from unittest import mock
 from tests.resources.team_data import f_teams, fls_teams, fd_teams
@@ -227,6 +228,9 @@ class ApiTest(unittest.TestCase):
         players = self.driver.request_player_details(f_team_id=1)
         self.assertTrue(len(players) > 0)
         for player in players:
+            self.assertRegexpMatches(player[Player.NAME], '^[a-zA-Z _-]+$')
+            self.assertRegexpMatches(player[Player.FIRST_NAME], '^[a-zA-Z _-]+$')
+            self.assertRegexpMatches(player[Player.LAST_NAME], '^[a-zA-Z _-]+$')  # No weird characters
             self.assertTrue(all(k in player for k in [Player.NAME,
                                                       Player.SHIRT_NUMBER,
                                                       Player.FANTASY_ID,
