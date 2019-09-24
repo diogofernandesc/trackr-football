@@ -291,6 +291,12 @@ class DBInterface(object):
                     .filter(Player.name.ilike(
                      f"{player[PLAYER.FIRST_NAME].split(' ')[0]} {player[PLAYER.LAST_NAME].split(' ')[0]}"))
 
+            if not player_query.count():  # Try to match with (last) first name and (first) last name
+                player_query = self.db.session \
+                    .query(Player) \
+                    .filter(Player.name.ilike(
+                    f"{player[PLAYER.FIRST_NAME].split(' ')[-1]} {player[PLAYER.LAST_NAME].split(' ')[0]}"))
+
             if not player_query.count():  # Try to match with just web_name and (last) last name
                 player_query = self.db.session\
                     .query(Player) \
