@@ -315,13 +315,6 @@ class DBInterface(object):
                     .filter(Player.name.ilike(
                      f"{player[PLAYER.FANTASY_WEB_NAME]} {player[PLAYER.LAST_NAME].split(' ')[0]}"))
 
-            if not player_query.count():
-                logging.info(f"name: {player[PLAYER.NAME]}")
-                logging.info(f"first_name: {player[PLAYER.FIRST_NAME]}")
-                logging.info(f"last_name: {player[PLAYER.LAST_NAME]}")
-                logging.info(f"web_name: {player[PLAYER.FANTASY_WEB_NAME]}")
-                logging.info("------------")
-
             if player_query.count():
                 player_record = player_query.first()
                 player_record.fantasy_id = player.get(PLAYER.FANTASY_ID, None)
