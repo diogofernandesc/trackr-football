@@ -100,7 +100,8 @@ class Driver(object):
         :return: standings information
         :rtype: dict
         """
-        return self.fd.request_competition_standings(competition_id=competition_id, standing_type=standing_type)
+        result = self.fd.request_competition_standings(competition_id=competition_id, standing_type=standing_type)
+        return result
 
     def request_match(self, fls_comp_id, fd_comp_id, game_week, season, limit=None):
         """
@@ -185,7 +186,7 @@ class Driver(object):
             fd_teams[idx] = {**team, **fd_team_extra}
 
         fls_teams = self.fls.request_teams(**{flsf.COMPETITION_ID: fls_comp_id})
-        f_teams = self.fantasy.request_base_information()['teams']
+        f_teams = self.fantasy.request_base_information()
 
         for fd_team in fd_teams:
             temp_dict = {}
@@ -261,8 +262,15 @@ class Driver(object):
         return f_players_base
 
 
-# if __name__ == "__main__":
-#     driver = Driver()
+if __name__ == "__main__":
+    driver = Driver()
+    fls_comp_id = 2
+    fd_comp_id = 2021
+    game_week = 1
+    season = 2019
+    driver.request_match(fls_comp_id=fls_comp_id, fd_comp_id=fd_comp_id,
+                                                         game_week=game_week, season=season)
+
     # print(driver.request_standings(competition_id=2021))
     # print(driver.request_player_details(team_fls_id=1))
     # print(driver.request_player_details(team_name="Liverpool", competition_name="test"))

@@ -1,5 +1,10 @@
 import re
 import unittest
+from unittest import mock
+from tests.resources.team_data import f_teams, fls_teams, fd_teams
+from tests.resources.match_data import fls_matches, fd_matches, fls_match_detail
+from tests.resources.standings_data import standings
+from tests.resources.player_data import f_data, extra_f_data
 from ingest_engine.ingest_driver import Driver, str_comparator
 from ingest_engine.cons import Competition, Match, Season, Team, Standings, Player, FootballDataApiFilters as fdf, \
     MatchEvent
@@ -13,6 +18,27 @@ class ApiTest(unittest.TestCase):
     def tearDown(self):
         pass
 
+    @mock.patch('ingest_engine.fastest_live_scores_api.FastestLiveScores.request_competitions')
+    @mock.patch('ingest_engine.football_data.FootballData.request_competitions')
+    def testRequestCompetitions(self, mock_fd_request_comps, mock_fls_request_comps):
+        mock_fd_request_comps.return_value =\
+            [{'name': 'Premier League', 'code': 'PL', 'location': 'England', 'fd_api_id': 2021}]
+        mock_fls_request_comps.return_value = \
+            [{'name': 'Premier League', 'location': 'England', 'fls_api_id': 2}]
+
+        competitions = self.driver.request_competitions()
+        self.assertTrue(mock_fls_request_comps.called)
+        self.assertTrue(mock_fd_request_comps.called)
+        self.assertEqual(1, mock_fd_request_comps.call_count)
+        self.assertEqual(1, mock_fls_request_comps.call_count)
+
+        for comp in competitions:
+            self.assertTrue(all(k in comp for k in (Competition.NAME,
+                                                    Competition.CODE,
+                                                    Competition.LOCATION,
+                                                    Competition.FOOTBALL_DATA_API_ID,
+                                                    Competition.FASTEST_LIVE_SCORES_API_ID)))
+
     def testStringComparator(self):
         hello1 = "Hello"
         hello2 = "Hello"
@@ -24,32 +50,113 @@ class ApiTest(unittest.TestCase):
         random_word2 = "nevermind"
         self.assertTrue(str_comparator(random_word1, random_word2) <= 0.5)
 
-    def testRequestCompetitions(self):
-        competitions = self.driver.request_competitions()
-        for comp in competitions:
-            self.assertTrue(all(k in comp for k in (Competition.NAME,
-                                                    Competition.CODE,
-                                                    Competition.LOCATION,
-                                                    Competition.FOOTBALL_DATA_API_ID,
-                                                    Competition.FASTEST_LIVE_SCORES_API_ID)))
+    @mock.patch('ingest_engine.fantasy_api.Fantasy.request_base_information')
+    @mock.patch('ingest_engine.fastest_live_scores_api.FastestLiveScores.request_teams')
+    @mock.patch('ingest_engine.football_data.FootballData.request_team')
+    @mock.patch('ingest_engine.football_data.FootballData.request_competition_team')
+    def testRequestTeams(self, fd_comp_teams, fd_req_team, fls_comp_teams, mock_f_teams):
+        # Build mocks
+        fd_comp_teams.return_value = fd_teams
+        fd_req_team.return_value = {}
+        fls_comp_teams.return_value = fls_teams
+        mock_f_teams.return_value = f_teams
 
-    def testRequestMatch(self):
+        fls_comp_id = 2
+        fd_comp_id = 2021
+        teams = self.driver.request_teams(fd_comp_id=fd_comp_id, fls_comp_id=fls_comp_id, season=2019)
+        _fls_teams = self.driver.fls.request_teams(**{flsf.COMPETITION_ID: fls_comp_id})
+        _f_teams = self.driver.fantasy.request_base_information()
+
+        for team in teams:
+            for fls_team in _fls_teams:
+                if str_comparator(team[Team.NAME], fls_team[Team.NAME]) >= 0.9:
+
+                    self.assertEqual(team[Team.FASTEST_LIVE_SCORES_API_ID], fls_team[Team.FASTEST_LIVE_SCORES_API_ID])
+                    self.assertTrue(all(k in team for k in fls_team))
+
+            for f_team in _f_teams:
+                if str_comparator(team[Team.NAME], f_team[Team.NAME]) >= 0.9:
+                    self.assertEqual(team[Team.FANTASY_ID], f_team[Team.FANTASY_ID])
+                    self.assertTrue(all(k in team for k in f_team))
+
+            self.assertTrue(all(k in team for k in [Team.FOOTBALL_DATA_ID,
+                                                    Team.NAME,
+                                                    Team.SHORT_NAME,
+                                                    Team.COUNTRY,
+                                                    Team.CREST_URL,
+                                                    Team.ADDRESS,
+                                                    Team.PHONE,
+                                                    Team.WEBSITE,
+                                                    Team.EMAIL,
+                                                    Team.YEAR_FOUNDED,
+                                                    Team.CLUB_COLOURS,
+                                                    Team.STADIUM]))
+
+            if Team.ACTIVE_COMPETITIONS in team:
+                for competition in team[Team.ACTIVE_COMPETITIONS]:
+                    self.assertTrue(all(k in competition for k in [Competition.FOOTBALL_DATA_API_ID,
+                                                                   Competition.LOCATION,
+                                                                   Competition.NAME,
+                                                                   Competition.CODE]))
+            if Team.SQUAD in team:
+                for member in team[Team.SQUAD]:
+                    self.assertTrue(all(k in member for k in [Player.NAME,
+                                                              Player.POSITION,
+                                                              Player.DATE_OF_BIRTH,
+                                                              Player.COUNTRY_OF_BIRTH,
+                                                              Player.NATIONALITY,
+                                                              Player.SHIRT_NUMBER,
+                                                              Team.SQUAD_ROLE]))
+
+    @mock.patch('ingest_engine.fantasy_api.Fantasy.build_team_mapper')
+    @mock.patch('ingest_engine.fastest_live_scores_api.FastestLiveScores.request_match_details')
+    @mock.patch('ingest_engine.fastest_live_scores_api.FastestLiveScores.request_matches')
+    @mock.patch('ingest_engine.football_data.FootballData.request_competition_match')
+    def testRequestMatch(self, mock_fd_matches, mock_fls_matches, mock_fls_match_detail, mock_f_mapper):
+
+        # Build mocks
+        mock_fd_matches.return_value = fd_matches
+        mock_fls_matches.return_value = fls_matches
+        mock_fls_match_detail.return_value = fls_match_detail
+        mock_f_mapper.return_value = {
+            1: "Arsenal",
+            2: "Aston Villa",
+            3: "Bournemouth",
+            4: "Brighton & Hove Albion",
+            5: "Burnley",
+            6: "Chelsea",
+            7: "Crystal Palace",
+            8: "Everton",
+            9: "Leicester City",
+            10: "Liverpool",
+            11: "Manchester City",
+            12: "Manchester United",
+            13: "Newcastle United",
+            14: "Norwich",
+            15: "Sheffield United",
+            16: "Southampton",
+            17: "Tottenham Hotspur",
+            18: "Watford",
+            19: "West Ham United",
+            20: "Wolverhampton Wanderers",
+        }
+
         # In FLS, 2 is id for premier league, 2021 in football-data
         fls_comp_id = 2
         fd_comp_id = 2021
         game_week = 1
-        season = 2018
+        season = 2019
         final_matches_result = self.driver.request_match(fls_comp_id=fls_comp_id, fd_comp_id=fd_comp_id,
                                                          game_week=game_week, season=season)
         fantasy_matches = self.driver.fantasy.request_matches()
-        fd_matches = self.driver.fd.request_competition_match(competition_id=fd_comp_id,
-                                                       **{fdf.MATCHDAY: game_week, fdf.SEASON: season})
-        game_week_start = f'{fd_matches[0][Match.MATCH_UTC_DATE].split("T")[0]}T00:00:00'
-        fls_matches = self.driver.fls.request_matches(**{flsf.COMPETITION_ID: fls_comp_id,
-                                                         flsf.FROM_DATETIME: game_week_start})
+        _fd_matches = self.driver.fd.request_competition_match(competition_id=fd_comp_id,
+                                                              **{fdf.MATCHDAY: game_week, fdf.SEASON: season})
+        game_week_start = f'{_fd_matches[0][Match.MATCH_UTC_DATE].split("T")[0]}T00:00:00'
+        _fls_matches = self.driver.fls.request_matches(**{flsf.COMPETITION_ID: fls_comp_id,
+                                                          flsf.FROM_DATETIME: game_week_start})
 
         for match in final_matches_result:
-            for fls_match in fls_matches:
+            for fls_match in _fls_matches:
                 if fls_match[Match.HOME_TEAM] in match[Match.HOME_TEAM] and \
                     fls_match[Match.AWAY_TEAM] in match[Match.AWAY_TEAM] and \
                         match[Match.FULL_TIME_HOME_SCORE] == fls_match[Match.FULL_TIME_HOME_SCORE] and \
@@ -87,60 +194,14 @@ class ApiTest(unittest.TestCase):
                                                      Match.HOME_TEAM,
                                                      Match.AWAY_TEAM]))
 
-    def testRequestTeams(self):
-        fls_comp_id = 2
-        fd_comp_id = 2021
-        teams = self.driver.request_teams(fd_comp_id=fd_comp_id, fls_comp_id=fls_comp_id, season=2019)
-        fls_teams = self.driver.fls.request_teams(**{flsf.COMPETITION_ID: fls_comp_id})
-        f_teams = self.driver.fantasy.request_base_information()['teams']
-
-        for team in teams:
-            for fls_team in fls_teams:
-                if str_comparator(team[Team.NAME], fls_team[Team.NAME]) >= 0.9:
-
-                    self.assertEqual(team[Team.FASTEST_LIVE_SCORES_API_ID], fls_team[Team.FASTEST_LIVE_SCORES_API_ID])
-                    self.assertTrue(all(k in team for k in fls_team))
-
-            for f_team in f_teams:
-                if str_comparator(team[Team.NAME], f_team[Team.NAME]) >= 0.9:
-                    self.assertEqual(team[Team.FANTASY_ID], f_team[Team.FANTASY_ID])
-                    self.assertTrue(all(k in team for k in f_team))
-
-            self.assertTrue(all(k in team for k in [Team.FOOTBALL_DATA_ID,
-                                                    Team.NAME,
-                                                    Team.SHORT_NAME,
-                                                    Team.COUNTRY,
-                                                    Team.CREST_URL,
-                                                    Team.ADDRESS,
-                                                    Team.PHONE,
-                                                    Team.WEBSITE,
-                                                    Team.EMAIL,
-                                                    Team.YEAR_FOUNDED,
-                                                    Team.CLUB_COLOURS,
-                                                    Team.STADIUM]))
-
-            if Team.ACTIVE_COMPETITIONS in team:
-                for competition in team[Team.ACTIVE_COMPETITIONS]:
-                    self.assertTrue(all(k in competition for k in [Competition.FOOTBALL_DATA_API_ID,
-                                                                   Competition.LOCATION,
-                                                                   Competition.NAME,
-                                                                   Competition.CODE]))
-            if Team.SQUAD in team:
-                for member in team[Team.SQUAD]:
-                    self.assertTrue(all(k in member for k in [Player.NAME,
-                                                              Player.POSITION,
-                                                              Player.DATE_OF_BIRTH,
-                                                              Player.COUNTRY_OF_BIRTH,
-                                                              Player.NATIONALITY,
-                                                              Player.SHIRT_NUMBER,
-                                                              Team.SQUAD_ROLE]))
-
-    def testStandings(self):
-        standings = self.driver.request_standings(competition_id=2021)
-        self.assertIn(Standings.COMPETITION_NAME, standings)
-        self.assertEqual(type(standings[Standings.COMPETITION_NAME]), str)
-        self.assertGreater(len(standings["standings"]), 0)
-        for standing in standings["standings"]:
+    @mock.patch('ingest_engine.football_data.FootballData.request_competition_standings')
+    def testStandings(self, mock_standings):
+        mock_standings.return_value = standings
+        _standings = self.driver.request_standings(competition_id=2021)
+        self.assertIn(Standings.COMPETITION_NAME, _standings)
+        self.assertEqual(type(_standings[Standings.COMPETITION_NAME]), str)
+        self.assertGreater(len(_standings["standings"]), 0)
+        for standing in _standings["standings"]:
             self.assertTrue(all(k in standing for k in [Standings.TYPE,
                                                         Standings.SEASON,
                                                         Standings.GROUP,
@@ -159,7 +220,11 @@ class ApiTest(unittest.TestCase):
                                                          Standings.GOALS_AGAINST,
                                                          Standings.GOAL_DIFFERENCE]))
 
-    def testPlayerDetails(self):
+    @mock.patch('ingest_engine.fantasy_api.Fantasy.request_player_data')
+    @mock.patch('ingest_engine.fantasy_api.Fantasy.request_base_information')
+    def testPlayerDetails(self, mock_f_players, mock_extra_f_data):
+        mock_f_players.return_value = {"players": f_data}
+        mock_extra_f_data.return_value = extra_f_data
         players = self.driver.request_player_details(f_team_id=1)
         self.assertTrue(len(players) > 0)
         for player in players:
