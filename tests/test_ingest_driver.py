@@ -1,4 +1,3 @@
-import re
 import unittest
 from unittest import mock
 from tests.resources.team_data import f_teams, fls_teams, fd_teams

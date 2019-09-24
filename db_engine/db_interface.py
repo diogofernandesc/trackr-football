@@ -554,9 +554,9 @@ class DBInterface(object):
 
         self.db.session.commit()
 
-if __name__ == "__main__":
-    db = DBInterface()
-    db.update_names()
+# if __name__ == "__main__":
+#     db = DBInterface()
+#     db.update_names()
 
 
 
