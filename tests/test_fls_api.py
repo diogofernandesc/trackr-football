@@ -47,11 +47,4 @@ class ApiTest(unittest.TestCase):
         self.assertTrue(Match.AWAY_FORM in match_details)
         self.assertTrue(Match.PREVIOUS_ENCOUNTERS in match_details)
 
-    def testPlayerDetailsEndpoint(self):
-        player_details = self.fls.request_player_details(team_ids=1)
-        self.assertTrue(len(player_details) > 0)
-        self.assertEqual(self.test_fls.request_player_details(team_ids=1), [])
-        self.assertTrue(Player.NAME in player_details[0])
-
-
 
