@@ -1,7 +1,13 @@
 import flask
+from flask import jsonify
 from flask_sqlalchemy import SQLAlchemy
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
 import os
-
+from api_engine.crud_service import crud_service
+from api_engine.api_service import api_service
+from api_engine.docs_service import docs_service
+from api_engine.ui_service import ui_service, www_ui_service
 from db_engine.db_interface import DBInterface
 
 
@@ -15,15 +21,27 @@ db = SQLAlchemy(application)
 db_interface = DBInterface(db=db)
 application.config['db_interface'] = db_interface
 
-from api_engine.crud_service import crud_service
-from api_engine.api_service import api_service
-from api_engine.docs_service import docs_service
-from api_engine.ui_service import ui_service, www_ui_service
+limiter = Limiter(
+    application,
+    key_func=get_remote_address,
+    default_limits=["200 per day", "100 per hour", "10 per minute"]
+)
+
+application.config['limiter'] = limiter
+
+
 application.register_blueprint(crud_service)  # Adds functionality for handling DB
 application.register_blueprint(api_service)
 application.register_blueprint(docs_service)
 application.register_blueprint(ui_service)
 application.register_blueprint(www_ui_service)
+
+
+@application.errorhandler(429)
+def ratelimit_handler(e):
+    return jsonify({"message": f"Rate limit threshold exceeded: {e.description}",
+                    "status_code": 429})
+
 
 if __name__ == '__main__':
     application.run(host='0.0.0.0', port=5000)

@@ -69,6 +69,28 @@ def get_competition_and_standings():
     return jsonify({"Message": "Nothing to update"})
 
 
+@crud_service.route('/update/standings', methods=['GET'])
+def get_standings():
+    with current_app.app_context():
+        db_interface = current_app.config['db_interface']
+
+    ra = request.args
+    try:
+        if STANDINGS.MATCH_DAY not in ra:
+            raise FilterException
+
+        match_day = int(ra[STANDINGS.MATCH_DAY])
+
+    except (FilterException, ValueError):
+        raise InvalidUsage(API_ERROR.FILTER_PROBLEM_400, status_code=400)
+
+    standings = api_ingest.request_standings(competition_id=2021)
+    update = db_interface.update_standings(match_day=match_day, record=standings)
+    if not update:
+        return jsonify({"Message": "Nothing to update"})
+
+    return jsonify({"Message": "Update successful"})
+
 
 @crud_service.route('/players', methods=['GET'])
 @crud_service.route('/player', methods=['GET'])

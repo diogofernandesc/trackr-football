@@ -456,6 +456,37 @@ class DBInterface(object):
         result = to_json(standings_map, aggregator_name='table', limit=limit)
         return result
 
+    def update_standings(self, match_day, record):
+        """
+        Update standings for the given match_day
+        :param match_day: match_day for standings
+        :return: DB record updated
+        """
+        comp_query = self.db.session.query(Competition).filter(Competition.fd_api_id == 2021)
+        comp = comp_query.first()
+
+        stan_query = self.db.session.query(Standings)\
+            .filter(Standings.match_day == match_day)\
+            .filter(Standings.competition_id == comp.id)
+
+        if not stan_query.count():
+            for stan in record['standings']:
+                table = stan.pop(STANDINGS.TABLE, [])
+                db_standing = Standings(**stan)
+
+                for entry in table:
+                    se = StandingsEntry(**entry)
+                    db_standing.standings_entries.append(se)
+
+                comp.standings.append(db_standing)
+
+            self.db.session.add(comp)
+            self.db.session.commit()
+
+            return True
+
+        return False
+
     def get_match(self, limit: int = 10, multi: bool = False, filters=None) -> dict:
         """
         Query DB for match record
