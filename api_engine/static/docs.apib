@@ -34,7 +34,7 @@ https://api.trackr.football/v1/player?name=digne
 ```
 :::
 
-
+<br/><br/>
 ## Filtering
 The API supports filtering in two ways:
 1. Direct value filter using `?filter_name=filter_value`
@@ -59,6 +59,21 @@ Whereas, `/v1/player/all?fantasy_price=65&fantasy_overall_price_fall=0` will per
 
 
 This can be particularly useful in making efficient use of the API calls made.
+<br/><br/>
+## Rate Limiting
+
+Trackr.football has a global rate limiting for ALL endpoints of:
+- 10 requests per minute
+- 100 requests per hour
+- 200 requests per day
+
+
+:::note
+<p>Attempting to go above these limits will result in a 429 Too many requests response.</p>
+<p>If you think you need more flexible rate limiting please get in touch at: <a href="mailto:diogofernandescon@gmail.com">diogofernandescon@gmail.com</a></p>
+:::
+
+
 <br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
 
 # Group Competition
@@ -113,7 +128,15 @@ https://api.trackr.football/v1/competition?code=PL
             {
                 "message:" "There is no competition with those filters",
                 "status_code": 404
-            }            
+            }
+
++ Response 429 (application/json)
+    + Body
+
+            {
+                "message:" "Rate limit threshold exceeded: {threshold description}",
+                "status_code": 429
+            }
             
             
 
@@ -228,7 +251,14 @@ When specifying a non integer limit
                 "message:" "There is no team with those filters",
                 "status_code": 404
             }                                      
-            
+
++ Response 429 (application/json)
+    + Body
+
+            {
+                "message:" "Rate limit threshold exceeded: {threshold description}",
+                "status_code": 429
+            }
             
     
     
@@ -327,7 +357,15 @@ When specifying a non integer limit
             {
                 "message:" "There is no standings with those filters",
                 "status_code": 404
-            }                             
+            }
+
++ Response 429 (application/json)
+    + Body
+
+            {
+                "message:" "Rate limit threshold exceeded: {threshold description}",
+                "status_code": 429
+            }
             
 # Group Match
 Get data for matches played
@@ -489,7 +527,15 @@ When specifying a non integer limit
             {
                 "message:" "There is no matches with those filters",
                 "status_code": 404
-            } 
+            }
+
++ Response 429 (application/json)
+    + Body
+
+            {
+                "message:" "Rate limit threshold exceeded: {threshold description}",
+                "status_code": 429
+            }
 
 # Group Player
 Get data for different players
@@ -638,7 +684,17 @@ When specifying a non integer limit
             {
                 "message:" "There is no players with those filters",
                 "status_code": 404
-            }                             
+            }
+
++ Response 429 (application/json)
+    + Body
+
+            {
+                "message:" "Rate limit threshold exceeded: {threshold description}",
+                "status_code": 429
+            }
+
+
             
 # Group Stats
 Get match stats for players
@@ -754,4 +810,12 @@ When specifying a non integer limit
             {
                 "message:" "There is no stats with those filters",
                 "status_code": 404
-            }                             
+            }
+
++ Response 429 (application/json)
+    + Body
+
+            {
+                "message:" "Rate limit threshold exceeded: {threshold description}",
+                "status_code": 429
+            }
