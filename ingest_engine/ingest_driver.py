@@ -262,14 +262,14 @@ class Driver(object):
         return f_players_base
 
 
-if __name__ == "__main__":
-    driver = Driver()
-    fls_comp_id = 2
-    fd_comp_id = 2021
-    game_week = 1
-    season = 2019
-    driver.request_match(fls_comp_id=fls_comp_id, fd_comp_id=fd_comp_id,
-                                                         game_week=game_week, season=season)
+# if __name__ == "__main__":
+#     driver = Driver()
+#     fls_comp_id = 2
+#     fd_comp_id = 2021
+#     game_week = 1
+#     season = 2019
+#     driver.request_match(fls_comp_id=fls_comp_id, fd_comp_id=fd_comp_id,
+#                                                          game_week=game_week, season=season)
 
     # print(driver.request_standings(competition_id=2021))
     # print(driver.request_player_details(team_fls_id=1))

@@ -451,8 +451,9 @@ class FootballData(ApiIntegration):
         return data
 
 
-# if __name__ == "__main__":
-#     fd = FootballData(api_key=os.getenv("FOOTBALL_DATA_API_KEY"))
+if __name__ == "__main__":
+    fd = FootballData(api_key=os.getenv("FOOTBALL_DATA_API_KEY"))
+    fd.request_competition_standings(competition_id=2002)
     # print(fd.request_competition_standings(competition_id=2002))
     # print(fd.request_competition_standings(competition_id=2002))
     # fd.request_competition_scorers(competition_id=2002)
