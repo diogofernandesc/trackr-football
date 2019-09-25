@@ -11,10 +11,6 @@ api_service = Blueprint('api_service', __name__, template_folder='templates', ur
 api_ingest = Driver()
 logging.basicConfig(format='%(asctime)s - %(message)s', level=logging.INFO)
 
-# db = SQLAlchemy(app)
-# db_interface = DBInterface(db=db)
-# Logging using app.logger.debug/warning/error
-
 
 def get_vals(v):
     """
