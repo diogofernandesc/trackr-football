@@ -20,13 +20,13 @@ db = SQLAlchemy(application)
 db_interface = DBInterface(db=db)
 application.config['db_interface'] = db_interface
 
-limiter = Limiter(
-    application,
-    key_func=get_remote_address)
-
-application.config['limiter'] = limiter
-
-limiter.limit("200/day;100/hour;10/minute")(api_service)
+# limiter = Limiter(
+#     application,
+#     key_func=get_remote_address)
+#
+# application.config['limiter'] = limiter
+#
+# limiter.limit("200/day;100/hour;10/minute")(api_service)
 
 
 application.register_blueprint(crud_service)  # Adds functionality for handling DB
