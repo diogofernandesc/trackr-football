@@ -1,6 +1,5 @@
-from datetime import datetime, timedelta
 from itertools import filterfalse
-
+from datetime import datetime as dt, timedelta
 import unidecode
 
 from ingest_engine.football_data import FootballData
@@ -12,7 +11,9 @@ from ingest_engine.cons import FLSApiFilters as flsf
 from Levenshtein import ratio
 import re
 import os
+import logging
 
+logging.basicConfig(format='%(asctime)s - %(message)s', level=logging.INFO)
 
 def str_comparator(str1, str2):
     """
@@ -128,7 +129,7 @@ class Driver(object):
         fd_matches = self.fd.request_competition_match(competition_id=fd_comp_id,
                                                        **{fdf.MATCHDAY: game_week, fdf.SEASON: season})
 
-        game_week_start = datetime.strptime(fd_matches[0][Match.MATCH_UTC_DATE], '%Y-%m-%dT%H:%M:%SZ')
+        game_week_start = dt.strptime(fd_matches[0][Match.MATCH_UTC_DATE], '%Y-%m-%dT%H:%M:%SZ')
         game_week_end = game_week_start + timedelta(days=4)  # 4 days per game week
         fls_matches = self.fls.request_matches(**{flsf.FROM_DATETIME: game_week_start,
                                                   flsf.TO_DATETIME: game_week_end})
@@ -136,7 +137,9 @@ class Driver(object):
         fls_matches = list(filterfalse(lambda x: x[Match.FLS_API_COMPETITION_ID] != fls_comp_id, fls_matches))
 
         for match in fd_matches:
-            match_start_datetime = match[Match.MATCH_UTC_DATE]
+            logging.info(match[Match.MATCH_UTC_DATE])
+            match_start_datetime = dt.strptime(match[Match.MATCH_UTC_DATE], '%Y-%m-%dT%H:%M:%SZ') + timedelta(hours=2)
+            match_start_datetime = dt.strftime(match_start_datetime, '%Y-%d-%mT%H:%M:%SZ')
             home_team = match[Match.HOME_TEAM]
             away_team = match[Match.AWAY_TEAM]
             home_score = match[Match.FULL_TIME_HOME_SCORE]
@@ -151,7 +154,9 @@ class Driver(object):
                     for f_match in fantasy_matches:
                         f_home_team = self.fantasy.name_to_id(f_match[Match.FANTASY_HOME_TEAM_ID])
                         f_away_team = self.fantasy.name_to_id(f_match[Match.FANTASY_AWAY_TEAM_ID])
-                        if f_match[Match.START_TIME] == match_start_datetime:
+                        parsed_date = dt.strftime(dt.strptime(f_match[Match.START_TIME], '%Y-%m-%dT%H:%M:%SZ'),
+                                                  '%Y-%d-%mT%H:%M:%SZ')
+                        if parsed_date == match_start_datetime:
                             if f_home_team in home_team and f_away_team in away_team and \
                                     home_score == f_match[Match.FULL_TIME_HOME_SCORE] and \
                                     away_score == f_match[Match.FULL_TIME_AWAY_SCORE]:

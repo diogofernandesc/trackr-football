@@ -7,6 +7,7 @@ from ingest_engine.cons import Competition as COMPETITION, Standings as STANDING
 from api_engine.api_cons import API_ENDPOINTS, API, API_ERROR, DB_QUERY_FIELD
 
 
+
 class ApiInterfaceTest(unittest.TestCase):
     def setUp(self):
         application.config["SERVER_NAME"] = "localhost:5000"
@@ -14,7 +15,6 @@ class ApiInterfaceTest(unittest.TestCase):
         limiter.enabled = False
         self.api = application.test_client()
         self.api.testing = True
-
 
     def tearDown(self):
         pass

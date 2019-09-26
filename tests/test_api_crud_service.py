@@ -2,6 +2,9 @@ import unittest
 from flask_run import application
 from ingest_engine.cons import Match as MATCH, Team as TEAM, Player as PLAYER
 from api_engine.api_cons import API, API_ERROR
+import logging
+
+logging.basicConfig(format='%(asctime)s - %(message)s', level=logging.INFO)
 
 
 class ApiInterfaceTest(unittest.TestCase):
@@ -20,7 +23,9 @@ class ApiInterfaceTest(unittest.TestCase):
         # comp_fls_id = 2
 
         single_result = self.api.get('http://api.localhost:5000/v1/db/match?match_day=1').get_json()
+        logging.info(single_result)
         for match in single_result:
+            logging.info(match)
             self.assertTrue(all(k in match for k in (MATCH.FOOTBALL_DATA_ID,
                                                      MATCH.FLS_MATCH_ID,
                                                      MATCH.FLS_API_COMPETITION_ID,
@@ -30,9 +35,6 @@ class ApiInterfaceTest(unittest.TestCase):
             self.assertEqual(match[MATCH.MATCHDAY], 1)
             self.assertIsInstance(match, dict)
 
-        filter_result = self.api.get('http://api.localhost:5000/v1/db/match?id=-1').get_json()
-        self.assertEqual(filter_result[API.MESSAGE], API_ERROR.MATCH_404)
-        self.assertEqual(filter_result[API.STATUS_CODE], 404)
 
     def testCrudDBTeamUrl(self):
         all_result = self.api.get('http://api.localhost:5000/v1/db/teams?limit=4', follow_redirects=True).get_json()

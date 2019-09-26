@@ -205,8 +205,8 @@ def get_match() -> dict:
     # comp_filters = CompFilters(**{k: get_vals(v) for k, v in ra.items()})
     # comp = db_interface.get_competition(multi=False, filters=comp_filters)
 
-    if not multi and MATCH.ID in ra:
-        raise InvalidUsage(API_ERROR.MATCH_404, status_code=404)
+    # if not multi and MATCH.ID in ra:
+    #     raise InvalidUsage(API_ERROR.MATCH_404, status_code=404)
 
     matches = api_ingest.request_match(fls_comp_id=comp_fls_id,
                                        fd_comp_id=comp_fd_id,
