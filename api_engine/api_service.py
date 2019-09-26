@@ -94,6 +94,12 @@ def base():
     })
 
 
+@api_service.errorhandler(429)
+def ratelimit_handler(e):
+    return jsonify({"message": f"Rate limit threshold exceeded: {e.description}",
+                    "status_code": 429})
+
+
 @api_service.errorhandler(InvalidUsage)
 def handle_invalid_usage(error):
     """
