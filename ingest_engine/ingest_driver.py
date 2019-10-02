@@ -126,8 +126,10 @@ class Driver(object):
 
         joint_matches = []
         fantasy_matches = self.fantasy.request_matches()
+        fantasy_matches = list(filter(lambda x: x[Match.FANTASY_GAME_WEEK] == int(game_week), fantasy_matches))
         fd_matches = self.fd.request_competition_match(competition_id=fd_comp_id,
                                                        **{fdf.MATCHDAY: game_week, fdf.SEASON: season})
+
 
         game_week_start = dt.strptime(fd_matches[0][Match.MATCH_UTC_DATE], '%Y-%m-%dT%H:%M:%SZ')
         game_week_end = game_week_start + timedelta(days=4)  # 4 days per game week
@@ -137,8 +139,7 @@ class Driver(object):
         fls_matches = list(filterfalse(lambda x: x[Match.FLS_API_COMPETITION_ID] != fls_comp_id, fls_matches))
 
         for match in fd_matches:
-            logging.info(match[Match.MATCH_UTC_DATE])
-            match_start_datetime = dt.strptime(match[Match.MATCH_UTC_DATE], '%Y-%m-%dT%H:%M:%SZ') + timedelta(hours=2)
+            match_start_datetime = dt.strptime(match[Match.MATCH_UTC_DATE], '%Y-%m-%dT%H:%M:%SZ')
             match_start_datetime = dt.strftime(match_start_datetime, '%Y-%d-%mT%H:%M:%SZ')
             home_team = match[Match.HOME_TEAM]
             away_team = match[Match.AWAY_TEAM]
