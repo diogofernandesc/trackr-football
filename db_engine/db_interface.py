@@ -1,7 +1,9 @@
 from typing import Union
 import logging
 import unidecode as unidecode
-from sqlalchemy import or_, func
+from sqlalchemy import or_, func, engine
+from sqlalchemy.orm import sessionmaker
+
 from db_engine.db_driver import Competition, Team, Standings, StandingsEntry, Match, Player, MatchStats, FantasyWeekStats
 from ingest_engine.cons import IGNORE, Team as TEAM, Standings as STANDINGS, Competition as COMPETITION, Match as MATCH,\
     Player as PLAYER, MatchEvent as MATCH_EVENT
@@ -96,6 +98,10 @@ class DBInterface(object):
 
     def __init__(self, db):
         self.db = db
+        # When using create_engine() directly, not via Flask
+        if isinstance(db, engine.base.Engine):
+            pg_session = sessionmaker(bind=db)
+            self.db.session = pg_session()
 
     def update_names(self):
         """
@@ -113,24 +119,26 @@ class DBInterface(object):
 
             self.db.session.commit()
 
-    def get_last_game_week(self, filters) -> int:
+    def get_last_game_week(self, filters=None, table=Standings) -> int:
         """
         Get the latest game week
         :return: int indicator
         """
-        base_standings_filters = []
-        bs_query = self.db.session.query(func.max(Standings.match_day))
+        base_filters = []
+        active_filters = []
+        bs_query = self.db.session.query(func.max(table.match_day))
 
-        if isinstance(filters, list):
-            active_filters = filters
-        else:
-            active_filters = [(f, v) for f, v in filters._asdict().items() if v]
+        if filters:
+            if isinstance(filters, list):
+                active_filters = filters
+            else:
+                active_filters = [(f, v) for f, v in filters._asdict().items() if v]
 
         for filter_ in active_filters:
             for filter_val in filter_[1]:
-                base_standings_filters.append(Standings.__table__.c[filter_[0]] == filter_val)
+                base_filters.append(table.__table__.c[filter_[0]] == filter_val)
 
-        return bs_query.filter(*base_standings_filters).scalar()
+        return bs_query.filter(*base_filters).scalar()
 
     def get_competition(self, limit: int= 1, multi=False, filters=None):
         """
@@ -460,6 +468,7 @@ class DBInterface(object):
         """
         Update standings for the given match_day
         :param match_day: match_day for standings
+        :param
         :return: DB record updated
         """
         comp_query = self.db.session.query(Competition).filter(Competition.fd_api_id == 2021)
