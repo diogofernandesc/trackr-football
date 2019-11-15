@@ -10,7 +10,7 @@ from api_engine.ui_service import ui_service, www_ui_service
 
 application = flask.Flask(__name__, subdomain_matching=True)
 application.config['DEBUG'] = True
-application.config["SERVER_NAME"] = "localhost:5000"
+application.config["SERVER_NAME"] = "trackr.football"
 application.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('POSTGRES_CONNECTION_STR')
 application.config['JSON_AS_ASCII'] = False
 application.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
