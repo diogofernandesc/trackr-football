@@ -62,7 +62,10 @@ def to_json(result_map, aggregator_name, limit=10):
         for k, v in result_map.items():
             dict_result = k.__dict__
             dict_result.pop(IGNORE.INSTANCE_STATE, None)
-            dict_result[aggregator_name] = clean_output(v, as_list=True)
+            if aggregator_name == PLAYER.WEEK_STATS:
+                dict_result[aggregator_name] = clean_output(v, as_list=True, limit=38)
+            else:
+                dict_result[aggregator_name] = clean_output(v, as_list=True)
             list_dict_result.append(dict_result)
 
     if len(list_dict_result) == 1:
@@ -265,7 +268,7 @@ class DBInterface(object):
             if week_stat:
                 player_week_stat_map[player].append(week_stat)
 
-        result = to_json(player_week_stat_map, aggregator_name=PLAYER.WEEK_STATS, limit=limit)
+        result = to_json(player_week_stat_map, aggregator_name=PLAYER.WEEK_STATS)
         return result
 
     def insert_player(self, record: Union[list, dict]):
