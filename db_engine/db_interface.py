@@ -451,9 +451,11 @@ class DBInterface(object):
         db_filters = db_filters[1:]
 
         if multi:
-            stan_query = stan_query.filter(comp_filter).filter(or_(*db_filters)).limit(100).all()
+            stan_query = stan_query.filter(comp_filter).filter(or_(*db_filters))\
+                .order_by(Standings.match_day.desc()).limit(100).all()
         else:
-            stan_query = stan_query.filter(*db_filters).limit(100).all()  # no standings will have more than 100 entries
+            # no standings will have more than 100 entries
+            stan_query = stan_query.filter(*db_filters).order_by(Standings.match_day.desc()).limit(100).all()
         standings_map = {}
 
         # Reformatting dict to get standings in list per comp as "standing_entries" field
