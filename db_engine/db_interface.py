@@ -599,6 +599,22 @@ class DBInterface(object):
 
         self.db.session.commit()
 
+    def insert_tweets(self, tweets: Union[list, dict]):
+        """
+        Inserts a tweet record(s)
+        :param tweets: dict of tweet or list of tweets to insert
+        :return:
+        """
+        if isinstance(tweets, dict):
+            tweets = [tweets]
+
+        for tweet in tweets:
+            pass
+            # tweet_query = self.db.session.query(Tweet).filter()
+
+
+
+
 # if __name__ == "__main__":
 #     db = DBInterface()
 #     db.update_names()
