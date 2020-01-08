@@ -37,7 +37,7 @@ def main():
         # api.GetStreamFilter will return a generator that yields one status
         # message (i.e., Tweet) at a time as a JSON dictionary.
         for line in api.GetStreamFilter(track=USERS, languages=LANGUAGES):
-            if 'extended_tweet' in line:
+            if 'extended_tweet' in line or not line['text'].endswith('...'):
                 f.write(line['extended_tweet']['full_text'])
                 f.write('\n')
 
