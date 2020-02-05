@@ -53,7 +53,7 @@ class WeeklyIngest(object):
 
 
 if __name__ == "__main__":
-    db = create_engine(os.getenv('POSTGRES_CREDENTIALS'))
+    db = create_engine(os.getenv('POSTGRES_CREDS'))
     ingest = WeeklyIngest(db=db)
     ingest.ingest_standings()
     ingest.ingest_matches()

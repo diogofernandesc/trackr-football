@@ -65,7 +65,7 @@ def to_json(result_map, aggregator_name, limit=10):
             if aggregator_name == PLAYER.WEEK_STATS:
                 dict_result[aggregator_name] = clean_output(v, as_list=True, limit=38)
             else:
-                dict_result[aggregator_name] = clean_output(v, as_list=True)
+                dict_result[aggregator_name] = clean_output(v, as_list=True, limit=limit)
             list_dict_result.append(dict_result)
 
     if len(list_dict_result) == 1:
@@ -411,7 +411,7 @@ class DBInterface(object):
 
                 self.db.session.commit()
 
-    def get_standings(self, limit=10, multi=False, filters=None):
+    def get_standings(self, limit=20, multi=False, filters=None):
         """
         Query DB for standings records
         :param limit: Due to how heavy standings are, default amount of standings to 10, unless otherwise changed
@@ -452,10 +452,10 @@ class DBInterface(object):
 
         if multi:
             stan_query = stan_query.filter(comp_filter).filter(or_(*db_filters))\
-                .order_by(Standings.match_day.desc()).limit(100).all()
+                .order_by(Standings.match_day.desc()).limit(60).all()
         else:
             # no standings will have more than 100 entries
-            stan_query = stan_query.filter(*db_filters).order_by(Standings.match_day.desc()).limit(100).all()
+            stan_query = stan_query.filter(*db_filters).order_by(Standings.match_day.desc()).limit(60).all()
         standings_map = {}
 
         # Reformatting dict to get standings in list per comp as "standing_entries" field

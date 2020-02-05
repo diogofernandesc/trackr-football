@@ -20,6 +20,7 @@ class API_ERROR:
     FILTER_PROBLEM_400 = 'Invalid filter applied'
     MISSING_FILTER_400 = 'You have not specified a filter to this endpoint'
     RESOURCE_NOT_FOUND_404 = "The resource you're looking for could not be found"
+    STANDINGS_MAX_LIMIT_400 = 'Invalid limit, the limit per table is 20'
 
 
 class API_ENDPOINTS:

@@ -7,7 +7,6 @@ from ingest_engine.cons import Competition as COMPETITION, Standings as STANDING
 from api_engine.api_cons import API_ENDPOINTS, API, API_ERROR, DB_QUERY_FIELD
 
 
-
 class ApiInterfaceTest(unittest.TestCase):
     def setUp(self):
         application.config["SERVER_NAME"] = "localhost:5000"
@@ -77,7 +76,8 @@ class ApiInterfaceTest(unittest.TestCase):
                         self.assertGreaterEqual(entry[filter_str], filter_val)
 
         all_result = self.api.get('http://api.localhost:5000/v1/standings/all').get_json()
-        self.assertTrue(len(all_result), 10)
+        self.assertEqual(len(all_result), 3)
+
         for result in all_result:
             self.assertTrue(all(k in result for k in (STANDINGS.ID,
                                                       STANDINGS.COMPETITION_ID,
@@ -85,6 +85,7 @@ class ApiInterfaceTest(unittest.TestCase):
                                                       STANDINGS.SEASON,
                                                       STANDINGS.MATCH_DAY)))
 
+            self.assertEqual(len(result[STANDINGS.TABLE]), 20)
             for entry in result[STANDINGS.TABLE]:
                 self.assertTrue(STANDINGS.ID in entry)
                 self.assertTrue(STANDINGS.STANDINGS_ID in entry)
@@ -117,6 +118,10 @@ class ApiInterfaceTest(unittest.TestCase):
         filter_result = self.api.get('http://api.localhost:5000/v1/standings?id=1&limit=astring').get_json()
         self.assertEqual(filter_result[API.MESSAGE], API_ERROR.INTEGER_LIMIT_400)
         self.assertEqual(filter_result[API.STATUS_CODE], 400)
+
+        limit_result = self.api.get('http://api.localhost:5000/v1/standings?limit=33').get_json()
+        self.assertEqual(limit_result[API.MESSAGE], API_ERROR.STANDINGS_MAX_LIMIT_400)
+        self.assertEqual(limit_result[API.STATUS_CODE], 400)
 
     def testDBMatchUrl(self):
         # Whilst API is PL only
