@@ -1,14 +1,14 @@
 import os
 import json
+import re
 from twitter import Api
+from textblob import TextBlob
+from nltk.corpus import stopwords
+from rake_nltk import Rake
 
-CONSUMER_KEY = 'FEX1vMnNmTl7OULEgdRF9BcEL'
 # CONSUMER_KEY = os.getenv("CONSUMER_KEY", None)
-CONSUMER_SECRET = 'oottsceTK4vbjYceigB4frHI8DNBffztDHH2rt9Xt743BxQW4k'
 # CONSUMER_SECRET = os.getenv("CONSUMER_SECRET", None)
-ACCESS_TOKEN = '212721420-9RvBPYn9uTj5GOHQM9DB7zAdSpMvV3dEaj2muG3R'
 # ACCESS_TOKEN = os.getenv("ACCESS_TOKEN", None)
-ACCESS_TOKEN_SECRET = '8bBK5BfiruvIPpghxUlfzV1iaDHrW2CngN2cyz5oaoSBu'
 # ACCESS_TOKEN_SECRET = os.getenv("ACCESS_TOKEN_SECRET", None)
 
 # Users to watch for should be a list. This will be joined by Twitter and the
@@ -17,7 +17,7 @@ ACCESS_TOKEN_SECRET = '8bBK5BfiruvIPpghxUlfzV1iaDHrW2CngN2cyz5oaoSBu'
 #USERS = ['@twitter',
  #        '@twitterapi',
   #       '@support']
-USERS = ['Kane', 'Mourinho']
+USERS = ['Trump']
 
 # Languages to filter tweets by is a list. This will be joined by Twitter
 # to return data mentioning tweets only in the english language.
@@ -42,5 +42,40 @@ def main():
                 f.write('\n')
 
 
+def twitter_test():
+    r = Rake()
+    tweet_count = 0
+    overall_sentiment = 0
+    noun_phrases = []
+    tags = []
+    for streamed_tweet in api.GetStreamFilter(track=USERS, languages=LANGUAGES):
+        if 'retweeted_status' not in streamed_tweet:
+            if 'extended_tweet' in streamed_tweet:
+                tweet = streamed_tweet['extended_tweet']['full_text']
+            else:
+                if 'text' in streamed_tweet:
+                    tweet = streamed_tweet['text']
+
+            # Clean tweet:
+            regex_remove = "(@[A-Za-z0-9]+)|([^0-9A-Za-z \t])|&amp;|amp|(\w+:\/\/\S+)|^RT|http.+?"
+            tweet = re.sub(regex_remove, '', tweet).strip()
+            # tweet = " ".join(word for word in tweet.split() if word not in stopwords.words('english'))
+            tweet_blob = TextBlob(tweet)
+            sentiment = tweet_blob.sentiment.polarity
+            print(tweet)
+            print(sentiment)
+            result = r.extract_keywords_from_text(text=tweet)
+            if result:
+                print(result)
+            print("------------------")
+            tweet_count += 1
+            overall_sentiment += sentiment
+
+
+        if tweet_count == 100:
+            print(tweet_count)
+            print(overall_sentiment)
+            break
+
 if __name__ == '__main__':
-    main()
+    twitter_test()

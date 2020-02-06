@@ -9,3 +9,5 @@ orjson
 unidecode
 flask-limiter
 python-twitter
+textblob
+rake-nltk
