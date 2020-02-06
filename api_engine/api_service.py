@@ -208,12 +208,15 @@ def standings():
         db_interface = current_app.config['db_interface']
     multi = 'standings/all' in request.url_rule.rule
     ra = request.args
-    limit = ra.get("limit", 10)
+    limit = ra.get("limit", 20)
     result = {}
     try:
         limit = int(limit)
     except ValueError:
         raise InvalidUsage(API_ERROR.INTEGER_LIMIT_400, status_code=400)
+
+    if limit > 20:
+        raise InvalidUsage(API_ERROR.STANDINGS_MAX_LIMIT_400, status_code=400)
 
     try:
         comp_filters = CompFilters(**{k: get_vals(v) for k, v in

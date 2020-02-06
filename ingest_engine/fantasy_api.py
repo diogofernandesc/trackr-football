@@ -275,7 +275,7 @@ class Fantasy(ApiIntegration):
                     Player.FANTASY_WEEK: current_game_week
                 }
 
-                if 'ep_this' in player:  # Is there a value for estimated points for next week
+                if 'ep_this' in player and player['ep_this']:  # Is there a value for estimated points for next week
                     player_dict[Player.FANTASY_ESTIMATED_WEEK_POINTS] = float(player['ep_this'])
 
                 players.append(player_dict)
