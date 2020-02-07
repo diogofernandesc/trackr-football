@@ -2,6 +2,7 @@ import flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
+from flask_cors import CORS
 import os
 from db_engine.db_interface import DBInterface
 from api_engine.api_service import api_service
@@ -9,7 +10,7 @@ from api_engine.docs_service import docs_service
 from api_engine.ui_service import ui_service, www_ui_service
 
 application = flask.Flask(__name__, subdomain_matching=True)
-application.config['DEBUG'] = True
+application.config['DEBUG'] = False
 application.config["SERVER_NAME"] = "trackr.football"
 application.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('POSTGRES_CONNECTION_STR')
 application.config['JSON_AS_ASCII'] = False
@@ -18,6 +19,7 @@ db = SQLAlchemy(application)
 db_interface = DBInterface(db=db)
 application.config['db_interface'] = db_interface
 
+CORS(application)
 limiter = Limiter(
     application,
     key_func=get_remote_address)

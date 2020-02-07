@@ -19,9 +19,14 @@ import {
   Progress,
   Row,
   Table,
+  FormGroup,
+  InputGroup,
+  InputGroupAddon,
+  Input
 } from 'reactstrap';
 import { CustomTooltips } from '@coreui/coreui-plugin-chartjs-custom-tooltips';
 import { getStyle, hexToRgba } from '@coreui/coreui/dist/js/coreui-utilities'
+import Player from '../../api_components/player';
 
 const Widget03 = lazy(() => import('../../views/Widgets/Widget03'));
 
@@ -462,6 +467,7 @@ class Dashboard extends Component {
     this.state = {
       dropdownOpen: false,
       radioSelected: 2,
+      player: {},
     };
   }
 
@@ -469,6 +475,16 @@ class Dashboard extends Component {
     this.setState({
       dropdownOpen: !this.state.dropdownOpen,
     });
+  }
+
+  // Retrieve test player data from trackr API
+  componentDidMount() {
+    fetch('http://api.localhost:5000/v1/player?name=kane')
+    .then(res => res.json())
+    .then((data) => {
+      this.setState({ player: data})
+    })
+    .catch(console.log)
   }
 
   onRadioBtnClick(radioSelected) {
@@ -485,7 +501,20 @@ class Dashboard extends Component {
       <div className="animated fadeIn">
         <Row>
           <Col xs="12" sm="6" lg="3">
-            <Card className="text-white bg-info">
+              <FormGroup>
+                <InputGroup>
+                  <InputGroupAddon addonType="prepend">
+                    <Button type="button" color="primary"><i className="fa fa-search"></i></Button>
+                  </InputGroupAddon>
+                  <Input type="text" id="input1-group1" name="input1-group1" placeholder="Find a player or team" />
+                </InputGroup>
+            </FormGroup>
+          </Col>
+        </Row>
+        <Row>
+          <Col xs="12" sm="6" lg="3">
+            <Player player={this.state.player} />
+            {/* <Card className="text-white bg-info">
               <CardBody className="pb-0">
                 <ButtonGroup className="float-right">
                   <ButtonDropdown id='card1' isOpen={this.state.card1} toggle={() => { this.setState({ card1: !this.state.card1 }); }}>
@@ -506,7 +535,7 @@ class Dashboard extends Component {
               <div className="chart-wrapper mx-3" style={{ height: '70px' }}>
                 <Line data={cardChartData2} options={cardChartOpts2} height={70} />
               </div>
-            </Card>
+            </Card> */}
           </Col>
 
           <Col xs="12" sm="6" lg="3">
