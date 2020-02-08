@@ -473,7 +473,7 @@ class Dashboard extends Component {
     this.state = {
       dropdownOpen: false,
       radioSelected: 2,
-      player: {"number_of_goals": 0},
+      player: {"number_of_goals": 0, "week_stats": [{"fantasy_selection_count":0}]},
       search: "kane",
       query: ""
     };
@@ -481,22 +481,21 @@ class Dashboard extends Component {
 
 
   getPlayer = async() => {
-    console.log("REQUEST WITH QUERY:")
-    console.log(this.state.search);
+    console.log("request")
     const response = await fetch(
       `http://api.localhost:5000/v1/player?name=${this.state.search}`
     );
     const data = await response.json();
     this.setState({player: data});
     // this.player = data;
-    console.log(data);
+    console.log("player in getPlayer:");
+    console.log(this.state.player);
 
   }
 
   updateSearch = e => {
     this.setState({search: e.target.value});
     // this.search = e.target.value;
-    console.log(this.state.search);
   }
 
   getSearch = e => {
@@ -532,11 +531,10 @@ class Dashboard extends Component {
   // Retrieve test player data from trackr API
  
   componentDidMount() {
-    this.getPlayer();
+    // this.getPlayer();
+    // Player.setState({'player': this.state.player});
     this.setState({search: ''})
 
-    console.log("when mounting this is the name")
-    console.log(this.state.query)
     // this.getPlayer();
 
     // this.performQuery("");
@@ -553,6 +551,12 @@ class Dashboard extends Component {
     this.setState({
       radioSelected: radioSelected,
     });
+  }
+
+  onChangePlayer(newPlayer) {
+    this.setState({
+      player: newPlayer
+    })
   }
 
   loading = () => <div className="animated fadeIn pt-1 text-center">Loading...</div>
@@ -590,7 +594,7 @@ class Dashboard extends Component {
           </Col> */}
 
           {/* Player info here */}
-          <Player player={this.state.player} />
+          <Player player_data={this.state.player} />
           <Col xs="24" sm="12" lg="6">
             <Card className="text-black ">
               <CardBody className="pb-0">
@@ -688,7 +692,7 @@ class Dashboard extends Component {
                     </DropdownMenu>
                   </Dropdown>
                 </ButtonGroup>
-                <div className="text-value">9.823</div>
+                <div className="text-value">9.824</div>
                 <div>Members online</div>
               </CardBody>
               <div className="chart-wrapper mx-3" style={{ height: '70px' }}>
@@ -712,7 +716,7 @@ class Dashboard extends Component {
                     </DropdownMenu>
                   </Dropdown>
                 </ButtonGroup>
-                <div className="text-value">9.823</div>
+                <div className="text-value">9.825</div>
                 <div>Members online</div>
               </CardBody>
               <div className="chart-wrapper" style={{ height: '70px' }}>
@@ -736,7 +740,7 @@ class Dashboard extends Component {
                     </DropdownMenu>
                   </ButtonDropdown>
                 </ButtonGroup>
-                <div className="text-value">9.823</div>
+                <div className="text-value">9.826</div>
                 <div>Members online</div>
               </CardBody>
               <div className="chart-wrapper mx-3" style={{ height: '70px' }}>
