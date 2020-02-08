@@ -82,34 +82,82 @@ const cardChartData2 = {
   };
 
 
-
-
 const Player = ({ player }) => {
     return (
-        <div>
-            <Card className="text-white bg-info">
-              <CardBody className="pb-0">
-                <ButtonGroup className="float-right">
-                  {/* <ButtonDropdown id='card1' isOpen={this.state.card1} toggle={() => { this.setState({ card1: !this.state.card1 }); }}>
-                    <DropdownToggle caret className="p-0" color="transparent">
-                      <i className="icon-settings"></i>
-                    </DropdownToggle>
-                    <DropdownMenu right>
-                      <DropdownItem>Action</DropdownItem>
-                      <DropdownItem>Another action</DropdownItem>
-                      <DropdownItem disabled>Disabled action</DropdownItem>
-                      <DropdownItem>Something else here</DropdownItem>
-                    </DropdownMenu>
-                  </ButtonDropdown> */}
-                </ButtonGroup>
-                <div className="text-value">{player.number_of_goals}</div>
-                <div>Number of goals</div>
-              </CardBody>
-              <div className="chart-wrapper mx-3" style={{ height: '70px' }}>
-                <Line data={cardChartData2} options={cardChartOpts2} height={70} />
-              </div>
+        <React.Fragment>
+        <Col xs="12" sm="6" lg="3">
+            <Card className="text-white ">
+                <CardBody >
+                {/* https://resources.premierleague.com/premierleague/photos/players/250x250/p78830.png */}
+                    <img src={`https://resources.premierleague.com/premierleague/photos/players/250x250/p${player.photo_url}`} width='100%' height='auto' alt="admin@bootstrapmaster.com" />
+                </CardBody>
+            </Card> 
+        </Col>
+        
+        <Col xs="24" sm="12" lg="3">
+            <Card className="text-black ">
+                <CardBody className="pb-0">
+                    <div className="progress-group">
+                        <div className="progress-group-header">
+                        {/* <i className="icon-user progress-group-icon"></i> */}
+                        <span className="title">Name</span>
+                        <span className="ml-auto font-weight-bold">{player.name}</span>
+                        </div>
+                        <div className="progress-group-bars">
+                        <Progress className="progress-xs" color="warning" value="0" />
+                        </div>
+                    </div>
+                    <div className="progress-group">
+                        <div className="progress-group-header">
+                        {/* <i className="icon-user progress-group-icon"></i> */}
+                        <span className="title">Club</span>
+                        <span className="ml-auto font-weight-bold">{player.team}</span>
+                        </div>
+                        <div className="progress-group-bars">
+                        <Progress className="progress-xs" color="warning" value="0" />
+                        </div>
+                    </div>
+                    <div className="progress-group">
+                        <div className="progress-group-header">
+                        {/* <i className="icon-user progress-group-icon"></i> */}
+                        <span className="title">Nationality</span>
+                        <span className="ml-auto font-weight-bold">{player.nationality}</span>
+                        </div>
+                        <div className="progress-group-bars">
+                        <Progress className="progress-xs" color="warning" value="0" />
+                        </div>
+                    </div>
+                    <div className="progress-group">
+                        <div className="progress-group-header">
+                        {/* <i className="icon-user progress-group-icon"></i> */}
+                        <span className="title">Position</span>
+                        <span className="ml-auto font-weight-bold">{player.position}</span>
+                        </div>
+                        <div className="progress-group-bars">
+                        <Progress className="progress-xs" color="warning" value="0" />
+                        </div>
+                    </div>
+                    <div className="progress-group">
+                        <div className="progress-group-header">
+                        {/* <i className="icon-user progress-group-icon"></i> */}
+                        <span className="title">Fantasy price</span>
+                        <span className="ml-auto font-weight-bold">{player.fantasy_price}</span>
+                        </div>
+                        <div className="progress-group-bars">
+                        <Progress className="progress-xs" color="warning" value="0" />
+                        </div>
+                    </div>
+                    <div className="progress-group">
+                        <div className="progress-group-header">
+                        {/* <i className="icon-user progress-group-icon"></i> */}
+                        <span className="title">Fantasy selection %</span>
+                        <span className="ml-auto font-weight-bold">{player.fantasy_selection_percentage}</span>
+                        </div>
+                    </div>
+                </CardBody>
             </Card>
-        </div>
+        </Col>
+        </React.Fragment>
     )
 }
 

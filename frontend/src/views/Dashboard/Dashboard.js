@@ -457,19 +457,71 @@ const mainChartOpts = {
   },
 };
 
+
+
 class Dashboard extends Component {
   constructor(props) {
     super(props);
 
     this.toggle = this.toggle.bind(this);
+    this.getPlayer = this.getPlayer.bind(this);
+    this.updateSearch = this.updateSearch.bind(this);
+    this.getSearch = this.getSearch.bind(this);
+
     this.onRadioBtnClick = this.onRadioBtnClick.bind(this);
 
     this.state = {
       dropdownOpen: false,
       radioSelected: 2,
-      player: {},
+      player: {"number_of_goals": 0},
+      search: "kane",
+      query: ""
     };
   }
+
+
+  getPlayer = async() => {
+    console.log("REQUEST WITH QUERY:")
+    console.log(this.state.search);
+    const response = await fetch(
+      `http://api.localhost:5000/v1/player?name=${this.state.search}`
+    );
+    const data = await response.json();
+    this.setState({player: data});
+    // this.player = data;
+    console.log(data);
+
+  }
+
+  updateSearch = e => {
+    this.setState({search: e.target.value});
+    // this.search = e.target.value;
+    console.log(this.state.search);
+  }
+
+  getSearch = e => {
+    e.preventDefault();
+    // this.setState({query: this.state.search})
+    this.getPlayer();
+    this.setState({search: ''})
+    // this.query = this.search;
+  }
+
+  
+ 
+
+  
+  // performQuery = e => {
+  //   e.preventDefault();
+  //   console.log(this.search_query)
+  //   const url = `http://api.localhost:5000/v1/player?name=${this.search_query}`;
+
+  //   fetch(url)
+  //     .then(results => results.json())
+  //     .then(data => {
+  //         this.setState({ player: data });
+  //     })
+  // }
 
   toggle() {
     this.setState({
@@ -478,14 +530,24 @@ class Dashboard extends Component {
   }
 
   // Retrieve test player data from trackr API
+ 
   componentDidMount() {
-    fetch('http://api.localhost:5000/v1/player?name=kane')
-    .then(res => res.json())
-    .then((data) => {
-      this.setState({ player: data})
-    })
-    .catch(console.log)
+    this.getPlayer();
+    this.setState({search: ''})
+
+    console.log("when mounting this is the name")
+    console.log(this.state.query)
+    // this.getPlayer();
+
+    // this.performQuery("");
+    // fetch('http://api.localhost:5000/v1/player?name=kane')
+    // .then(res => res.json())
+    // .then((data) => {
+    //   this.setState({ player: data})
+    // })
+    // .catch(console.log)
   }
+
 
   onRadioBtnClick(radioSelected) {
     this.setState({
@@ -500,20 +562,93 @@ class Dashboard extends Component {
     return (
       <div className="animated fadeIn">
         <Row>
-          <Col xs="12" sm="6" lg="3">
-              <FormGroup>
+          <Col></Col>
+          <Col></Col>
+          <Col></Col>
+          <Col xs="12" sm="6" lg="4">
+            <form onSubmit={this.getSearch}> 
+              <FormGroup role="form">
                 <InputGroup>
                   <InputGroupAddon addonType="prepend">
-                    <Button type="button" color="primary"><i className="fa fa-search"></i></Button>
+                    <Button type="submit" color="primary"><i className="fa fa-search"></i></Button>
                   </InputGroupAddon>
-                  <Input type="text" id="input1-group1" name="input1-group1" placeholder="Find a player or team" />
+                  <Input onChange={this.updateSearch} value={this.state.search} type="text" placeholder="Find a player or team" />
                 </InputGroup>
-            </FormGroup>
+              </FormGroup>
+            </form>
+          </Col>
+        </Row>
+
+        <Row>
+          
+          {/* <Col xs="12" sm="6" lg="3">
+             <Card className="text-white ">
+              <CardBody >
+                <img src='https://resources.premierleague.com/premierleague/photos/players/250x250/p78830.png' width='100%' height='auto' alt="admin@bootstrapmaster.com" />     
+              </CardBody>
+            </Card>
+          </Col> */}
+
+          {/* Player info here */}
+          <Player player={this.state.player} />
+          <Col xs="24" sm="12" lg="6">
+            <Card className="text-black ">
+              <CardBody className="pb-0">
+                <Row>
+                  <Col sm="6">
+                    <div className="callout callout-info">
+                      <small className="text-muted">New Clients</small>
+                      <br />
+                      <strong className="h4">9,123</strong>
+                      <div className="chart-wrapper">
+                        <Line data={makeSparkLineData(0, brandPrimary)} options={sparklineChartOpts} width={100} height={30} />
+                      </div>
+                    </div>
+                  </Col>
+                  <Col sm="6">
+                    <div className="callout callout-danger">
+                      <small className="text-muted">Recurring Clients</small>
+                      <br />
+                      <strong className="h4">22,643</strong>
+                      <div className="chart-wrapper">
+                        <Line data={makeSparkLineData(1, brandDanger)} options={sparklineChartOpts} width={100} height={30} />
+                      </div>
+                    </div>
+                  </Col>
+                </Row>
+              </CardBody>
+            </Card>
+          
+            {/* <Player player={this.state.player} /> */}
+            {/* https://resources.premierleague.com/premierleague/photos/players/250x250/p78830.png */}
+            {/* <Card className="text-white bg-info">
+              <CardBody className="pb-0">
+                <ButtonGroup className="float-right">
+                  <ButtonDropdown id='card1' isOpen={this.state.card1} toggle={() => { this.setState({ card1: !this.state.card1 }); }}>
+                    <DropdownToggle caret className="p-0" color="transparent">
+                      <i className="icon-settings"></i>
+                    </DropdownToggle>
+                    <DropdownMenu right>
+                      <DropdownItem>Action</DropdownItem>
+                      <DropdownItem>Another action</DropdownItem>
+                      <DropdownItem disabled>Disabled action</DropdownItem>
+                      <DropdownItem>Something else here</DropdownItem>
+                    </DropdownMenu>
+                  </ButtonDropdown>
+                </ButtonGroup>
+                <div className="text-value">9.823</div>
+                <div>Members online</div>
+              </CardBody>
+              <div className="chart-wrapper mx-3" style={{ height: '70px' }}>
+                <Line data={cardChartData2} options={cardChartOpts2} height={70} />
+              </div>
+            </Card> */}
           </Col>
         </Row>
         <Row>
           <Col xs="12" sm="6" lg="3">
-            <Player player={this.state.player} />
+            {/* <Player player={this.state.player} /> */}
+            {/* https://resources.premierleague.com/premierleague/photos/players/250x250/p78830.png */}
             {/* <Card className="text-white bg-info">
               <CardBody className="pb-0">
                 <ButtonGroup className="float-right">
